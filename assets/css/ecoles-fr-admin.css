@@ -1,0 +1,21 @@
+/* Admin styles for Gravity Forms French Schools field */
+
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-field label {
+    display: none !important;
+}
+
+.gf-ecoles-fr-wrapper > span.gf-ecoles-fr-field {
+    display: block !important;
+    margin-bottom: 10px !important;
+}
+
+.gf-ecoles-fr-wrapper select,
+.gf-ecoles-fr-wrapper input[type="text"] {
+    margin-bottom: 10px !important;
+    color: #6b7280 !important;
+}
+
+.gf-ecoles-fr-wrapper input[type="text"]::placeholder {
+    color: #6b7280 !important;
+    opacity: 1;
+}
