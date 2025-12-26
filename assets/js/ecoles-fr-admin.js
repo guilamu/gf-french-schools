@@ -28,6 +28,23 @@
         $('#ecoles_fr_hide_colleges_lycees').prop('checked', field.hideCollegesLycees === true);
     });
 
+    // Persist setting changes without inline handlers.
+    $(document).on('change', '.ecoles-fr-setting', function () {
+        var setting = $(this).data('setting');
+        if (!setting) {
+            return;
+        }
+
+        var value;
+        if ($(this).is(':checkbox')) {
+            value = $(this).is(':checked');
+        } else {
+            value = $(this).val();
+        }
+
+        SetFieldProperty(setting, value);
+    });
+
     // Custom field title in the editor
     if (typeof gform !== 'undefined' && gform.addFilter) {
         gform.addFilter('gform_form_editor_can_field_be_added', function (canBeAdded, type) {

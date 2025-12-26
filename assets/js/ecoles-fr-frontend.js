@@ -9,8 +9,19 @@
 (function ($) {
     'use strict';
 
+    // Timing configuration (overridable via localized data).
+    var TIMINGS = $.extend({
+        debounce: 300,
+        ajaxTimeout: 15000,
+        retryLimit: 2,
+        retryDelay: 700,
+    }, (window.gfEcolesFR && gfEcolesFR.timings) ? gfEcolesFR.timings : {});
+
     /**
      * Debounce function to limit API calls.
+     * @param {Function} func
+     * @param {number} wait
+     * @returns {Function}
      */
     function debounce(func, wait) {
         var timeout;
@@ -65,6 +76,7 @@
         $('.gf-ecoles-fr-wrapper').each(function () {
             var $wrapper = $(this);
             var fieldId = $wrapper.data('field-id');
+            var formId = $wrapper.data('form-id');
 
             if ($wrapper.data('initialized')) {
                 return;
@@ -90,6 +102,10 @@
 
             var selectedVille = '';
             var schoolsData = [];
+            var activeVilleRequest = null;
+            var activeEcoleRequest = null;
+            var lastVilleParams = '';
+            var lastEcoleParams = '';
 
             // If both statut and departement are preselected, enable ville field
             if (preselectedStatut && preselectedDepartement) {
@@ -153,7 +169,7 @@
                 }
 
                 searchVilles(query);
-            }, 300));
+            }, TIMINGS.debounce));
 
             // Ville focus out - hide results after delay
             $ville.on('blur', function () {
@@ -172,7 +188,7 @@
                 }
 
                 searchEcoles(query);
-            }, 300));
+            }, TIMINGS.debounce));
 
             // École focus out - hide results after delay
             $ecole.on('blur', function () {
@@ -184,31 +200,61 @@
             /**
              * Search for cities via AJAX.
              */
-            function searchVilles(query) {
+            function searchVilles(query, retryCount) {
+                retryCount = retryCount || 0;
+
+                var params = {
+                    action: 'gf_ecoles_fr_search',
+                    nonce: gfEcolesFR.nonce,
+                    form_id: formId,
+                    search_type: 'villes',
+                    statut: $statut.val(),
+                    departement: $departement.val(),
+                    query: query,
+                    hide_ecoles: hideEcoles ? 'true' : 'false',
+                    hide_colleges_lycees: hideCollegesLycees ? 'true' : 'false'
+                };
+
+                var paramsKey = JSON.stringify(params);
+                if (paramsKey === lastVilleParams && $villeResults.is(':visible')) {
+                    return;
+                }
+                lastVilleParams = paramsKey;
+
+                if (activeVilleRequest) {
+                    activeVilleRequest.abort();
+                }
+
                 $villeResults.html('<div class="gf-ecoles-fr-loading">' + (gfEcolesFR.i18n.searching || 'Searching...') + '</div>').show();
 
-                $.ajax({
+                activeVilleRequest = $.ajax({
                     url: gfEcolesFR.ajaxUrl,
                     type: 'POST',
-                    data: {
-                        action: 'gf_ecoles_fr_search',
-                        nonce: gfEcolesFR.nonce,
-                        search_type: 'villes',
-                        statut: $statut.val(),
-                        departement: $departement.val(),
-                        query: query,
-                        hide_ecoles: hideEcoles ? 'true' : 'false',
-                        hide_colleges_lycees: hideCollegesLycees ? 'true' : 'false'
-                    },
+                    timeout: TIMINGS.ajaxTimeout,
+                    data: params,
                     success: function (response) {
+                        activeVilleRequest = null;
                         if (response.success && response.data.length > 0) {
                             displayVilleResults(response.data);
                         } else {
                             $villeResults.html('<div class="gf-ecoles-fr-no-results">' + (gfEcolesFR.i18n.noResults || 'No results found') + '</div>');
                         }
                     },
-                    error: function () {
-                        $villeResults.html('<div class="gf-ecoles-fr-error">Error loading results</div>');
+                    error: function (jqXHR, textStatus) {
+                        activeVilleRequest = null;
+
+                        if (textStatus === 'abort') {
+                            return;
+                        }
+
+                        if (retryCount < TIMINGS.retryLimit && (textStatus === 'timeout' || jqXHR.status >= 500)) {
+                            setTimeout(function () {
+                                searchVilles(query, retryCount + 1);
+                            }, TIMINGS.retryDelay * (retryCount + 1));
+                            return;
+                        }
+
+                        $villeResults.html('<div class="gf-ecoles-fr-error">' + (gfEcolesFR.i18n.errorLoading || 'Error loading results') + '</div>');
                     }
                 });
             }
@@ -242,24 +288,41 @@
             /**
              * Search for schools via AJAX.
              */
-            function searchEcoles(query) {
+            function searchEcoles(query, retryCount) {
+                retryCount = retryCount || 0;
+
+                var params = {
+                    action: 'gf_ecoles_fr_search',
+                    nonce: gfEcolesFR.nonce,
+                    form_id: formId,
+                    search_type: 'ecoles',
+                    statut: $statut.val(),
+                    departement: $departement.val(),
+                    ville: selectedVille,
+                    query: query,
+                    hide_ecoles: hideEcoles ? 'true' : 'false',
+                    hide_colleges_lycees: hideCollegesLycees ? 'true' : 'false'
+                };
+
+                var paramsKey = JSON.stringify(params);
+                if (paramsKey === lastEcoleParams && $ecoleResults.is(':visible')) {
+                    return;
+                }
+                lastEcoleParams = paramsKey;
+
+                if (activeEcoleRequest) {
+                    activeEcoleRequest.abort();
+                }
+
                 $ecoleResults.html('<div class="gf-ecoles-fr-loading">' + (gfEcolesFR.i18n.searching || 'Searching...') + '</div>').show();
 
-                $.ajax({
+                activeEcoleRequest = $.ajax({
                     url: gfEcolesFR.ajaxUrl,
                     type: 'POST',
-                    data: {
-                        action: 'gf_ecoles_fr_search',
-                        nonce: gfEcolesFR.nonce,
-                        search_type: 'ecoles',
-                        statut: $statut.val(),
-                        departement: $departement.val(),
-                        ville: selectedVille,
-                        query: query,
-                        hide_ecoles: hideEcoles ? 'true' : 'false',
-                        hide_colleges_lycees: hideCollegesLycees ? 'true' : 'false'
-                    },
+                    timeout: TIMINGS.ajaxTimeout,
+                    data: params,
                     success: function (response) {
+                        activeEcoleRequest = null;
                         if (response.success && response.data.length > 0) {
                             schoolsData = response.data;
                             displayEcoleResults(response.data);
@@ -268,8 +331,21 @@
                             $ecoleResults.html('<div class="gf-ecoles-fr-no-results">' + (gfEcolesFR.i18n.noResults || 'No results found') + '</div>');
                         }
                     },
-                    error: function () {
-                        $ecoleResults.html('<div class="gf-ecoles-fr-error">Error loading results</div>');
+                    error: function (jqXHR, textStatus) {
+                        activeEcoleRequest = null;
+
+                        if (textStatus === 'abort') {
+                            return;
+                        }
+
+                        if (retryCount < TIMINGS.retryLimit && (textStatus === 'timeout' || jqXHR.status >= 500)) {
+                            setTimeout(function () {
+                                searchEcoles(query, retryCount + 1);
+                            }, TIMINGS.retryDelay * (retryCount + 1));
+                            return;
+                        }
+
+                        $ecoleResults.html('<div class="gf-ecoles-fr-error">' + (gfEcolesFR.i18n.errorLoading || 'Error loading results') + '</div>');
                     }
                 });
             }
