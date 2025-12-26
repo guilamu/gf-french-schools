@@ -158,3 +158,60 @@ function gf_french_schools_plugin_info($res, $action, $args)
 
     return $res;
 }
+
+/**
+ * Fix the folder name after GitHub zip extraction.
+ * 
+ * GitHub zipball contains a folder named "username-repo-hash" which breaks
+ * WordPress plugin updates. This filter renames it to the correct folder name.
+ */
+add_filter('upgrader_source_selection', 'gf_french_schools_fix_folder_name', 10, 4);
+
+/**
+ * Rename the extracted folder to match the expected plugin folder name.
+ *
+ * @param string      $source        File source location.
+ * @param string      $remote_source Remote file source location.
+ * @param WP_Upgrader $upgrader      WP_Upgrader instance.
+ * @param array       $hook_extra    Extra arguments passed to hooked filters.
+ * @return string|WP_Error The corrected source path or WP_Error on failure.
+ */
+function gf_french_schools_fix_folder_name($source, $remote_source, $upgrader, $hook_extra)
+{
+    global $wp_filesystem;
+
+    // Only process plugin updates
+    if (!isset($hook_extra['plugin'])) {
+        return $source;
+    }
+
+    // Check if this is our plugin
+    if ($hook_extra['plugin'] !== 'gf-french-schools/gf-french-schools.php') {
+        return $source;
+    }
+
+    // Expected folder name
+    $correct_folder = 'gf-french-schools';
+
+    // Get the current folder name from source path
+    $source_folder = basename(untrailingslashit($source));
+
+    // If already correct, no action needed
+    if ($source_folder === $correct_folder) {
+        return $source;
+    }
+
+    // Build new source path with correct folder name
+    $new_source = trailingslashit($remote_source) . $correct_folder . '/';
+
+    // Rename the folder
+    if ($wp_filesystem->move($source, $new_source)) {
+        return $new_source;
+    }
+
+    // If rename failed, return error
+    return new WP_Error(
+        'rename_failed',
+        __('Unable to rename the update folder.', 'gf-french-schools')
+    );
+}
