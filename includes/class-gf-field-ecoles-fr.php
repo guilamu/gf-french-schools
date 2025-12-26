@@ -649,22 +649,6 @@ class GF_Field_Ecoles_FR extends GF_Field
         return sprintf('%s (%s)', $data['nom'] ?? '', $data['identifiant'] ?? '');
     }
 }
-
-/**
- * Register merge tag filter.
- */
-add_filter('gform_merge_tag_filter', 'gf_french_schools_merge_tag_filter', 10, 6);
-
-function gf_french_schools_merge_tag_filter($value, $merge_tag, $modifier, $field, $raw_value, $format)
-{
-    if (!$field instanceof GF_Field_Ecoles_FR) {
-        return $value;
-    }
-
-    // The field's get_value_merge_tag handles the logic
-    return $value;
-}
-
 /**
  * Add custom merge tags to the merge tag dropdown.
  */
