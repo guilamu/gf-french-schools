@@ -129,3 +129,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 - [Gravity Forms](https://www.gravityforms.com/) pour leur excellent framework de formulaires
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
+
+## Change Log
+
+### Version 1.0.3 - 2025-12-26
+- 🎉 Version initiale
+
