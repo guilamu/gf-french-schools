@@ -1,0 +1,206 @@
+# French translations for Gravity Forms - French Schools plugin.
+# Copyright (C) 2024 Guilamu
+# This file is distributed under the AGPL-3.0.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Gravity Forms - French Schools 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
+"POT-Creation-Date: 2024-12-26T10:15:00+01:00\n"
+"PO-Revision-Date: 2025-12-26 18:08+0100\n"
+"Last-Translator: Guilamu <guilamu@gmail.com>\n"
+"Language-Team: French <guilamu@gmail.com>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.8\n"
+
+#: gf-french-schools.php
+msgid "Preselection Settings"
+msgstr "Paramètres de présélection"
+
+#: gf-french-schools.php
+msgid "Preselected Status"
+msgstr "Statut présélectionné"
+
+#: gf-french-schools.php
+msgid "Preselected Department"
+msgstr "Département présélectionné"
+
+#: gf-french-schools.php
+msgid "-- None --"
+msgstr "-- Aucun --"
+
+#: gf-french-schools.php
+msgid "Preselected fields will be hidden from users on the frontend."
+msgstr "Les champs présélectionnés seront masqués pour les utilisateurs."
+
+#: gf-french-schools.php
+msgid "Set default values for Status and Department. When a value is preselected, the corresponding field will be hidden from users on the form."
+msgstr "Définir des valeurs par défaut pour le Statut et le Département. Lorsqu'une valeur est présélectionnée, le champ correspondant sera masqué aux utilisateurs du formulaire."
+
+#: gf-french-schools.php
+msgid "-- Select status first --"
+msgstr "-- Sélectionnez d'abord le statut --"
+
+#: gf-french-schools.php
+msgid "-- Select department first --"
+msgstr "-- Sélectionnez d'abord le département --"
+
+#: gf-french-schools.php
+msgid "-- Select city first --"
+msgstr "-- Sélectionnez d'abord la ville --"
+
+#: gf-french-schools.php
+msgid "No results found"
+msgstr "Aucun résultat trouvé"
+
+#: gf-french-schools.php
+msgid "Searching..."
+msgstr "Recherche en cours..."
+
+#: gf-french-schools.php
+msgid "Type at least 2 characters"
+msgstr "Saisissez au moins 2 caractères"
+
+#: gf-french-schools.php
+msgid "Invalid search type"
+msgstr "Type de recherche invalide"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "French Schools"
+msgstr "Écoles françaises"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Allows users to search and select a French educational institution."
+msgstr "Permet aux utilisateurs de rechercher et de sélectionner un établissement scolaire français."
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Status"
+msgstr "Statut"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "-- Select --"
+msgstr "-- Sélectionner --"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Public"
+msgstr "Public"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Private"
+msgstr "Privé"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School status"
+msgstr "Statut de l'établissement"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Department"
+msgstr "Département"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "City"
+msgstr "Ville"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Start typing city name..."
+msgstr "Commencez à saisir le nom de la ville..."
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School"
+msgstr "École"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Start typing school name..."
+msgstr "Commencez à saisir le nom de l'école..."
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Selected School Information"
+msgstr "Informations sur l'établissement sélectionné"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "ID"
+msgstr "Identifiant"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Name"
+msgstr "Nom"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Type"
+msgstr "Type"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Category"
+msgstr "Catégorie"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Address"
+msgstr "Adresse"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Postal Code"
+msgstr "Code postal"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Phone"
+msgstr "Téléphone"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Email"
+msgstr "E-mail"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Priority Education"
+msgstr "Éducation prioritaire"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "No"
+msgstr "Non"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "This field is required. Please select a school."
+msgstr "Ce champ est obligatoire. Veuillez sélectionner un établissement."
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School ID"
+msgstr "Identifiant de l'établissement"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School Name"
+msgstr "Nom de l'établissement"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School Type"
+msgstr "Type d'établissement"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School Category"
+msgstr "Catégorie d'établissement"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "All Information"
+msgstr "Toutes les informations"
+
+#: includes/class-ecoles-api-service.php
+msgid "API request failed with status code %d"
+msgstr "La requête API a échoué avec le code de statut %d"
+
+#: includes/class-ecoles-api-service.php
+msgid "Failed to parse API response"
+msgstr "Échec de l'analyse de la réponse API"
+
+#: gf-french-schools.php
+msgid "School Type Filters"
+msgstr "Filtres par type d'établissement"
+
+#: gf-french-schools.php
+msgid "Hide primary schools (Ecoles)"
+msgstr "Masquer les écoles primaires (Écoles)"
+
+#: gf-french-schools.php
+msgid "Hide middle and high schools (Collèges and Lycées)"
+msgstr "Masquer les collèges et lycées"
