@@ -1,0 +1,163 @@
+# Copyright (C) 2024 Guilamu
+# This file is distributed under the AGPL-3.0.
+msgid ""
+msgstr ""
+"Project-Id-Version: Gravity Forms - French Schools 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
+"POT-Creation-Date: 2024-12-26T07:40:00+01:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: gf-french-schools.php
+msgid "-- Select status first --"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "-- Select department first --"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "-- Select city first --"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "No results found"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Searching..."
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Type at least 2 characters"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Invalid search type"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "French Schools"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Allows users to search and select a French educational institution."
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Status"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "-- Select --"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Public"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Private"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School status"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Department"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "City"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Start typing city name..."
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Start typing school name..."
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Selected School Information"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "ID"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Name"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Type"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Category"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Address"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Postal Code"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Phone"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Email"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Priority Education"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "This field is required. Please select a school."
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School ID"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School Name"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School Type"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "School Category"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "All Information"
+msgstr ""
+
+#: includes/class-ecoles-api-service.php
+msgid "API request failed with status code %d"
+msgstr ""
+
+#: includes/class-ecoles-api-service.php
+msgid "Failed to parse API response"
+msgstr ""
