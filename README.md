@@ -134,6 +134,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.1.0 - 2025-12-27
+- 🔒 Durcissement de la sécurité : validation du formulaire côté AJAX, whitelists statut/département, limite de requêtes filtrable
+- 🌐 Requêtes frontend plus robustes : annulation des appels en cours, déduplication, timeouts configurables et retries avec backoff
+- 🛠️ Vérification de version minimale Gravity Forms et messages d'erreur plus clairs
+- 📦 Updater GitHub plus résilient (fallback copy/delete, logs en debug)
+- 🎨 CSS admin extrait dans un fichier dédié (plus d'inline styles)
+
 ### Version 1.0.4 - 2025-12-26
 - ⚡ Amélioration des performances : le CSS pour les champs présélectionnés n'est plus chargé sur toutes les pages
 - 🔒 Ajout d'une limite de requêtes (rate limiting) sur l'endpoint AJAX

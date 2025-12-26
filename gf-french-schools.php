@@ -37,6 +37,21 @@ function gf_french_schools_init()
         return;
     }
 
+    // Enforce minimum Gravity Forms version for compatibility.
+    $min_version = '2.5';
+    if (empty(GFForms::$version) || version_compare(GFForms::$version, $min_version, '<')) {
+        add_action('admin_notices', static function () use ($min_version) {
+            printf(
+                '<div class="notice notice-error"><p>%s</p></div>',
+                sprintf(
+                    esc_html__('Gravity Forms - French Schools requires Gravity Forms %s or higher.', 'gf-french-schools'),
+                    esc_html($min_version)
+                )
+            );
+        });
+        return;
+    }
+
     require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-ecoles-api-service.php';
     require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-gf-field-ecoles-fr.php';
 
@@ -135,6 +150,13 @@ add_action('gform_editor_js', 'gf_french_schools_editor_js');
 
 function gf_french_schools_editor_js()
 {
+    wp_enqueue_style(
+        'gf-ecoles-fr-admin-css',
+        GF_FRENCH_SCHOOLS_URL . 'assets/css/ecoles-fr-admin.css',
+        array(),
+        GF_FRENCH_SCHOOLS_VERSION
+    );
+
     wp_enqueue_script(
         'gf-ecoles-fr-admin',
         GF_FRENCH_SCHOOLS_URL . 'assets/js/ecoles-fr-admin.js',
@@ -157,25 +179,6 @@ function gf_french_schools_editor_js()
         ),
     ));
 
-    // Add admin CSS to hide field labels and add spacing in the form editor
-    echo '<style type="text/css">
-        .gf-ecoles-fr-wrapper .gf-ecoles-fr-field label {
-            display: none !important;
-        }
-        .gf-ecoles-fr-wrapper > span.gf-ecoles-fr-field {
-            display: block !important;
-            margin-bottom: 10px !important;
-        }
-        .gf-ecoles-fr-wrapper select,
-        .gf-ecoles-fr-wrapper input[type="text"] {
-            margin-bottom: 10px !important;
-            color: #6b7280 !important;
-        }
-        .gf-ecoles-fr-wrapper input[type="text"]::placeholder {
-            color: #6b7280 !important;
-            opacity: 1;
-        }
-    </style>';
 }
 
 /**
@@ -198,7 +201,7 @@ function gf_french_schools_field_settings($position, $form_id)
                 <label for="ecoles_fr_preselected_statut" style="display: block; margin-bottom: 5px;">
                     <?php esc_html_e('Preselected Status', 'gf-french-schools'); ?>
                 </label>
-                <select id="ecoles_fr_preselected_statut" onchange="SetFieldProperty('preselectedStatut', this.value);"
+                <select id="ecoles_fr_preselected_statut" class="ecoles-fr-setting" data-setting="preselectedStatut"
                     style="width: 100%;">
                     <option value=""><?php esc_html_e('-- None --', 'gf-french-schools'); ?></option>
                     <option value="Public"><?php esc_html_e('Public', 'gf-french-schools'); ?></option>
@@ -210,8 +213,7 @@ function gf_french_schools_field_settings($position, $form_id)
                 <label for="ecoles_fr_preselected_departement" style="display: block; margin-bottom: 5px;">
                     <?php esc_html_e('Preselected Department', 'gf-french-schools'); ?>
                 </label>
-                <select id="ecoles_fr_preselected_departement"
-                    onchange="SetFieldProperty('preselectedDepartement', this.value);" style="width: 100%;">
+                <select id="ecoles_fr_preselected_departement" class="ecoles-fr-setting" data-setting="preselectedDepartement" style="width: 100%;">
                     <option value=""><?php esc_html_e('-- None --', 'gf-french-schools'); ?></option>
                     <?php foreach (GF_Field_Ecoles_FR::get_departements() as $dept): ?>
                         <option value="<?php echo esc_attr($dept); ?>"><?php echo esc_html($dept); ?></option>
@@ -228,15 +230,14 @@ function gf_french_schools_field_settings($position, $form_id)
             </label>
 
             <div style="margin-bottom: 10px;">
-                <input type="checkbox" id="ecoles_fr_hide_ecoles" onclick="SetFieldProperty('hideEcoles', this.checked);" />
+                <input type="checkbox" id="ecoles_fr_hide_ecoles" class="ecoles-fr-setting" data-setting="hideEcoles" />
                 <label for="ecoles_fr_hide_ecoles" style="display: inline;">
                     <?php esc_html_e('Hide primary schools (Ecoles)', 'gf-french-schools'); ?>
                 </label>
             </div>
 
             <div style="margin-bottom: 10px;">
-                <input type="checkbox" id="ecoles_fr_hide_colleges_lycees"
-                    onclick="SetFieldProperty('hideCollegesLycees', this.checked);" />
+                <input type="checkbox" id="ecoles_fr_hide_colleges_lycees" class="ecoles-fr-setting" data-setting="hideCollegesLycees" />
                 <label for="ecoles_fr_hide_colleges_lycees" style="display: inline;">
                     <?php esc_html_e('Hide middle and high schools (Collèges and Lycées)', 'gf-french-schools'); ?>
                 </label>
@@ -296,9 +297,20 @@ function gf_french_schools_enqueue_scripts($form, $is_ajax)
         true
     );
 
+    $timings = apply_filters(
+        'gf_french_schools_timings',
+        array(
+            'debounce' => 300,
+            'ajaxTimeout' => 15000,
+            'retryLimit' => 2,
+            'retryDelay' => 700,
+        )
+    );
+
     wp_localize_script('gf-ecoles-fr-frontend', 'gfEcolesFR', array(
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('gf_ecoles_fr_nonce'),
+        'timings' => $timings,
         'i18n' => array(
             'selectStatut' => __('-- Select status first --', 'gf-french-schools'),
             'selectDepartement' => __('-- Select department first --', 'gf-french-schools'),
@@ -306,8 +318,48 @@ function gf_french_schools_enqueue_scripts($form, $is_ajax)
             'noResults' => __('No results found', 'gf-french-schools'),
             'searching' => __('Searching...', 'gf-french-schools'),
             'minChars' => __('Type at least 2 characters', 'gf-french-schools'),
+            'errorLoading' => __('Error loading results. Please try again.', 'gf-french-schools'),
         ),
     ));
+}
+
+/**
+ * Resolve client IP with proxy awareness.
+ *
+ * @return string
+ */
+function gf_french_schools_get_client_ip()
+{
+    $headers = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR');
+
+    foreach ($headers as $header) {
+        if (!empty($_SERVER[$header])) {
+            $ip = sanitize_text_field(wp_unslash($_SERVER[$header]));
+
+            if (strpos($ip, ',') !== false) {
+                $parts = explode(',', $ip);
+                $ip = trim($parts[0]);
+            }
+
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+    }
+
+    return 'unknown';
+}
+
+/**
+ * Build a rate-limit key based on user/session and IP.
+ *
+ * @return string
+ */
+function gf_french_schools_get_rate_key()
+{
+    $identifier = is_user_logged_in() ? 'user_' . get_current_user_id() : 'visitor_' . gf_french_schools_get_client_ip();
+
+    return 'gf_ecoles_rate_' . md5($identifier);
 }
 
 /**
@@ -318,40 +370,77 @@ add_action('wp_ajax_nopriv_gf_ecoles_fr_search', 'gf_french_schools_ajax_search'
 
 function gf_french_schools_ajax_search()
 {
-    check_ajax_referer('gf_ecoles_fr_nonce', 'nonce');
+    if (!check_ajax_referer('gf_ecoles_fr_nonce', 'nonce', false)) {
+        wp_send_json_error(array('message' => __('Security check failed.', 'gf-french-schools')));
+        return;
+    }
 
-    // Simple rate limiting (30 requests per minute per IP)
-    $rate_key = 'gf_ecoles_rate_' . md5(sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown')));
+    // Require a valid form context for all requests.
+    $form_id = isset($_POST['form_id']) ? absint(wp_unslash($_POST['form_id'])) : 0;
+    $form = $form_id ? GFAPI::get_form($form_id) : false;
+    if (!$form) {
+        wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
+        return;
+    }
+
+    // Simple rate limiting (filterable).
+    $rate_limit = (int) apply_filters('gf_french_schools_rate_limit', 30);
+    $rate_window = (int) apply_filters('gf_french_schools_rate_window', MINUTE_IN_SECONDS);
+    $rate_key = gf_french_schools_get_rate_key();
     $rate_count = (int) get_transient($rate_key);
-    if ($rate_count > 30) {
+    if ($rate_count >= $rate_limit) {
         wp_send_json_error(array('message' => __('Too many requests. Please wait a moment.', 'gf-french-schools')));
         return;
     }
-    set_transient($rate_key, $rate_count + 1, MINUTE_IN_SECONDS);
+    set_transient($rate_key, $rate_count + 1, $rate_window);
 
-    $search_type = sanitize_text_field(wp_unslash($_POST['search_type'] ?? ''));
+    // Sanitize and validate input.
+    $allowed_types = array('villes', 'ecoles');
+    $search_type = sanitize_key(wp_unslash($_POST['search_type'] ?? ''));
+    if (!in_array($search_type, $allowed_types, true)) {
+        wp_send_json_error(array('message' => __('Invalid search type', 'gf-french-schools')));
+        return;
+    }
+
     $statut = sanitize_text_field(wp_unslash($_POST['statut'] ?? ''));
+    $valid_statuses = array('Public', 'Privé');
+    if (!in_array($statut, $valid_statuses, true)) {
+        wp_send_json_error(array('message' => __('Invalid status.', 'gf-french-schools')));
+        return;
+    }
+
     $departement = sanitize_text_field(wp_unslash($_POST['departement'] ?? ''));
+    if (!in_array($departement, GF_Field_Ecoles_FR::get_departements(), true)) {
+        wp_send_json_error(array('message' => __('Invalid department.', 'gf-french-schools')));
+        return;
+    }
+
     $ville = sanitize_text_field(wp_unslash($_POST['ville'] ?? ''));
     $query = sanitize_text_field(wp_unslash($_POST['query'] ?? ''));
 
     // Get school type filter settings
-    $hide_ecoles = isset($_POST['hide_ecoles']) && $_POST['hide_ecoles'] === 'true';
-    $hide_colleges_lycees = isset($_POST['hide_colleges_lycees']) && $_POST['hide_colleges_lycees'] === 'true';
+    $hide_ecoles = filter_var(wp_unslash($_POST['hide_ecoles'] ?? false), FILTER_VALIDATE_BOOLEAN);
+    $hide_colleges_lycees = filter_var(wp_unslash($_POST['hide_colleges_lycees'] ?? false), FILTER_VALIDATE_BOOLEAN);
 
     $api_service = new GF_Ecoles_API_Service();
     $results = array();
 
+    if (strlen($query) < 2) {
+        wp_send_json_error(array('message' => __('Type at least 2 characters', 'gf-french-schools')));
+        return;
+    }
+
     switch ($search_type) {
         case 'villes':
-            $results = $api_service->get_villes($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+            $results = $api_service->search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
             break;
         case 'ecoles':
-            $results = $api_service->get_ecoles($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            if (empty($ville)) {
+                wp_send_json_error(array('message' => __('City is required.', 'gf-french-schools')));
+                return;
+            }
+            $results = $api_service->search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
             break;
-        default:
-            wp_send_json_error(array('message' => __('Invalid search type', 'gf-french-schools')));
-            return;
     }
 
     if (is_wp_error($results)) {
