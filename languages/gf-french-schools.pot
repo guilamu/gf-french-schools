@@ -2,9 +2,9 @@
 # This file is distributed under the AGPL-3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.0.0\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.0.4\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
-"POT-Creation-Date: 2024-12-26T07:40:00+01:00\n"
+"POT-Creation-Date: 2024-12-26T21:30:00+01:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -42,6 +42,54 @@ msgstr ""
 msgid "Invalid search type"
 msgstr ""
 
+#: gf-french-schools.php
+msgid "Too many requests. Please wait a moment."
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Preselection Settings"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Preselected Status"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Preselected Department"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "-- None --"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Public"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Private"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Preselected fields will be hidden from users on the frontend."
+msgstr ""
+
+#: gf-french-schools.php
+msgid "School Type Filters"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Hide primary schools (Ecoles)"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Hide middle and high schools (Collèges and Lycées)"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Set default values for Status and Department. When a value is preselected, the corresponding field will be hidden from users on the form."
+msgstr ""
+
 #: includes/class-gf-field-ecoles-fr.php
 msgid "French Schools"
 msgstr ""
@@ -56,14 +104,6 @@ msgstr ""
 
 #: includes/class-gf-field-ecoles-fr.php
 msgid "-- Select --"
-msgstr ""
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Public"
-msgstr ""
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Private"
 msgstr ""
 
 #: includes/class-gf-field-ecoles-fr.php
@@ -131,6 +171,10 @@ msgid "Priority Education"
 msgstr ""
 
 #: includes/class-gf-field-ecoles-fr.php
+msgid "No"
+msgstr ""
+
+#: includes/class-gf-field-ecoles-fr.php
 msgid "This field is required. Please select a school."
 msgstr ""
 
@@ -160,4 +204,8 @@ msgstr ""
 
 #: includes/class-ecoles-api-service.php
 msgid "Failed to parse API response"
+msgstr ""
+
+#: includes/class-github-updater.php
+msgid "Unable to rename the update folder."
 msgstr ""
