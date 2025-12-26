@@ -134,7 +134,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.0.4 - 2025-12-26
+- ⚡ Amélioration des performances : le CSS pour les champs présélectionnés n'est plus chargé sur toutes les pages
+- 🔒 Ajout d'une limite de requêtes (rate limiting) sur l'endpoint AJAX
+- 🔧 Refactorisation du module de mise à jour GitHub avec mise en cache des requêtes API
+- 🧹 Suppression du code mort (filtre de merge tag inutilisé)
+- 🎨 Amélioration du contraste visuel entre les champs activés et désactivés
+- 🌐 Mise à jour des fichiers de traduction
+
 ### Version 1.0.3 - 2025-12-26
 - 🎉 Version initiale
-
-

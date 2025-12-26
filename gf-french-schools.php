@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Adds a "French Schools" field type to Gravity Forms allowing users to search and select French educational institutions via the Education Ministry API.
- * Version: 1.0.3
+ * Version: 1.0.4
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.0.0');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.0.4');
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
 
@@ -58,56 +58,74 @@ function gf_french_schools_load_textdomain()
 }
 
 /**
- * Output dynamic CSS to hide preselected fields.
- * This follows the same pattern as gf-chained-select-enhancer.
+ * Collect CSS rules for preselected fields during form rendering.
+ * This is more performant than loading all forms on every page.
  */
-add_action('wp_head', 'gf_french_schools_output_hide_preselected_css');
+add_filter('gform_pre_render', 'gf_french_schools_collect_hide_css', 10, 1);
 
-function gf_french_schools_output_hide_preselected_css()
+/**
+ * Collect CSS rules from forms being rendered.
+ *
+ * @param array $form The form object.
+ * @return array The form object.
+ */
+function gf_french_schools_collect_hide_css($form)
 {
-    if (!class_exists('GFAPI')) {
-        return;
+    global $gf_french_schools_css_rules;
+
+    if (!isset($gf_french_schools_css_rules)) {
+        $gf_french_schools_css_rules = array();
     }
 
-    $forms = GFAPI::get_forms();
-    $css_rules = array();
+    if (!isset($form['fields']) || !is_array($form['fields'])) {
+        return $form;
+    }
 
-    foreach ($forms as $form) {
-        if (!isset($form['fields']) || !is_array($form['fields'])) {
+    foreach ($form['fields'] as $field) {
+        if ('ecoles_fr' !== $field->type) {
             continue;
         }
 
-        foreach ($form['fields'] as $field) {
-            if ($field->type !== 'ecoles_fr') {
-                continue;
-            }
+        $form_id = absint($form['id']);
+        $field_id = absint($field->id);
 
-            $form_id = $form['id'];
-            $field_id = $field->id;
+        // Hide Status field if preselected
+        if (!empty($field->preselectedStatut)) {
+            $gf_french_schools_css_rules[] = sprintf(
+                '#input_%d_%d_container .gf-ecoles-fr-statut-field { display: none !important; }',
+                $form_id,
+                $field_id
+            );
+        }
 
-            // Hide Status field if preselected
-            if (!empty($field->preselectedStatut)) {
-                $css_rules[] = sprintf(
-                    '#input_%d_%d_container .gf-ecoles-fr-statut-field { display: none !important; }',
-                    $form_id,
-                    $field_id
-                );
-            }
-
-            // Hide Department field if preselected
-            if (!empty($field->preselectedDepartement)) {
-                $css_rules[] = sprintf(
-                    '#input_%d_%d_container .gf-ecoles-fr-departement-field { display: none !important; }',
-                    $form_id,
-                    $field_id
-                );
-            }
+        // Hide Department field if preselected
+        if (!empty($field->preselectedDepartement)) {
+            $gf_french_schools_css_rules[] = sprintf(
+                '#input_%d_%d_container .gf-ecoles-fr-departement-field { display: none !important; }',
+                $form_id,
+                $field_id
+            );
         }
     }
 
-    if (!empty($css_rules)) {
-        echo '<style type="text/css">' . implode(' ', $css_rules) . '</style>';
+    return $form;
+}
+
+/**
+ * Output collected CSS rules in footer.
+ */
+add_action('wp_footer', 'gf_french_schools_output_hide_preselected_css', 20);
+
+function gf_french_schools_output_hide_preselected_css()
+{
+    global $gf_french_schools_css_rules;
+
+    if (empty($gf_french_schools_css_rules)) {
+        return;
     }
+
+    $css = implode(' ', array_unique($gf_french_schools_css_rules));
+    printf('<style type="text/css">%s</style>', wp_strip_all_tags($css));
 }
 
 /**
@@ -302,6 +320,15 @@ function gf_french_schools_ajax_search()
 {
     check_ajax_referer('gf_ecoles_fr_nonce', 'nonce');
 
+    // Simple rate limiting (30 requests per minute per IP)
+    $rate_key = 'gf_ecoles_rate_' . md5(sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown')));
+    $rate_count = (int) get_transient($rate_key);
+    if ($rate_count > 30) {
+        wp_send_json_error(array('message' => __('Too many requests. Please wait a moment.', 'gf-french-schools')));
+        return;
+    }
+    set_transient($rate_key, $rate_count + 1, MINUTE_IN_SECONDS);
+
     $search_type = sanitize_text_field(wp_unslash($_POST['search_type'] ?? ''));
     $statut = sanitize_text_field(wp_unslash($_POST['statut'] ?? ''));
     $departement = sanitize_text_field(wp_unslash($_POST['departement'] ?? ''));
@@ -333,6 +360,3 @@ function gf_french_schools_ajax_search()
         wp_send_json_success($results);
     }
 }
-
-
-
