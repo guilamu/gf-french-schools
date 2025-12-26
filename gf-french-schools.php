@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Adds a "French Schools" field type to Gravity Forms allowing users to search and select French educational institutions via the Education Ministry API.
- * Version: 1.1.O
+ * Version: 1.1.0
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -449,5 +449,6 @@ function gf_french_schools_ajax_search()
         wp_send_json_success($results);
     }
 }
+
 
 
