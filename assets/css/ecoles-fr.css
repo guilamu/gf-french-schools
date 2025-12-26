@@ -1,0 +1,310 @@
+/**
+ * Gravity Forms French Schools - Styles
+ *
+ * @package GF_French_Schools
+ */
+
+/* ==========================================================================
+   Main Container - Always Vertical Layout
+   Following the same pattern as Gravity Forms Chained Selects
+   ========================================================================== */
+
+/* Force vertical display on the main container with row gap like chained select */
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper.ginput_complex,
+.gform_legacy_markup_wrapper.gform_wrapper .gf-ecoles-fr-wrapper.ginput_complex,
+.gf-ecoles-fr-wrapper.ginput_complex,
+.gf-ecoles-fr-wrapper {
+    display: flex !important;
+    flex-direction: column;
+    row-gap: var(--gf-field-gap-y);
+}
+
+/* Force full-width block display on all field spans (except hidden ones) */
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper.ginput_complex>span:not(.gf-ecoles-fr-hidden),
+.gform_legacy_markup_wrapper.gform_wrapper .gf-ecoles-fr-wrapper.ginput_complex>span:not(.gf-ecoles-fr-hidden),
+.gf-ecoles-fr-wrapper>span:not(.gf-ecoles-fr-hidden),
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden) {
+    display: block !important;
+    inline-size: 100% !important;
+    width: 100% !important;
+    padding-block: 0 5px !important;
+    padding-inline: 0 !important;
+    flex: none !important;
+}
+
+/* Hidden fields (preselected values) - matches gf-chained-select-enhancer pattern */
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-hidden {
+    display: none !important;
+}
+
+/* Remove grid layout from gform-grid-row if applied */
+.gf-ecoles-fr-wrapper.gform-grid-row {
+    display: block !important;
+}
+
+/* ==========================================================================
+   Field Labels - Hidden to match chained select style
+   ========================================================================== */
+
+.gf-ecoles-fr-field label,
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-field label,
+.gravity-theme .gf-ecoles-fr-wrapper .gf-ecoles-fr-field label,
+.gform_wrapper .gf-ecoles-fr-wrapper .gf-ecoles-fr-field label,
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper .gf-ecoles-fr-field label,
+.gf-ecoles-fr-wrapper span.gf-ecoles-fr-field>label {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ==========================================================================
+   Select and Input Styling
+   ========================================================================== */
+
+.gf-ecoles-fr-wrapper select,
+.gf-ecoles-fr-wrapper input[type="text"] {
+    width: 100%;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border: 1px solid #d0d5dd;
+    background-color: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.gf-ecoles-fr-wrapper select:focus,
+.gf-ecoles-fr-wrapper input[type="text"]:focus {
+    outline: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.15);
+}
+
+.gf-ecoles-fr-wrapper select:disabled,
+.gf-ecoles-fr-wrapper input[type="text"]:disabled {
+    background-color: #f5f5f5;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Autocomplete
+   ========================================================================== */
+
+.gf-ecoles-fr-autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.gf-ecoles-fr-autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 240px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #d0d5dd;
+    border-top: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.gf-ecoles-fr-autocomplete-results:empty {
+    display: none !important;
+}
+
+.gf-ecoles-fr-autocomplete-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.15s ease;
+}
+
+.gf-ecoles-fr-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.gf-ecoles-fr-autocomplete-item:hover {
+    background-color: #f0f6fc;
+}
+
+.gf-ecoles-fr-ecole-item {
+    line-height: 1.4;
+}
+
+.gf-ecoles-fr-ecole-item strong {
+    color: #1d2327;
+}
+
+.gf-ecoles-fr-ecole-item small {
+    color: #666;
+    font-size: 12px;
+}
+
+/* ==========================================================================
+   Loading and Status Messages
+   ========================================================================== */
+
+.gf-ecoles-fr-loading,
+.gf-ecoles-fr-no-results,
+.gf-ecoles-fr-error {
+    padding: 12px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.gf-ecoles-fr-loading {
+    color: #2271b1;
+}
+
+.gf-ecoles-fr-error {
+    color: #d63638;
+}
+
+/* ==========================================================================
+   Result Display
+   ========================================================================== */
+
+.gf-ecoles-fr-result {
+    width: 100%;
+    margin-top: 1px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border: 1px solid #d0d5dd;
+    box-sizing: border-box;
+}
+
+.gf-ecoles-fr-result-header {
+    font-weight: 700;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #d0d5dd;
+}
+
+.gf-ecoles-fr-result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.gf-ecoles-fr-result-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px;
+    padding: 8px 10px !important;
+    background-color: #fff;
+    border: 1px solid #d0d5dd;
+    position: relative !important;
+}
+
+/* Override Gravity Forms span styling - use high specificity */
+.gform_wrapper .gf-ecoles-fr-result .gf-ecoles-fr-result-item .gf-ecoles-fr-result-label,
+.gform_wrapper.gravity-theme .gf-ecoles-fr-result .gf-ecoles-fr-result-item .gf-ecoles-fr-result-label,
+.gf-ecoles-fr-result-label {
+    font-size: 11px !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    order: 1;
+    position: static !important;
+    display: block !important;
+    margin: 0 !important;
+    flex: none !important;
+    padding: 0 !important;
+}
+
+.gform_wrapper .gf-ecoles-fr-result .gf-ecoles-fr-result-item .gf-ecoles-fr-result-value,
+.gform_wrapper.gravity-theme .gf-ecoles-fr-result .gf-ecoles-fr-result-item .gf-ecoles-fr-result-value,
+.gf-ecoles-fr-result-value {
+    font-size: 14px !important;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    order: 2;
+    position: static !important;
+    display: block !important;
+    margin: 0 !important;
+    flex: none !important;
+    padding: 0 !important;
+}
+
+/* ==========================================================================
+   Entry Detail Table
+   ========================================================================== */
+
+.gf-ecoles-fr-entry-detail {
+    margin: 10px 0;
+}
+
+.gf-ecoles-fr-entry-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.gf-ecoles-fr-entry-table th,
+.gf-ecoles-fr-entry-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.gf-ecoles-fr-entry-table th {
+    width: 30%;
+    font-weight: 600;
+    color: #555;
+    background-color: #f9f9f9;
+}
+
+.gf-ecoles-fr-entry-table td {
+    color: #333;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 600px) {
+    .gf-ecoles-fr-result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gf-ecoles-fr-result {
+        padding: 15px;
+    }
+
+    .gf-ecoles-fr-result-value {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        word-break: break-word;
+    }
+
+    .gf-ecoles-fr-entry-table th,
+    .gf-ecoles-fr-entry-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .gf-ecoles-fr-entry-table th {
+        border-bottom: none;
+        padding-bottom: 2px;
+    }
+
+    .gf-ecoles-fr-entry-table td {
+        padding-top: 2px;
+        padding-bottom: 12px;
+    }
+}
