@@ -276,6 +276,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         ?>
         <div class="gf-ecoles-fr-wrapper ginput_complex ginput_container" id="<?php echo esc_attr($input_id); ?>_container"
             data-field-id="<?php echo esc_attr($field_id); ?>"
+            data-form-id="<?php echo esc_attr($form_id); ?>"
             data-preselected-statut="<?php echo esc_attr($preselected_statut); ?>"
             data-preselected-departement="<?php echo esc_attr($preselected_departement); ?>"
             data-hide-ecoles="<?php echo esc_attr($hide_ecoles); ?>"

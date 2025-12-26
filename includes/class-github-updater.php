@@ -252,14 +252,23 @@ class GF_French_Schools_GitHub_Updater
         $new_source = trailingslashit($remote_source) . $correct_folder . '/';
 
         // Rename the folder
-        if ($wp_filesystem->move($source, $new_source)) {
+        if ($wp_filesystem && $wp_filesystem->move($source, $new_source)) {
             return $new_source;
         }
 
-        // If rename failed, return error
+        // Attempt copy+delete fallback if move failed.
+        if ($wp_filesystem && $wp_filesystem->copy($source, $new_source, true) && $wp_filesystem->delete($source, true)) {
+            return $new_source;
+        }
+
+        // Log for debugging without fatals in production
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf('GF French Schools updater: failed to rename update folder from %s to %s', $source, $new_source));
+        }
+
         return new WP_Error(
             'rename_failed',
-            __('Unable to rename the update folder.', 'gf-french-schools')
+            __('Unable to rename the update folder. Please retry or update manually.', 'gf-french-schools')
         );
     }
 }

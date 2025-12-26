@@ -39,6 +39,10 @@ class GF_Ecoles_API_Service
      */
     public function get_villes($statut, $departement, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
     {
+        $statut = $this->validate_statut($statut);
+        $departement = $this->validate_departement($departement);
+        $query = $this->sanitize_query($query);
+
         if (empty($statut) || empty($departement) || strlen($query) < 2) {
             return array();
         }
@@ -97,6 +101,14 @@ class GF_Ecoles_API_Service
     }
 
     /**
+     * English alias for city search to ease future naming alignment.
+     */
+    public function search_cities($statut, $departement, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
+    {
+        return $this->get_villes($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+    }
+
+    /**
      * Get list of schools matching the query.
      *
      * @param string $statut              School status (Public/Privé).
@@ -109,6 +121,11 @@ class GF_Ecoles_API_Service
      */
     public function get_ecoles($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
     {
+        $statut = $this->validate_statut($statut);
+        $departement = $this->validate_departement($departement);
+        $ville = $this->sanitize_query($ville);
+        $query = $this->sanitize_query($query);
+
         if (empty($statut) || empty($departement) || empty($ville) || strlen($query) < 2) {
             return array();
         }
@@ -188,6 +205,14 @@ class GF_Ecoles_API_Service
     }
 
     /**
+     * English alias for school search to ease future naming alignment.
+     */
+    public function search_schools($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
+    {
+        return $this->get_ecoles($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+    }
+
+    /**
      * Make HTTP request to the API.
      *
      * @param string $url API URL.
@@ -206,11 +231,13 @@ class GF_Ecoles_API_Service
         );
 
         if (is_wp_error($response)) {
-            return $response;
+            $this->log_error('API connection error: ' . $response->get_error_message(), $url);
+            return new WP_Error('api_connection_error', __('Unable to connect to the school directory. Please try again later.', 'gf-french-schools'));
         }
 
         $status_code = wp_remote_retrieve_response_code($response);
         if ($status_code !== 200) {
+            $this->log_error('API HTTP error: ' . $status_code, $url);
             return new WP_Error(
                 'api_error',
                 sprintf(
@@ -225,6 +252,7 @@ class GF_Ecoles_API_Service
         $data = json_decode($body, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->log_error('JSON parse error: ' . json_last_error_msg(), $url);
             return new WP_Error('json_error', __('Failed to parse API response', 'gf-french-schools'));
         }
 
@@ -239,7 +267,65 @@ class GF_Ecoles_API_Service
      */
     private function escape_api_string($string)
     {
-        // Escape double quotes for OpenDataSoft API
-        return str_replace('"', '\\"', $string);
+        $string = (string) $string;
+        // Remove control characters
+        $string = preg_replace('/[\x00-\x1F\x7F]/', '', $string);
+        // Escape backslashes and quotes
+        $string = str_replace(array('\\', '"'), array('\\\\', '\\"'), $string);
+
+        return $string;
+    }
+
+    /**
+     * Validate statut against allowed values.
+     *
+     * @param string $statut Statut value.
+     * @return string
+     */
+    private function validate_statut($statut)
+    {
+        $allowed = array('Public', 'Privé');
+        return in_array($statut, $allowed, true) ? $statut : '';
+    }
+
+    /**
+     * Validate departement against allowed list.
+     *
+     * @param string $departement Departement value.
+     * @return string
+     */
+    private function validate_departement($departement)
+    {
+        return in_array($departement, GF_Field_Ecoles_FR::get_departements(), true) ? $departement : '';
+    }
+
+    /**
+     * Sanitize free-text query parameters.
+     *
+     * @param string $query Query value.
+     * @return string
+     */
+    private function sanitize_query($query)
+    {
+        $query = is_string($query) ? $query : '';
+        // Remove control chars and keep letters/numbers/basic punctuation
+        $query = preg_replace('/[^\p{L}\p{N}\s\'\-]/u', '', $query);
+        $query = trim($query);
+
+        return mb_substr($query, 0, 100);
+    }
+
+    /**
+     * Log API-related errors when debugging is enabled.
+     *
+     * @param string $message Message to log.
+     * @param string $context Context (URL).
+     * @return void
+     */
+    private function log_error($message, $context)
+    {
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log(sprintf('[GF French Schools] %s | Context: %s', $message, $context));
+        }
     }
 }
