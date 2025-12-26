@@ -2,6 +2,8 @@
 
 Extension Gravity Forms permettant aux utilisateurs de rechercher et sélectionner un établissement scolaire français via l'API officielle du Ministère de l'Éducation Nationale.
 
+![Plugin Screenshot](https://github.com/guilamu/gf-french-schools/blob/main/screenshot.jpg)
+
 ## Description
 
 Ce plugin ajoute un nouveau type de champ "Écoles françaises" à Gravity Forms. Il permet aux utilisateurs de :
@@ -134,4 +136,5 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ### Version 1.0.3 - 2025-12-26
 - 🎉 Version initiale
+
 
