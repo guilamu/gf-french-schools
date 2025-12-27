@@ -134,6 +134,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.1.1 - 2025-12-27
+- ➕ Option pour cacher le bloc de récapitulatif et fallback accessible directement dans le champ (Type Catégorie Nom)
+- 🌐 Chaîne i18n pour le fallback "No" côté JS
+- 🧹 Nettoyage cohérent des valeurs (nom/catégorie) stockées et affichées
+
 ### Version 1.1.0 - 2025-12-27
 - 🔒 Durcissement de la sécurité : validation du formulaire côté AJAX, whitelists statut/département, limite de requêtes filtrable
 - 🌐 Requêtes frontend plus robustes : annulation des appels en cours, déduplication, timeouts configurables et retries avec backoff

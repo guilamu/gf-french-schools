@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Adds a "French Schools" field type to Gravity Forms allowing users to search and select French educational institutions via the Education Ministry API.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.1.0');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.1.1');
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
 
@@ -221,10 +221,6 @@ function gf_french_schools_field_settings($position, $form_id)
                 </select>
             </div>
 
-            <p class="description" style="margin-top: 10px; margin-bottom: 15px; color: #666;">
-                <?php esc_html_e('Preselected fields will be hidden from users on the frontend.', 'gf-french-schools'); ?>
-            </p>
-
             <label class="section_label" style="margin-top: 15px;">
                 <?php esc_html_e('School Type Filters', 'gf-french-schools'); ?>
             </label>
@@ -240,6 +236,17 @@ function gf_french_schools_field_settings($position, $form_id)
                 <input type="checkbox" id="ecoles_fr_hide_colleges_lycees" class="ecoles-fr-setting" data-setting="hideCollegesLycees" />
                 <label for="ecoles_fr_hide_colleges_lycees" style="display: inline;">
                     <?php esc_html_e('Hide middle and high schools (Collèges and Lycées)', 'gf-french-schools'); ?>
+                </label>
+            </div>
+
+            <label class="section_label" style="margin-top: 15px;">
+                <?php esc_html_e('Result Display', 'gf-french-schools'); ?>
+            </label>
+
+            <div style="margin-bottom: 10px;">
+                <input type="checkbox" id="ecoles_fr_hide_result" class="ecoles-fr-setting" data-setting="hideResult" />
+                <label for="ecoles_fr_hide_result" style="display: inline;">
+                    <?php esc_html_e('Hide the selected school summary block', 'gf-french-schools'); ?>
                 </label>
             </div>
         </li>
@@ -319,6 +326,7 @@ function gf_french_schools_enqueue_scripts($form, $is_ajax)
             'searching' => __('Searching...', 'gf-french-schools'),
             'minChars' => __('Type at least 2 characters', 'gf-french-schools'),
             'errorLoading' => __('Error loading results. Please try again.', 'gf-french-schools'),
+            'noValue' => __('No', 'gf-french-schools'),
         ),
     ));
 }
@@ -449,6 +457,3 @@ function gf_french_schools_ajax_search()
         wp_send_json_success($results);
     }
 }
-
-
-
