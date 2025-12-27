@@ -89,6 +89,28 @@ Le plugin supporte les mises à jour automatiques depuis GitHub. Lorsqu'une nouv
 
 Le plugin est entièrement traduisible et inclut une traduction française complète.
 
+## Structure du projet
+
+```
+gf-french-schools.php
+README.md
+assets/
+	css/
+		ecoles-fr-admin.css
+		ecoles-fr.css
+	js/
+		ecoles-fr-admin.js
+		ecoles-fr-frontend.js
+includes/
+	class-ecoles-api-service.php
+	class-gf-field-ecoles-fr.php
+	class-github-updater.php
+languages/
+	gf-french-schools-fr_FR.mo
+	gf-french-schools-fr_FR.po
+	gf-french-schools.pot
+```
+
 ## API utilisée
 
 - **Endpoint** : `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records`
@@ -135,24 +157,24 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 ## Change Log
 
 ### Version 1.1.1 - 2025-12-27
-- ➕ Option pour cacher le bloc de récapitulatif et fallback accessible directement dans le champ (Type Catégorie Nom)
-- 🌐 Chaîne i18n pour le fallback "No" côté JS
-- 🧹 Nettoyage cohérent des valeurs (nom/catégorie) stockées et affichées
+- Option pour cacher le bloc de récapitulatif et fallback accessible directement dans le champ (Type Catégorie Nom)
+- Chaîne i18n pour le fallback "No" côté JS
+- Nettoyage cohérent des valeurs (nom/catégorie) stockées et affichées
 
 ### Version 1.1.0 - 2025-12-27
-- 🔒 Durcissement de la sécurité : validation du formulaire côté AJAX, whitelists statut/département, limite de requêtes filtrable
-- 🌐 Requêtes frontend plus robustes : annulation des appels en cours, déduplication, timeouts configurables et retries avec backoff
-- 🛠️ Vérification de version minimale Gravity Forms et messages d'erreur plus clairs
-- 📦 Updater GitHub plus résilient (fallback copy/delete, logs en debug)
-- 🎨 CSS admin extrait dans un fichier dédié (plus d'inline styles)
+- Durcissement de la sécurité : validation du formulaire côté AJAX, whitelists statut/département, limite de requêtes filtrable
+- Requêtes frontend plus robustes : annulation des appels en cours, déduplication, timeouts configurables et retries avec backoff
+- Vérification de version minimale Gravity Forms et messages d'erreur plus clairs
+- Updater GitHub plus résilient (fallback copy/delete, logs en debug)
+- CSS admin extrait dans un fichier dédié (plus d'inline styles)
 
 ### Version 1.0.4 - 2025-12-26
-- ⚡ Amélioration des performances : le CSS pour les champs présélectionnés n'est plus chargé sur toutes les pages
-- 🔒 Ajout d'une limite de requêtes (rate limiting) sur l'endpoint AJAX
-- 🔧 Refactorisation du module de mise à jour GitHub avec mise en cache des requêtes API
-- 🧹 Suppression du code mort (filtre de merge tag inutilisé)
-- 🎨 Amélioration du contraste visuel entre les champs activés et désactivés
-- 🌐 Mise à jour des fichiers de traduction
+- Amélioration des performances : le CSS pour les champs présélectionnés n'est plus chargé sur toutes les pages
+- Ajout d'une limite de requêtes (rate limiting) sur l'endpoint AJAX
+- Refactorisation du module de mise à jour GitHub avec mise en cache des requêtes API
+- Suppression du code mort (filtre de merge tag inutilisé)
+- Amélioration du contraste visuel entre les champs activés et désactivés
+- Mise à jour des fichiers de traduction
 
 ### Version 1.0.3 - 2025-12-26
-- 🎉 Version initiale
+- Version initiale
