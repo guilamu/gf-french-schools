@@ -99,6 +99,11 @@
             // Get filter settings from data attributes
             var hideEcoles = $wrapper.data('hide-ecoles') === 'true' || $wrapper.data('hide-ecoles') === true;
             var hideCollegesLycees = $wrapper.data('hide-colleges-lycees') === 'true' || $wrapper.data('hide-colleges-lycees') === true;
+            var hideResult = $wrapper.data('hide-result') === 'true' || $wrapper.data('hide-result') === true;
+
+            if (hideResult) {
+                $result = null;
+            }
 
             var selectedVille = '';
             var schoolsData = [];
@@ -151,7 +156,9 @@
                     $ecole.prop('disabled', true)
                         .addClass('disabled')
                         .val('');
-                    $result.hide();
+                    if ($result) {
+                        $result.hide();
+                    }
                 } else {
                     resetFields(['ville', 'ecole']);
                 }
@@ -268,7 +275,9 @@
                 villes.forEach(function (ville) {
                     var $item = $('<div class="gf-ecoles-fr-autocomplete-item"></div>')
                         .text(ville.label)
-                        .on('click', function () {
+                        .on('mousedown', function (e) {
+                            e.preventDefault(); // prevent blur before selection is applied
+
                             $ville.val(ville.value);
                             selectedVille = ville.value;
                             $villeResults.empty().hide();
@@ -277,7 +286,9 @@
                             $ecole.prop('disabled', false)
                                 .removeClass('disabled')
                                 .val('');
-                            $result.hide();
+                            if ($result) {
+                                $result.hide();
+                            }
 
                             updateDataInput();
                         });
@@ -360,7 +371,8 @@
                     var $item = $('<div class="gf-ecoles-fr-autocomplete-item gf-ecoles-fr-ecole-item"></div>')
                         .html('<strong>' + escapeHtml(ecole.nom) + '</strong><br><small>' + escapeHtml(ecole.adresse) + ', ' + escapeHtml(ecole.code_postal) + '</small>')
                         .data('index', index)
-                        .on('click', function () {
+                        .on('mousedown', function (e) {
+                            e.preventDefault(); // avoid blur swallowing selection
                             selectEcole(ecole);
                         });
                     $ecoleResults.append($item);
@@ -371,21 +383,32 @@
              * Select a school and display its information.
              */
             function selectEcole(ecole) {
-                $ecole.val(ecole.nom);
+                var cleanNom = cleanDisplayValue(ecole.nom);
+                var cleanNature = cleanCategoryValue(ecole.nature);
+
+                $ecole.val(cleanNom);
                 $ecoleResults.empty().hide();
 
-                // Update result display (apply cleanDisplayValue to remove school type words from nom)
-                $result.find('[data-field="identifiant"]').text(ecole.identifiant || '');
-                $result.find('[data-field="nom"]').text(cleanDisplayValue(ecole.nom) || '');
-                $result.find('[data-field="type"]').text(ecole.type || '');
-                $result.find('[data-field="nature"]').text(cleanCategoryValue(ecole.nature) || '');
-                $result.find('[data-field="adresse"]').text(ecole.adresse || '');
-                $result.find('[data-field="code_postal"]').text(ecole.code_postal || '');
-                $result.find('[data-field="commune"]').text(ecole.commune || '');
-                $result.find('[data-field="telephone"]').text(ecole.telephone || '');
-                $result.find('[data-field="mail"]').text(ecole.mail || '');
-                $result.find('[data-field="education_prioritaire"]').text(ecole.education_prioritaire || 'Non');
-                $result.show();
+                var fallbackNo = (gfEcolesFR && gfEcolesFR.i18n && gfEcolesFR.i18n.noValue) ? gfEcolesFR.i18n.noValue : 'No';
+
+                if ($result) {
+                    // Update result display (apply cleanDisplayValue to remove school type words from nom)
+                    $result.find('[data-field="identifiant"]').text(ecole.identifiant || '');
+                    $result.find('[data-field="nom"]').text(cleanNom || '');
+                    $result.find('[data-field="type"]').text(ecole.type || '');
+                    $result.find('[data-field="nature"]').text(cleanNature || '');
+                    $result.find('[data-field="adresse"]').text(ecole.adresse || '');
+                    $result.find('[data-field="code_postal"]').text(ecole.code_postal || '');
+                    $result.find('[data-field="commune"]').text(ecole.commune || '');
+                    $result.find('[data-field="telephone"]').text(ecole.telephone || '');
+                    $result.find('[data-field="mail"]').text(ecole.mail || '');
+                    $result.find('[data-field="education_prioritaire"]').text(ecole.education_prioritaire || fallbackNo);
+                    $result.show();
+                } else {
+                    // Accessibility: when summary is hidden, show key info directly in the field (Type Catégorie Nom)
+                    var summaryParts = [ecole.type, cleanNature, cleanNom].filter(Boolean);
+                    $ecole.val(summaryParts.join(' '));
+                }
 
                 // Update hidden data input
                 var data = {
@@ -393,9 +416,9 @@
                     departement: $departement.val(),
                     ville: selectedVille,
                     identifiant: ecole.identifiant,
-                    nom: ecole.nom,
+                    nom: cleanNom,
                     type: ecole.type,
-                    nature: ecole.nature,
+                    nature: cleanNature,
                     adresse: ecole.adresse,
                     code_postal: ecole.code_postal,
                     commune: ecole.commune,
@@ -420,7 +443,7 @@
                 }
 
                 // If we're changing filters, clear school data
-                if ($result.is(':hidden')) {
+                if (!$result || $result.is(':hidden')) {
                     currentData = {
                         statut: $statut.val(),
                         departement: $departement.val(),

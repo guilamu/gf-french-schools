@@ -26,6 +26,9 @@
         // Load school type filter values
         $('#ecoles_fr_hide_ecoles').prop('checked', field.hideEcoles === true);
         $('#ecoles_fr_hide_colleges_lycees').prop('checked', field.hideCollegesLycees === true);
+
+        // Load result visibility
+        $('#ecoles_fr_hide_result').prop('checked', field.hideResult === true);
     });
 
     // Persist setting changes without inline handlers.
