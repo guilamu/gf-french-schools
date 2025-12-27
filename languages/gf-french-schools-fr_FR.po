@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Gravity Forms - French Schools 1.0.4\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2024-12-26T10:15:00+01:00\n"
-"PO-Revision-Date: 2025-12-26 22:08+0100\n"
+"PO-Revision-Date: 2025-12-27 19:32+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -208,6 +208,14 @@ msgstr "Masquer les collèges et lycées"
 #: gf-french-schools.php
 msgid "Too many requests. Please wait a moment."
 msgstr "Trop de requêtes. Veuillez patienter un instant."
+
+#: gf-french-schools.php
+msgid "Result Display"
+msgstr "Affichage du récapitulatif"
+
+#: gf-french-schools.php
+msgid "Hide the selected school summary block"
+msgstr "Masquer le bloc de récap établissement"
 
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder."
