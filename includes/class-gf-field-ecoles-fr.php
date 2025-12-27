@@ -253,6 +253,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         // Get school type filter settings
         $hide_ecoles = !empty($this->hideEcoles) ? 'true' : 'false';
         $hide_colleges_lycees = !empty($this->hideCollegesLycees) ? 'true' : 'false';
+        $hide_result = !empty($this->hideResult) ? 'true' : 'false';
 
         // Use preselected values if available, otherwise use saved data
         $statut_value = !empty($preselected_statut) ? $preselected_statut : ($data['statut'] ?? '');
@@ -280,7 +281,8 @@ class GF_Field_Ecoles_FR extends GF_Field
             data-preselected-statut="<?php echo esc_attr($preselected_statut); ?>"
             data-preselected-departement="<?php echo esc_attr($preselected_departement); ?>"
             data-hide-ecoles="<?php echo esc_attr($hide_ecoles); ?>"
-            data-hide-colleges-lycees="<?php echo esc_attr($hide_colleges_lycees); ?>">
+            data-hide-colleges-lycees="<?php echo esc_attr($hide_colleges_lycees); ?>"
+            data-hide-result="<?php echo esc_attr($hide_result); ?>">
 
             <!-- Hidden field for storing complete data -->
             <input type="hidden" name="input_<?php echo esc_attr($field_id); ?>" id="<?php echo esc_attr($input_id); ?>"
@@ -352,66 +354,68 @@ class GF_Field_Ecoles_FR extends GF_Field
                 </div>
             </span>
 
-            <!-- Result display -->
-            <div class="gf-ecoles-fr-result" id="<?php echo esc_attr($input_id); ?>_result"
-                style="<?php echo empty($data['identifiant']) ? 'display:none;' : ''; ?>">
-                <div class="gf-ecoles-fr-result-header">
-                    <?php esc_html_e('Selected School Information', 'gf-french-schools'); ?>
+            <?php if (empty($this->hideResult)) : ?>
+                <!-- Result display -->
+                <div class="gf-ecoles-fr-result" id="<?php echo esc_attr($input_id); ?>_result"
+                    style="<?php echo empty($data['identifiant']) ? 'display:none;' : ''; ?>">
+                    <div class="gf-ecoles-fr-result-header">
+                        <?php esc_html_e('Selected School Information', 'gf-french-schools'); ?>
+                    </div>
+                    <div class="gf-ecoles-fr-result-grid">
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('ID', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="identifiant"><?php echo esc_html($data['identifiant'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Name', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="nom"><?php echo esc_html($data['nom'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Type', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="type"><?php echo esc_html($data['type'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Category', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="nature"><?php echo esc_html($data['nature'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Address', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="adresse"><?php echo esc_html($data['adresse'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Postal Code', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="code_postal"><?php echo esc_html($data['code_postal'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('City', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="commune"><?php echo esc_html($data['commune'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Phone', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="telephone"><?php echo esc_html($data['telephone'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Email', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="mail"><?php echo esc_html($data['mail'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span
+                                class="gf-ecoles-fr-result-label"><?php esc_html_e('Priority Education', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="education_prioritaire"><?php echo esc_html(!empty($data['education_prioritaire']) ? $data['education_prioritaire'] : __('No', 'gf-french-schools')); ?></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="gf-ecoles-fr-result-grid">
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('ID', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="identifiant"><?php echo esc_html($data['identifiant'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Name', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="nom"><?php echo esc_html($data['nom'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Type', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="type"><?php echo esc_html($data['type'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Category', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="nature"><?php echo esc_html($data['nature'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Address', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="adresse"><?php echo esc_html($data['adresse'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Postal Code', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="code_postal"><?php echo esc_html($data['code_postal'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('City', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="commune"><?php echo esc_html($data['commune'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Phone', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="telephone"><?php echo esc_html($data['telephone'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span class="gf-ecoles-fr-result-label"><?php esc_html_e('Email', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="mail"><?php echo esc_html($data['mail'] ?? ''); ?></span>
-                    </div>
-                    <div class="gf-ecoles-fr-result-item">
-                        <span
-                            class="gf-ecoles-fr-result-label"><?php esc_html_e('Priority Education', 'gf-french-schools'); ?></span>
-                        <span class="gf-ecoles-fr-result-value"
-                            data-field="education_prioritaire"><?php echo esc_html(!empty($data['education_prioritaire']) ? $data['education_prioritaire'] : __('No', 'gf-french-schools')); ?></span>
-                    </div>
-                </div>
-            </div>
+            <?php endif; ?>
         </div>
         <?php
         return ob_get_clean();
