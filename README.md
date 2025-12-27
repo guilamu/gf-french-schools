@@ -92,23 +92,24 @@ Le plugin est entièrement traduisible et inclut une traduction française compl
 ## Structure du projet
 
 ```
-gf-french-schools.php
-README.md
-assets/
-	css/
-		ecoles-fr-admin.css
-		ecoles-fr.css
-	js/
-		ecoles-fr-admin.js
-		ecoles-fr-frontend.js
-includes/
-	class-ecoles-api-service.php
-	class-gf-field-ecoles-fr.php
-	class-github-updater.php
-languages/
-	gf-french-schools-fr_FR.mo
-	gf-french-schools-fr_FR.po
-	gf-french-schools.pot
+.
+├── gf-french-schools.php
+├── README.md
+├── assets
+│   ├── css
+│   │   ├── ecoles-fr-admin.css        # styles éditeur GF
+│   │   └── ecoles-fr.css              # styles frontend + bloc résultat
+│   └── js
+│       ├── ecoles-fr-admin.js         # réglages custom dans l’éditeur GF
+│       └── ecoles-fr-frontend.js      # logique cascade, autocomplétion, accessibilité
+├── includes
+│   ├── class-ecoles-api-service.php   # client OpenDataSoft + cache
+│   ├── class-gf-field-ecoles-fr.php   # définition du champ GF, rendu, validation
+│   └── class-github-updater.php       # mise à jour GitHub
+└── languages
+	├── gf-french-schools-fr_FR.mo     # binaire FR
+	├── gf-french-schools-fr_FR.po     # sources FR
+	└── gf-french-schools.pot          # modèle de traduction
 ```
 
 ## API utilisée
