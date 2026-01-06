@@ -160,7 +160,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
-### Version 1.1.2 - 2026-01-06
+### Version 1.1.3 - 2026-01-06
+- Traduction de la description du plugin en français
 - Ajout du workflow GitHub Actions pour la création automatique des releases
 - Génération automatique du fichier ZIP avec le bon nommage de dossier
 

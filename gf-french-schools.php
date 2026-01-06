@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
- * Description: Adds a "French Schools" field type to Gravity Forms allowing users to search and select French educational institutions via the Education Ministry API.
- * Version: 1.1.2
+ * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
+ * Version: 1.1.3
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.1.2');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.1.3');
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
 
@@ -213,7 +213,8 @@ function gf_french_schools_field_settings($position, $form_id)
                 <label for="ecoles_fr_preselected_departement" style="display: block; margin-bottom: 5px;">
                     <?php esc_html_e('Preselected Department', 'gf-french-schools'); ?>
                 </label>
-                <select id="ecoles_fr_preselected_departement" class="ecoles-fr-setting" data-setting="preselectedDepartement" style="width: 100%;">
+                <select id="ecoles_fr_preselected_departement" class="ecoles-fr-setting" data-setting="preselectedDepartement"
+                    style="width: 100%;">
                     <option value=""><?php esc_html_e('-- None --', 'gf-french-schools'); ?></option>
                     <?php foreach (GF_Field_Ecoles_FR::get_departements() as $dept): ?>
                         <option value="<?php echo esc_attr($dept); ?>"><?php echo esc_html($dept); ?></option>
@@ -233,7 +234,8 @@ function gf_french_schools_field_settings($position, $form_id)
             </div>
 
             <div style="margin-bottom: 10px;">
-                <input type="checkbox" id="ecoles_fr_hide_colleges_lycees" class="ecoles-fr-setting" data-setting="hideCollegesLycees" />
+                <input type="checkbox" id="ecoles_fr_hide_colleges_lycees" class="ecoles-fr-setting"
+                    data-setting="hideCollegesLycees" />
                 <label for="ecoles_fr_hide_colleges_lycees" style="display: inline;">
                     <?php esc_html_e('Hide middle and high schools (Collèges and Lycées)', 'gf-french-schools'); ?>
                 </label>
