@@ -93,6 +93,9 @@ Le plugin est entièrement traduisible et inclut une traduction française compl
 
 ```
 .
+├── .github
+│   └── workflows
+│       └── release.yml                # GitHub Actions release workflow
 ├── gf-french-schools.php
 ├── README.md
 ├── assets
@@ -156,6 +159,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.1.2 - 2026-01-06
+- Ajout du workflow GitHub Actions pour la création automatique des releases
+- Génération automatique du fichier ZIP avec le bon nommage de dossier
 
 ### Version 1.1.1 - 2025-12-27
 - Option pour cacher le bloc de récapitulatif et fallback accessible directement dans le champ (Type Catégorie Nom)
