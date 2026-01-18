@@ -160,6 +160,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.2.0 - 2026-01-18
+- Intégration du support Guilamu Bug Reporter
+- Ajout du lien "🐛 Report a Bug" dans la liste des extensions
+
 ### Version 1.1.3 - 2026-01-06
 - Traduction de la description du plugin en français
 - Ajout du workflow GitHub Actions pour la création automatique des releases

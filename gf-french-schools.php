@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.1.3
+ * Version: 1.2.0
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,7 +19,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.1.3');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.2.0');
+define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
 
@@ -459,3 +460,43 @@ function gf_french_schools_ajax_search()
         wp_send_json_success($results);
     }
 }
+
+/**
+ * Register with Guilamu Bug Reporter
+ */
+add_action('plugins_loaded', function() {
+    if (class_exists('Guilamu_Bug_Reporter')) {
+        Guilamu_Bug_Reporter::register(array(
+            'slug'        => 'gf-french-schools',
+            'name'        => 'Gravity Forms - French Schools',
+            'version'     => GF_FRENCH_SCHOOLS_VERSION,
+            'github_repo' => 'guilamu/gf-french-schools',
+        ));
+    }
+}, 20);
+
+/**
+ * Add 'Report a Bug' link to plugin row meta.
+ *
+ * @param array  $links Plugin row meta links.
+ * @param string $file  Plugin file path.
+ * @return array Modified links.
+ */
+function gf_french_schools_plugin_row_meta($links, $file) {
+    if (plugin_basename(GF_FRENCH_SCHOOLS_PLUGIN_FILE) !== $file) {
+        return $links;
+    }
+
+    if (class_exists('Guilamu_Bug_Reporter')) {
+        $links[] = sprintf(
+            '<a href="#" class="guilamu-bug-report-btn" data-plugin-slug="gf-french-schools" data-plugin-name="%s">%s</a>',
+            esc_attr__('Gravity Forms - French Schools', 'gf-french-schools'),
+            esc_html__('🐛 Report a Bug', 'gf-french-schools')
+        );
+    } else {
+        $links[] = '<a href="https://github.com/guilamu/guilamu-bug-reporter/releases" target="_blank">🐛 Report a Bug (install Bug Reporter)</a>';
+    }
+
+    return $links;
+}
+add_filter('plugin_row_meta', 'gf_french_schools_plugin_row_meta', 10, 2);
