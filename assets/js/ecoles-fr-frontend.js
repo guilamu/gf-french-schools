@@ -87,6 +87,9 @@
             var $departement = $wrapper.find('.gf-ecoles-fr-departement');
             var $ville = $wrapper.find('.gf-ecoles-fr-ville');
             var $ecole = $wrapper.find('.gf-ecoles-fr-ecole');
+            var $autres = $wrapper.find('.gf-ecoles-fr-autres');
+            var $autresField = $wrapper.find('.gf-ecoles-fr-autres-field');
+            var $autresCancel = $wrapper.find('.gf-ecoles-fr-autres-cancel');
             var $dataInput = $wrapper.find('.gf-ecoles-fr-data');
             var $result = $wrapper.find('.gf-ecoles-fr-result');
             var $villeResults = $wrapper.find('.gf-ecoles-fr-ville-field .gf-ecoles-fr-autocomplete-results');
@@ -127,6 +130,30 @@
             }
             if (preselectedDepartement) {
                 $wrapper.find('.gf-ecoles-fr-departement-field').addClass('gf-ecoles-fr-hidden');
+            }
+
+            // Initialize selected ville from current data
+            try {
+                var currentData = JSON.parse($dataInput.val() || '{}');
+                if (currentData.ville) {
+                    selectedVille = currentData.ville;
+                }
+                // Ensure proper state on page load based on existing data
+                if (currentData.autres_nom) {
+                    // Manual entry exists - show Autres field, disable école
+                    $autresField.removeClass('gf-ecoles-fr-hidden');
+                    $ecole.prop('disabled', true).addClass('disabled');
+                } else {
+                    // No manual entry - hide Autres field
+                    $autresField.addClass('gf-ecoles-fr-hidden');
+                    if (currentData.identifiant || $ecole.val()) {
+                        // School is selected - enable école field
+                        $ecole.prop('disabled', false).removeClass('disabled');
+                    }
+                }
+            } catch (e) {
+                // Invalid JSON, ensure Autres is hidden
+                $autresField.addClass('gf-ecoles-fr-hidden');
             }
 
             // Statut change handler
@@ -282,10 +309,12 @@
                             selectedVille = ville.value;
                             $villeResults.empty().hide();
 
-                            // Enable school field
+                            // Enable school field and hide "Autres" field
                             $ecole.prop('disabled', false)
                                 .removeClass('disabled')
                                 .val('');
+                            $autresField.addClass('gf-ecoles-fr-hidden');
+                            $autres.val('');
                             if ($result) {
                                 $result.hide();
                             }
@@ -339,7 +368,8 @@
                             displayEcoleResults(response.data);
                         } else {
                             schoolsData = [];
-                            $ecoleResults.html('<div class="gf-ecoles-fr-no-results">' + (gfEcolesFR.i18n.noResults || 'No results found') + '</div>');
+                            // Show "Autres" option when no results found
+                            displayNoResultsWithAutres();
                         }
                     },
                     error: function (jqXHR, textStatus) {
@@ -385,6 +415,13 @@
             function selectEcole(ecole) {
                 var cleanNom = cleanDisplayValue(ecole.nom);
                 var cleanNature = cleanCategoryValue(ecole.nature);
+
+                // Hide "Autres" field if it was shown and clear its value
+                $autresField.addClass('gf-ecoles-fr-hidden');
+                $autres.val('');
+
+                // Re-enable the ecole field for potential re-search
+                $ecole.prop('disabled', false).removeClass('disabled');
 
                 $ecole.val(cleanNom);
                 $ecoleResults.empty().hide();
@@ -477,13 +514,119 @@
                                 .addClass('disabled')
                                 .val('');
                             $ecoleResults.empty().hide();
-                            $result.hide();
+                            if ($result) {
+                                $result.hide();
+                            }
+                            // Also hide autres field when resetting
+                            hideAutresField();
                             break;
                     }
                 });
 
                 updateDataInput();
             }
+
+            /**
+             * Display no results message with "Autres" option.
+             */
+            function displayNoResultsWithAutres() {
+                $ecoleResults.empty().show();
+
+                var $noResults = $('<div class="gf-ecoles-fr-no-results"></div>')
+                    .text(gfEcolesFR.i18n.noResults || 'No results found');
+                $ecoleResults.append($noResults);
+
+                var $autresOption = $('<div class="gf-ecoles-fr-autocomplete-item gf-ecoles-fr-autres-option"></div>')
+                    .html('<strong>' + (gfEcolesFR.i18n.otherSchool || 'Other: Enter school name manually') + '</strong>')
+                    .on('mousedown', function (e) {
+                        e.preventDefault();
+                        showAutresField();
+                    });
+                $ecoleResults.append($autresOption);
+            }
+
+            /**
+             * Show the "Autres" manual input field.
+             */
+            function showAutresField() {
+                $ecoleResults.empty().hide();
+                $ecole.val('').prop('disabled', true).addClass('disabled');
+                $autresField.removeClass('gf-ecoles-fr-hidden');
+                $autres.focus();
+                if ($result) {
+                    $result.hide();
+                }
+            }
+
+            /**
+             * Hide the "Autres" manual input field.
+             */
+            function hideAutresField() {
+                $autresField.addClass('gf-ecoles-fr-hidden');
+                $autres.val('');
+                $ecole.prop('disabled', false).removeClass('disabled').val('');
+                // Clear the autres_nom from data
+                var currentData = {};
+                try {
+                    currentData = JSON.parse($dataInput.val() || '{}');
+                } catch (e) {
+                    currentData = {};
+                }
+                delete currentData.autres_nom;
+                $dataInput.val(JSON.stringify(currentData));
+            }
+
+            /**
+             * Save the "Autres" manual entry.
+             */
+            function saveAutresEntry() {
+                var autresNom = $autres.val().trim();
+                if (!autresNom) {
+                    return;
+                }
+
+                var data = {
+                    statut: $statut.val(),
+                    departement: $departement.val(),
+                    ville: selectedVille,
+                    autres_nom: autresNom
+                };
+
+                $dataInput.val(JSON.stringify(data)).trigger('change');
+
+                // Show result if not hidden
+                if ($result) {
+                    $result.find('[data-field="identifiant"]').text('');
+                    $result.find('[data-field="nom"]').text(autresNom + ' (' + (gfEcolesFR.i18n.manualEntry || 'Manual Entry') + ')');
+                    $result.find('[data-field="type"]').text('');
+                    $result.find('[data-field="nature"]').text('');
+                    $result.find('[data-field="adresse"]').text('');
+                    $result.find('[data-field="code_postal"]').text('');
+                    $result.find('[data-field="commune"]').text(selectedVille);
+                    $result.find('[data-field="telephone"]').text('');
+                    $result.find('[data-field="mail"]').text('');
+                    $result.find('[data-field="education_prioritaire"]').text('');
+                    $result.show();
+                }
+            }
+
+            // Cancel button for "Autres" field
+            $autresCancel.on('click', function () {
+                hideAutresField();
+            });
+
+            // Save "Autres" entry on blur or Enter key
+            $autres.on('blur', function () {
+                saveAutresEntry();
+            });
+
+            $autres.on('keypress', function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    saveAutresEntry();
+                    $autres.blur();
+                }
+            });
 
             /**
              * Escape HTML entities.

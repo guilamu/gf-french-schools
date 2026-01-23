@@ -288,6 +288,59 @@
 }
 
 /* ==========================================================================
+   Autres (Other/Manual Entry) Field
+   ========================================================================== */
+
+.gf-ecoles-fr-autres-field {
+    margin-top: 5px;
+}
+
+.gf-ecoles-fr-autres-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.gf-ecoles-fr-autres-wrapper input[type="text"] {
+    flex: 1;
+}
+
+.gf-ecoles-fr-autres-cancel {
+    padding: 10px 16px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    border: 1px solid #d0d5dd;
+    color: #555;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.gf-ecoles-fr-autres-cancel:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+}
+
+.gf-ecoles-fr-autres-cancel:focus {
+    outline: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.15);
+}
+
+/* "Other" option styling in autocomplete dropdown */
+.gf-ecoles-fr-autres-option {
+    border-top: 1px solid #e5e5e5;
+    margin-top: 5px;
+    padding-top: 10px !important;
+    color: #2271b1;
+}
+
+.gf-ecoles-fr-autres-option:hover {
+    background-color: #f0f7fc !important;
+}
+
+/* ==========================================================================
    Responsive Adjustments
    ========================================================================== */
 
@@ -321,5 +374,15 @@
     .gf-ecoles-fr-entry-table td {
         padding-top: 2px;
         padding-bottom: 12px;
+    }
+
+    /* Autres field responsive */
+    .gf-ecoles-fr-autres-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gf-ecoles-fr-autres-cancel {
+        align-self: flex-start;
     }
 }

@@ -160,6 +160,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.3.0 - 2026-01-23
+- Ajout d'un champ "Autre" permettant la saisie manuelle du nom de l'école si la recherche ne retourne aucun résultat
+- Le champ manuel apparaît uniquement après une recherche infructueuse
+- Les entrées manuelles sont correctement enregistrées, affichées et exportées avec la mention "Saisie manuelle"
+- Mise à jour des fichiers de traduction (français)
+
 ### Version 1.2.0 - 2026-01-18
 - Intégration du support Guilamu Bug Reporter
 - Ajout du lien "🐛 Report a Bug" dans la liste des extensions

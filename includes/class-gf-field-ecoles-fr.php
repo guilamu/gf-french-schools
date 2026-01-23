@@ -260,6 +260,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         $departement_value = !empty($preselected_departement) ? $preselected_departement : ($data['departement'] ?? '');
         $ville_value = $data['ville'] ?? '';
         $ecole_value = $data['nom'] ?? '';
+        $autres_nom_value = $data['autres_nom'] ?? '';
 
         // Determine which fields should be hidden
         // Only hide on frontend (not in form editor or entry detail)
@@ -347,10 +348,27 @@ class GF_Field_Ecoles_FR extends GF_Field
                     <input type="text" id="<?php echo esc_attr($input_id); ?>_ecole" class="gf-ecoles-fr-ecole"
                         value="<?php echo esc_attr($ecole_value); ?>"
                         placeholder="<?php esc_attr_e('Start typing school name...', 'gf-french-schools'); ?>"
-                        autocomplete="off" <?php echo $is_admin ? 'disabled="disabled"' : (empty($ville_value) ? 'disabled="disabled"' : ''); ?>
+                        autocomplete="off" <?php echo $is_admin ? 'disabled="disabled"' : ((empty($ville_value) || !empty($autres_nom_value)) ? 'disabled="disabled"' : ''); ?>
                         aria-label="<?php esc_attr_e('School', 'gf-french-schools'); ?>" />
                     <div class="gf-ecoles-fr-autocomplete-results" id="<?php echo esc_attr($input_id); ?>_ecole_results">
                     </div>
+                </div>
+            </span>
+
+            <!-- Autres (Manual input when school not found) -->
+            <span class="gf-ecoles-fr-field gf-ecoles-fr-autres-field gf-ecoles-fr-hidden">
+                <label for="<?php echo esc_attr($input_id); ?>_autres">
+                    <?php esc_html_e('Other (School not found)', 'gf-french-schools'); ?>
+                </label>
+                <div class="gf-ecoles-fr-autres-wrapper">
+                    <input type="text" id="<?php echo esc_attr($input_id); ?>_autres" class="gf-ecoles-fr-autres"
+                        value="<?php echo esc_attr($data['autres_nom'] ?? ''); ?>"
+                        placeholder="<?php esc_attr_e('Enter school name manually...', 'gf-french-schools'); ?>"
+                        autocomplete="off"
+                        aria-label="<?php esc_attr_e('Other school name', 'gf-french-schools'); ?>" />
+                    <button type="button" class="gf-ecoles-fr-autres-cancel" aria-label="<?php esc_attr_e('Cancel manual entry', 'gf-french-schools'); ?>">
+                        <?php esc_html_e('Cancel', 'gf-french-schools'); ?>
+                    </button>
                 </div>
             </span>
 
@@ -466,6 +484,12 @@ class GF_Field_Ecoles_FR extends GF_Field
 
         if ($format === 'text') {
             $lines = array();
+            // Check if this is a manual entry
+            if (!empty($data['autres_nom'])) {
+                $lines[] = sprintf('%s: %s', __('Name (Manual Entry)', 'gf-french-schools'), $data['autres_nom']);
+                $lines[] = sprintf('%s: %s', __('City', 'gf-french-schools'), $data['ville'] ?? '');
+                return implode("\n", $lines);
+            }
             $lines[] = sprintf('%s: %s', __('ID', 'gf-french-schools'), $data['identifiant'] ?? '');
             $lines[] = sprintf('%s: %s', __('Name', 'gf-french-schools'), $data['nom'] ?? '');
             $lines[] = sprintf('%s: %s', __('Type', 'gf-french-schools'), $data['type'] ?? '');
@@ -482,6 +506,14 @@ class GF_Field_Ecoles_FR extends GF_Field
         // HTML format
         $html = '<div class="gf-ecoles-fr-entry-detail">';
         $html .= '<table class="gf-ecoles-fr-entry-table">';
+        // Check if this is a manual entry
+        if (!empty($data['autres_nom'])) {
+            $html .= '<tr><th>' . esc_html__('Name (Manual Entry)', 'gf-french-schools') . '</th><td>' . esc_html($data['autres_nom']) . '</td></tr>';
+            $html .= '<tr><th>' . esc_html__('City', 'gf-french-schools') . '</th><td>' . esc_html($data['ville'] ?? '') . '</td></tr>';
+            $html .= '</table>';
+            $html .= '</div>';
+            return $html;
+        }
         $html .= '<tr><th>' . esc_html__('ID', 'gf-french-schools') . '</th><td>' . esc_html($data['identifiant'] ?? '') . '</td></tr>';
         $html .= '<tr><th>' . esc_html__('Name', 'gf-french-schools') . '</th><td>' . esc_html($data['nom'] ?? '') . '</td></tr>';
         $html .= '<tr><th>' . esc_html__('Type', 'gf-french-schools') . '</th><td>' . esc_html($data['type'] ?? '') . '</td></tr>';
@@ -524,9 +556,9 @@ class GF_Field_Ecoles_FR extends GF_Field
             return $value;
         }
 
-        // If no modifier, return school name
+        // If no modifier, return school name (or manual entry name)
         if (empty($modifier)) {
-            return $data['nom'] ?? '';
+            return $data['nom'] ?? $data['autres_nom'] ?? '';
         }
 
         // Mapping of modifiers to data keys
@@ -535,6 +567,8 @@ class GF_Field_Ecoles_FR extends GF_Field
             'identifiant' => 'identifiant',
             'nom' => 'nom',
             'name' => 'nom',
+            'autres_nom' => 'autres_nom',
+            'other_name' => 'autres_nom',
             'type' => 'type',
             'nature' => 'nature',
             'category' => 'nature',
@@ -616,7 +650,8 @@ class GF_Field_Ecoles_FR extends GF_Field
             }
 
             $data = json_decode($value, true);
-            if (!is_array($data) || empty($data['identifiant'])) {
+            // Accept either a school from the API (has identifiant) or a manual entry (has autres_nom)
+            if (!is_array($data) || (empty($data['identifiant']) && empty($data['autres_nom']))) {
                 $this->failed_validation = true;
                 $this->validation_message = empty($this->errorMessage)
                     ? __('This field is required. Please select a school.', 'gf-french-schools')
@@ -648,6 +683,11 @@ class GF_Field_Ecoles_FR extends GF_Field
         $data = json_decode($value, true);
         if (!is_array($data)) {
             return $value;
+        }
+
+        // Check if this is a manual entry
+        if (!empty($data['autres_nom'])) {
+            return sprintf('%s (%s)', $data['autres_nom'], __('Manual Entry', 'gf-french-schools'));
         }
 
         // Return school name and ID for export

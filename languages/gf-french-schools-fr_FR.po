@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.2.0\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.3.0\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
-"POT-Creation-Date: 2024-12-26T10:15:00+01:00\n"
-"PO-Revision-Date: 2026-01-18 11:42+0100\n"
+"POT-Creation-Date: 2026-01-23T12:00:00+01:00\n"
+"PO-Revision-Date: 2026-01-23 13:30+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.8\n"
 
 #: gf-french-schools.php
 msgid "Preselection Settings"
@@ -220,3 +220,36 @@ msgstr "Masquer le bloc de récap établissement"
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder."
 msgstr "Impossible de renommer le dossier de mise à jour."
+
+#. New strings for "Autres" (Other/Manual entry) feature
+#: gf-french-schools.php
+msgid "Other: Enter school name manually"
+msgstr "Autre : Saisir le nom de l'école manuellement"
+
+#: gf-french-schools.php
+msgid "Manual Entry"
+msgstr "Saisie manuelle"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Other (School not found)"
+msgstr "Autre (École non trouvée)"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Enter school name manually..."
+msgstr "Saisir le nom de l'école manuellement..."
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Other school name"
+msgstr "Autre nom d'école"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Cancel manual entry"
+msgstr "Annuler la saisie manuelle"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Cancel"
+msgstr "Annuler"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Name (Manual Entry)"
+msgstr "Nom (Saisie manuelle)"
