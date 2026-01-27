@@ -70,6 +70,56 @@
     }
 
     /**
+     * Clean circonscription name by removing standard prefixes.
+     * Removes:
+     * - "Circonscription d'inspection du 1er degré de/du/d'"
+     * - "Circonscription d'inspection du 1r degré de/du/d'"
+     * - "Circonscription" alone
+     */
+    function cleanNomCirconscription(value) {
+        if (!value) return '';
+        var cleaned = value;
+
+        // Patterns to remove (order matters - longer patterns first)
+        var patterns = [
+            /^Circonscription d'inspection du 1er degré de\s+/i,
+            /^Circonscription d'inspection du 1er degré du\s+/i,
+            /^Circonscription d'inspection du 1er degré d'/i,
+            /^Circonscription d'inspection du 1r degré de\s+/i,
+            /^Circonscription d'inspection du 1r degré du\s+/i,
+            /^Circonscription d'inspection du 1r degré d'/i,
+            /^Circonscription\s+/i
+        ];
+
+        patterns.forEach(function (pattern) {
+            cleaned = cleaned.replace(pattern, '');
+        });
+
+        return cleaned.trim();
+    }
+
+    /**
+     * Generate circonscription email from code and school mail domain.
+     * 
+     * @param {string} codeCirconscription - The circonscription code (e.g., "0931052N")
+     * @param {string} schoolMail - The school email to extract domain from (e.g., "ce.xxx@ac-creteil.fr")
+     * @returns {string} The circonscription email (e.g., "ce.0931052N@ac-creteil.fr") or empty string
+     */
+    function getCirconscriptionMail(codeCirconscription, schoolMail) {
+        if (!codeCirconscription) return '';
+        if (!schoolMail) return codeCirconscription;
+
+        // Extract domain from school mail (everything after @)
+        var atIndex = schoolMail.indexOf('@');
+        if (atIndex === -1) return codeCirconscription;
+
+        var domain = schoolMail.substring(atIndex + 1);
+        if (!domain) return codeCirconscription;
+
+        return 'ce.' + codeCirconscription + '@' + domain;
+    }
+
+    /**
      * Initialize the French Schools field.
      */
     function initEcolesFRField() {
@@ -415,6 +465,8 @@
             function selectEcole(ecole) {
                 var cleanNom = cleanDisplayValue(ecole.nom);
                 var cleanNature = cleanCategoryValue(ecole.nature);
+                var cleanCirco = cleanNomCirconscription(ecole.nom_circonscription);
+                var circoMail = getCirconscriptionMail(ecole.code_circonscription, ecole.mail);
 
                 // Hide "Autres" field if it was shown and clear its value
                 $autresField.addClass('gf-ecoles-fr-hidden');
@@ -440,6 +492,8 @@
                     $result.find('[data-field="telephone"]').text(ecole.telephone || '');
                     $result.find('[data-field="mail"]').text(ecole.mail || '');
                     $result.find('[data-field="education_prioritaire"]').text(ecole.education_prioritaire || fallbackNo);
+                    $result.find('[data-field="nom_circonscription"]').text(cleanCirco || '');
+                    $result.find('[data-field="code_circonscription"]').text(circoMail || '');
                     $result.show();
                 } else {
                     // Accessibility: when summary is hidden, show key info directly in the field (Type Catégorie Nom)
@@ -461,7 +515,9 @@
                     commune: ecole.commune,
                     telephone: ecole.telephone,
                     mail: ecole.mail,
-                    education_prioritaire: ecole.education_prioritaire
+                    education_prioritaire: ecole.education_prioritaire,
+                    nom_circonscription: cleanCirco,
+                    code_circonscription: circoMail
                 };
 
                 $dataInput.val(JSON.stringify(data)).trigger('change');

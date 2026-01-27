@@ -431,6 +431,18 @@ class GF_Field_Ecoles_FR extends GF_Field
                             <span class="gf-ecoles-fr-result-value"
                                 data-field="education_prioritaire"><?php echo esc_html(!empty($data['education_prioritaire']) ? $data['education_prioritaire'] : __('No', 'gf-french-schools')); ?></span>
                         </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span
+                                class="gf-ecoles-fr-result-label"><?php esc_html_e('Circonscription', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="nom_circonscription"><?php echo esc_html($data['nom_circonscription'] ?? ''); ?></span>
+                        </div>
+                        <div class="gf-ecoles-fr-result-item">
+                            <span
+                                class="gf-ecoles-fr-result-label"><?php esc_html_e('Email Circonscription', 'gf-french-schools'); ?></span>
+                            <span class="gf-ecoles-fr-result-value"
+                                data-field="code_circonscription"><?php echo esc_html($data['code_circonscription'] ?? ''); ?></span>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -500,6 +512,8 @@ class GF_Field_Ecoles_FR extends GF_Field
             $lines[] = sprintf('%s: %s', __('Phone', 'gf-french-schools'), $data['telephone'] ?? '');
             $lines[] = sprintf('%s: %s', __('Email', 'gf-french-schools'), $data['mail'] ?? '');
             $lines[] = sprintf('%s: %s', __('Priority Education', 'gf-french-schools'), $data['education_prioritaire'] ?? '');
+            $lines[] = sprintf('%s: %s', __('Circonscription', 'gf-french-schools'), $data['nom_circonscription'] ?? '');
+            $lines[] = sprintf('%s: %s', __('Email Circonscription', 'gf-french-schools'), $data['code_circonscription'] ?? '');
             return implode("\n", $lines);
         }
 
@@ -524,6 +538,8 @@ class GF_Field_Ecoles_FR extends GF_Field
         $html .= '<tr><th>' . esc_html__('Phone', 'gf-french-schools') . '</th><td>' . esc_html($data['telephone'] ?? '') . '</td></tr>';
         $html .= '<tr><th>' . esc_html__('Email', 'gf-french-schools') . '</th><td>' . esc_html($data['mail'] ?? '') . '</td></tr>';
         $html .= '<tr><th>' . esc_html__('Priority Education', 'gf-french-schools') . '</th><td>' . esc_html($data['education_prioritaire'] ?? '') . '</td></tr>';
+        $html .= '<tr><th>' . esc_html__('Circonscription', 'gf-french-schools') . '</th><td>' . esc_html($data['nom_circonscription'] ?? '') . '</td></tr>';
+        $html .= '<tr><th>' . esc_html__('Email Circonscription', 'gf-french-schools') . '</th><td>' . esc_html($data['code_circonscription'] ?? '') . '</td></tr>';
         $html .= '</table>';
         $html .= '</div>';
 
@@ -584,6 +600,10 @@ class GF_Field_Ecoles_FR extends GF_Field
             'email' => 'mail',
             'education_prioritaire' => 'education_prioritaire',
             'priority_education' => 'education_prioritaire',
+            'nom_circonscription' => 'nom_circonscription',
+            'circonscription' => 'nom_circonscription',
+            'code_circonscription' => 'code_circonscription',
+            'mail_circonscription' => 'code_circonscription',
             'all' => 'all',
         );
 
@@ -628,6 +648,8 @@ class GF_Field_Ecoles_FR extends GF_Field
             'telephone',
             'mail',
             'education_prioritaire',
+            'nom_circonscription',
+            'code_circonscription',
             'all',
         );
     }
@@ -717,6 +739,8 @@ function gf_french_schools_custom_merge_tags($merge_tags, $form_id, $fields, $el
                 'telephone' => __('Phone', 'gf-french-schools'),
                 'mail' => __('Email', 'gf-french-schools'),
                 'education_prioritaire' => __('Priority Education', 'gf-french-schools'),
+                'nom_circonscription' => __('Circonscription', 'gf-french-schools'),
+                'code_circonscription' => __('Email Circonscription', 'gf-french-schools'),
                 'all' => __('All Information', 'gf-french-schools'),
             );
 

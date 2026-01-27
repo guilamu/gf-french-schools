@@ -148,6 +148,8 @@ class GF_Ecoles_API_Service
             'telephone',
             'mail',
             'appartenance_education_prioritaire',
+            'nom_circonscription',
+            'code_circonscription',
         );
 
         $where = sprintf(
@@ -195,6 +197,8 @@ class GF_Ecoles_API_Service
                     'telephone' => $item['telephone'] ?? '',
                     'mail' => $item['mail'] ?? '',
                     'education_prioritaire' => $item['appartenance_education_prioritaire'] ?? '',
+                    'nom_circonscription' => $item['nom_circonscription'] ?? '',
+                    'code_circonscription' => $item['code_circonscription'] ?? '',
                 );
             }
         }

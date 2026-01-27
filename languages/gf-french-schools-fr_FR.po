@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.3.0\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.4.0\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
-"POT-Creation-Date: 2026-01-23T12:00:00+01:00\n"
-"PO-Revision-Date: 2026-01-23 13:30+0100\n"
+"POT-Creation-Date: 2026-01-27T10:00:00+01:00\n"
+"PO-Revision-Date: 2026-01-27 10:14+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -253,3 +253,12 @@ msgstr "Annuler"
 #: includes/class-gf-field-ecoles-fr.php
 msgid "Name (Manual Entry)"
 msgstr "Nom (Saisie manuelle)"
+
+#. New strings for circonscription feature
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Circonscription"
+msgstr "Circonscription"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Email Circonscription"
+msgstr "Email Circonscription"

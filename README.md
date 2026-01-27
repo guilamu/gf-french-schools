@@ -59,6 +59,8 @@ Pour chaque établissement sélectionné, les informations suivantes sont enregi
 | Téléphone | Numéro de téléphone |
 | E-mail | Adresse email |
 | Éducation prioritaire | REP, REP+, ou Non |
+| Circonscription | Nom de la circonscription (nettoyé du préfixe standard) |
+| Mail circo | Email Circonscription (code + domaine académique) |
 
 ## Merge Tags
 
@@ -77,6 +79,8 @@ Accédez aux données de l'établissement dans les notifications et confirmation
 | `{Libellé:ID:telephone}` | Téléphone |
 | `{Libellé:ID:mail}` | Email |
 | `{Libellé:ID:education_prioritaire}` | Statut éducation prioritaire |
+| `{Libellé:ID:nom_circonscription}` | Nom de la circonscription |
+| `{Libellé:ID:code_circonscription}` | Email Circonscription |
 | `{Libellé:ID:all}` | Toutes les informations |
 
 Remplacez `Libellé` par le libellé de votre champ et `ID` par le numéro d'identifiant du champ.
@@ -159,6 +163,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.4.0 - 2026-01-27
+- Ajout des champs "Circonscription" et "Mail circo" pour chaque établissement
+- Le nom de la circonscription est nettoyé (suppression du préfixe "Circonscription d'inspection du 1er degré de/du/d'")
+- Le mail de la circonscription est généré automatiquement (code + domaine académique de l'école)
+- Nouveaux merge tags disponibles : `nom_circonscription` et `code_circonscription`
 
 ### Version 1.3.0 - 2026-01-23
 - Ajout d'un champ "Autre" permettant la saisie manuelle du nom de l'école si la recherche ne retourne aucun résultat
