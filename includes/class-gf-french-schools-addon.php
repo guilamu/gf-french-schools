@@ -79,6 +79,18 @@ class GF_French_Schools_AddOn extends GFAddOn
     protected $_capabilities_settings_page = 'manage_options';
 
     /**
+     * Settings tab icon (Dashicon class).
+     *
+     * @see https://developer.wordpress.org/resource/dashicons/#building
+     *
+     * @return string
+     */
+    public function get_menu_icon()
+    {
+        return 'dashicons-building';
+    }
+
+    /**
      * Singleton instance.
      *
      * @var GF_French_Schools_AddOn|null

@@ -179,6 +179,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.5.2 - 2026-02-07
+- Ajout de l'icône Dashicon "building" pour l'onglet French Schools dans les réglages Gravity Forms
+
 ### Version 1.5.1 - 2026-02-07
 - Intégration de la page de réglages dans l'onglet Gravity Forms Settings (GFAddOn) au lieu d'un sous-menu séparé
 - Utilisation du framework GFAddOn pour le rendu et la sauvegarde des paramètres (bouton Save natif)
@@ -191,7 +194,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 - Nouvelle page de réglages sous Formulaires → French Schools
 - Mode « Local Only » : possibilité de désactiver totalement l'API distante
 - Bouton de synchronisation manuelle avec affichage du statut en temps réel
-
 
 ### Version 1.4.0 - 2026-01-27
 - Ajout des champs "Circonscription" et "Mail circo" pour chaque établissement
@@ -236,4 +238,3 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ### Version 1.0.3 - 2025-12-26
 - Version initiale
-
