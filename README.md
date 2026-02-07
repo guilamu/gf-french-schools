@@ -182,9 +182,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 ### Version 1.5.1 - 2026-02-07
 - Intégration de la page de réglages dans l'onglet Gravity Forms Settings (GFAddOn) au lieu d'un sous-menu séparé
 - Utilisation du framework GFAddOn pour le rendu et la sauvegarde des paramètres (bouton Save natif)
-- Correction du bouton « Synchroniser maintenant » (délégation d'événement JS)
-- Correction de l'alignement du tableau de synchronisation (largeur automatique des colonnes)
-- Mise à jour des fichiers de traduction (français)
 
 ### Version 1.5.0 - 2026-02-07
 - Ajout d'une base de données locale comme filet de sécurité en cas d'indisponibilité de l'API
@@ -194,8 +191,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 - Nouvelle page de réglages sous Formulaires → French Schools
 - Mode « Local Only » : possibilité de désactiver totalement l'API distante
 - Bouton de synchronisation manuelle avec affichage du statut en temps réel
-- Correction de l'alignement du padding des champs (16px uniforme)
-- Mise à jour des fichiers de traduction (français)
+
 
 ### Version 1.4.0 - 2026-01-27
 - Ajout des champs "Circonscription" et "Mail circo" pour chaque établissement
@@ -240,3 +236,4 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ### Version 1.0.3 - 2025-12-26
 - Version initiale
+
