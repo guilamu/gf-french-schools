@@ -179,6 +179,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.5.1 - 2026-02-07
+- Intégration de la page de réglages dans l'onglet Gravity Forms Settings (GFAddOn) au lieu d'un sous-menu séparé
+- Utilisation du framework GFAddOn pour le rendu et la sauvegarde des paramètres (bouton Save natif)
+- Correction du bouton « Synchroniser maintenant » (délégation d'événement JS)
+- Correction de l'alignement du tableau de synchronisation (largeur automatique des colonnes)
+- Mise à jour des fichiers de traduction (français)
+
 ### Version 1.5.0 - 2026-02-07
 - Ajout d'une base de données locale comme filet de sécurité en cas d'indisponibilité de l'API
 - Téléchargement mensuel automatique de l'annuaire complet (~69 000 établissements) via WP-Cron

@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.5.0');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.5.1');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -58,8 +58,10 @@ function gf_french_schools_init()
 
     require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-ecoles-api-service.php';
     require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-gf-field-ecoles-fr.php';
+    require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-gf-french-schools-addon.php';
 
     GF_Fields::register(new GF_Field_Ecoles_FR());
+    GFAddOn::register('GF_French_Schools_AddOn');
 }
 
 // ------------------------------------------------------------------
@@ -531,216 +533,7 @@ function gf_french_schools_ajax_search()
     }
 }
 
-// ------------------------------------------------------------------
-// Admin settings page for local DB sync management.
-// ------------------------------------------------------------------
 
-add_action('admin_menu', 'gf_french_schools_admin_menu', 20);
-
-/**
- * Register the settings page under the Gravity Forms menu.
- */
-function gf_french_schools_admin_menu()
-{
-    global $gf_french_schools_sync_hook;
-
-    $gf_french_schools_sync_hook = add_submenu_page(
-        'gf_edit_forms',
-        __('French Schools', 'gf-french-schools'),
-        __('French Schools', 'gf-french-schools'),
-        'manage_options',
-        'gf-french-schools-sync',
-        'gf_french_schools_sync_page'
-    );
-}
-
-/**
- * Render the sync settings page.
- */
-function gf_french_schools_sync_page()
-{
-    $status = GF_Ecoles_Local_DB::get_status();
-    $next_scheduled = wp_next_scheduled(GF_Ecoles_Local_DB::CRON_HOOK);
-    $local_only = get_option('gf_ecoles_fr_local_only', false);
-
-    $has_local_data = !empty($status['record_count']);
-
-    // Handle form submission for the local-only toggle.
-    if (isset($_POST['gf_ecoles_fr_save_settings']) && check_admin_referer('gf_ecoles_fr_settings')) {
-        $local_only = !empty($_POST['gf_ecoles_fr_local_only']) && $has_local_data;
-        update_option('gf_ecoles_fr_local_only', $local_only);
-        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'gf-french-schools') . '</p></div>';
-    }
-
-    // Force-disable if the local DB was emptied/lost after the option was saved.
-    if ($local_only && !$has_local_data) {
-        $local_only = false;
-        update_option('gf_ecoles_fr_local_only', false);
-    }
-    ?>
-    <div class="wrap gf-ecoles-sync-wrap">
-        <h1><?php esc_html_e('French Schools', 'gf-french-schools'); ?></h1>
-
-        <h2><?php esc_html_e('Mode', 'gf-french-schools'); ?></h2>
-        <form method="post">
-            <?php wp_nonce_field('gf_ecoles_fr_settings'); ?>
-            <table class="form-table" role="presentation">
-                <tbody>
-                    <tr>
-                        <th scope="row"><?php esc_html_e('Local Only', 'gf-french-schools'); ?></th>
-                        <td>
-                            <label>
-                                <input type="checkbox" name="gf_ecoles_fr_local_only" value="1" <?php checked($local_only); ?> <?php disabled(!$has_local_data); ?> />
-                                <?php esc_html_e('Disable the remote API and use only the local database', 'gf-french-schools'); ?>
-                            </label>
-                            <p class="description">
-                                <?php if ($has_local_data) : ?>
-                                    <?php esc_html_e('When enabled, all searches use the locally downloaded copy of the school directory. The remote API will never be called.', 'gf-french-schools'); ?>
-                                <?php else : ?>
-                                    <?php esc_html_e('This option requires a local database. Please sync the database first using the button below.', 'gf-french-schools'); ?>
-                                <?php endif; ?>
-                            </p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <?php submit_button(__('Save Settings', 'gf-french-schools'), 'primary', 'gf_ecoles_fr_save_settings'); ?>
-        </form>
-
-        <hr />
-
-        <h2><?php esc_html_e('Local Database Sync', 'gf-french-schools'); ?></h2>
-        <p class="description">
-            <?php esc_html_e('The plugin downloads a copy of the French Education Ministry directory monthly. This local copy is used automatically when the remote API is unavailable, or exclusively when Local Only mode is enabled.', 'gf-french-schools'); ?>
-        </p>
-
-        <table class="form-table gf-ecoles-sync-table" role="presentation">
-            <tbody>
-                <tr>
-                    <th scope="row"><?php esc_html_e('Sync Status', 'gf-french-schools'); ?></th>
-                    <td>
-                        <span id="gf-ecoles-sync-status" class="gf-ecoles-status-badge gf-ecoles-status-<?php echo esc_attr($status['status']); ?>">
-                            <?php echo esc_html(_gf_ecoles_status_label($status['status'])); ?>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><?php esc_html_e('Last Successful Sync', 'gf-french-schools'); ?></th>
-                    <td id="gf-ecoles-last-sync">
-                        <?php
-                        if (!empty($status['last_sync'])) {
-                            echo esc_html(
-                                date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $status['last_sync'])
-                            );
-                        } else {
-                            esc_html_e('Never', 'gf-french-schools');
-                        }
-                        ?>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><?php esc_html_e('Records in Local DB', 'gf-french-schools'); ?></th>
-                    <td id="gf-ecoles-record-count">
-                        <?php echo esc_html(number_format_i18n($status['record_count'])); ?>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><?php esc_html_e('Next Scheduled Sync', 'gf-french-schools'); ?></th>
-                    <td>
-                        <?php
-                        if ($next_scheduled) {
-                            echo esc_html(
-                                date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $next_scheduled)
-                            );
-                        } else {
-                            esc_html_e('Not scheduled', 'gf-french-schools');
-                        }
-                        ?>
-                    </td>
-                </tr>
-                <?php if (!empty($status['error'])) : ?>
-                <tr>
-                    <th scope="row"><?php esc_html_e('Last Error', 'gf-french-schools'); ?></th>
-                    <td class="gf-ecoles-error-message">
-                        <?php echo esc_html($status['error']); ?>
-                    </td>
-                </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-
-        <p>
-            <button type="button" id="gf-ecoles-sync-btn" class="button button-primary">
-                <?php esc_html_e('Sync Now', 'gf-french-schools'); ?>
-            </button>
-            <span id="gf-ecoles-sync-spinner" class="spinner" style="float:none;"></span>
-            <span id="gf-ecoles-sync-message" class="gf-ecoles-sync-msg"></span>
-        </p>
-    </div>
-    <?php
-}
-
-/**
- * Return a human-readable status label.
- *
- * Must be called from within the page callback, so it is a plain function.
- *
- * @param string $status Status key.
- * @return string
- */
-function _gf_ecoles_status_label($status)
-{
-    $labels = array(
-        'idle'    => __('Idle — no sync has run yet', 'gf-french-schools'),
-        'running' => __('Sync in progress…', 'gf-french-schools'),
-        'success' => __('OK', 'gf-french-schools'),
-        'error'   => __('Error', 'gf-french-schools'),
-    );
-    return $labels[$status] ?? $status;
-}
-
-/**
- * Enqueue admin scripts/styles on the sync settings page.
- */
-add_action('admin_enqueue_scripts', 'gf_french_schools_sync_admin_assets');
-
-function gf_french_schools_sync_admin_assets($hook)
-{
-    global $gf_french_schools_sync_hook;
-
-    if ($hook !== $gf_french_schools_sync_hook) {
-        return;
-    }
-
-    wp_enqueue_style(
-        'gf-ecoles-fr-sync-css',
-        GF_FRENCH_SCHOOLS_URL . 'assets/css/ecoles-fr-admin.css',
-        array(),
-        GF_FRENCH_SCHOOLS_VERSION
-    );
-
-    wp_enqueue_script(
-        'gf-ecoles-fr-sync-js',
-        GF_FRENCH_SCHOOLS_URL . 'assets/js/ecoles-fr-admin.js',
-        array('jquery'),
-        GF_FRENCH_SCHOOLS_VERSION,
-        true
-    );
-
-    wp_localize_script('gf-ecoles-fr-sync-js', 'gfEcolesFRSync', array(
-        'ajaxUrl' => admin_url('admin-ajax.php'),
-        'nonce'   => wp_create_nonce('gf_ecoles_fr_sync_nonce'),
-        'i18n'    => array(
-            'syncing'      => __('Syncing — this may take a few minutes…', 'gf-french-schools'),
-            'success'      => __('Sync completed successfully!', 'gf-french-schools'),
-            'error'        => __('Sync failed. See error details below.', 'gf-french-schools'),
-            'statusOk'     => __('OK', 'gf-french-schools'),
-            'statusError'  => __('Error', 'gf-french-schools'),
-            'statusRunning' => __('Sync in progress…', 'gf-french-schools'),
-            'never'        => __('Never', 'gf-french-schools'),
-        ),
-    ));
-}
 
 /**
  * AJAX handler for manual sync trigger (admin only).

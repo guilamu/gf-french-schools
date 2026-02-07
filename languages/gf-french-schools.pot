@@ -2,7 +2,7 @@
 # This file is distributed under the AGPL-3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.5.0\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.5.1\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2026-02-07T12:00:00+01:00\n"
 "MIME-Version: 1.0\n"
@@ -426,6 +426,10 @@ msgstr ""
 
 #: includes/class-ecoles-local-db.php
 msgid "CSV is missing required columns: %s"
+msgstr ""
+
+#: includes/class-gf-french-schools-addon.php
+msgid "Configure how the plugin searches for schools."
 msgstr ""
 
 #: includes/class-github-updater.php

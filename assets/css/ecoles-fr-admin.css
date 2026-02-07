@@ -21,15 +21,52 @@
 }
 
 /* ------------------------------------------------------------------
-   Sync settings page (Settings > French Schools Sync)
+   Sync settings page (Settings > French Schools)
    ------------------------------------------------------------------ */
 
-.gf-ecoles-sync-wrap .description {
-    margin-bottom: 20px;
+.gf-ecoles-sync-dashboard {
+    text-align: left;
+}
+
+.gf-ecoles-sync-table {
+    border-collapse: collapse;
+}
+
+.gf-ecoles-sync-table th,
+.gf-ecoles-sync-table td {
+    text-align: left;
+    padding: 6px 12px 6px 0;
+    vertical-align: middle;
 }
 
 .gf-ecoles-sync-table th {
-    width: 200px;
+    white-space: nowrap;
+    width: 1%;
+}
+
+/* Sync Now button — override GFAddOn panel button resets */
+#gf-ecoles-sync-btn {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #2271b1 !important;
+    border-color: #2271b1 !important;
+    color: #fff !important;
+    cursor: pointer;
+    padding: 4px 12px;
+    font-size: 13px;
+    line-height: 2;
+    border-radius: 3px;
+}
+
+#gf-ecoles-sync-btn:hover {
+    background: #135e96 !important;
+    border-color: #135e96 !important;
+}
+
+#gf-ecoles-sync-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed;
 }
 
 /* Status badges */
