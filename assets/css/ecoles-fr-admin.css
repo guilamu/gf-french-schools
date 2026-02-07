@@ -19,3 +19,64 @@
     color: #6b7280 !important;
     opacity: 1;
 }
+
+/* ------------------------------------------------------------------
+   Sync settings page (Settings > French Schools Sync)
+   ------------------------------------------------------------------ */
+
+.gf-ecoles-sync-wrap .description {
+    margin-bottom: 20px;
+}
+
+.gf-ecoles-sync-table th {
+    width: 200px;
+}
+
+/* Status badges */
+.gf-ecoles-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.gf-ecoles-status-idle {
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+.gf-ecoles-status-running {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.gf-ecoles-status-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.gf-ecoles-status-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Error message in table */
+.gf-ecoles-error-message {
+    color: #721c24;
+    font-style: italic;
+}
+
+/* Sync feedback messages */
+.gf-ecoles-sync-msg {
+    margin-left: 10px;
+    font-weight: 500;
+}
+
+.gf-ecoles-msg-success {
+    color: #155724;
+}
+
+.gf-ecoles-msg-error {
+    color: #721c24;
+}

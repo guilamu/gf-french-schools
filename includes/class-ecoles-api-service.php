@@ -54,6 +54,11 @@ class GF_Ecoles_API_Service
             return $cached;
         }
 
+        // Local-only mode: skip remote API entirely.
+        if (get_option('gf_ecoles_fr_local_only', false) && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
+            return GF_Ecoles_Local_DB::search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+        }
+
         $where = sprintf(
             'statut_public_prive="%s" and libelle_departement="%s" and suggest(nom_commune,"%s")',
             $this->escape_api_string($statut),
@@ -82,6 +87,11 @@ class GF_Ecoles_API_Service
         $response = $this->make_request($url);
 
         if (is_wp_error($response)) {
+            // Fallback to local database when API is unavailable.
+            if (class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
+                $this->log_error('Falling back to local database for city search', $url);
+                return GF_Ecoles_Local_DB::search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+            }
             return $response;
         }
 
@@ -137,6 +147,11 @@ class GF_Ecoles_API_Service
             return $cached;
         }
 
+        // Local-only mode: skip remote API entirely.
+        if (get_option('gf_ecoles_fr_local_only', false) && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
+            return GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+        }
+
         $select_fields = array(
             'identifiant_de_l_etablissement',
             'nom_etablissement',
@@ -180,6 +195,11 @@ class GF_Ecoles_API_Service
         $response = $this->make_request($url);
 
         if (is_wp_error($response)) {
+            // Fallback to local database when API is unavailable.
+            if (class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
+                $this->log_error('Falling back to local database for school search', $url);
+                return GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            }
             return $response;
         }
 

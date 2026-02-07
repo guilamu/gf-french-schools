@@ -58,4 +58,79 @@
         });
     }
 
+    // ------------------------------------------------------------------
+    // Sync settings page (Settings > French Schools Sync)
+    // ------------------------------------------------------------------
+
+    var $syncBtn = $('#gf-ecoles-sync-btn');
+    if ($syncBtn.length && typeof gfEcolesFRSync !== 'undefined') {
+
+        $syncBtn.on('click', function () {
+            var $btn = $(this);
+            var $spinner = $('#gf-ecoles-sync-spinner');
+            var $msg = $('#gf-ecoles-sync-message');
+
+            $btn.prop('disabled', true);
+            $spinner.addClass('is-active');
+            $msg.text(gfEcolesFRSync.i18n.syncing).removeClass('gf-ecoles-msg-error gf-ecoles-msg-success');
+
+            $.ajax({
+                url: gfEcolesFRSync.ajaxUrl,
+                type: 'POST',
+                timeout: 600000, // 10 minutes
+                data: {
+                    action: 'gf_ecoles_fr_manual_sync',
+                    nonce: gfEcolesFRSync.nonce
+                },
+                success: function (response) {
+                    $spinner.removeClass('is-active');
+                    $btn.prop('disabled', false);
+
+                    if (response.success) {
+                        $msg.text(response.data.message).addClass('gf-ecoles-msg-success');
+                        updateStatusDisplay(response.data.status);
+                    } else {
+                        $msg.text(response.data.message || gfEcolesFRSync.i18n.error).addClass('gf-ecoles-msg-error');
+                        if (response.data && response.data.status) {
+                            updateStatusDisplay(response.data.status);
+                        }
+                    }
+                },
+                error: function () {
+                    $spinner.removeClass('is-active');
+                    $btn.prop('disabled', false);
+                    $msg.text(gfEcolesFRSync.i18n.error).addClass('gf-ecoles-msg-error');
+                }
+            });
+        });
+
+        /**
+         * Update the status fields on the page after a sync.
+         */
+        function updateStatusDisplay(status) {
+            if (!status) return;
+
+            var $badge = $('#gf-ecoles-sync-status');
+            $badge.removeClass('gf-ecoles-status-idle gf-ecoles-status-running gf-ecoles-status-success gf-ecoles-status-error');
+            $badge.addClass('gf-ecoles-status-' + status.status);
+
+            var statusLabels = {
+                'idle': gfEcolesFRSync.i18n.never,
+                'running': gfEcolesFRSync.i18n.statusRunning,
+                'success': gfEcolesFRSync.i18n.statusOk,
+                'error': gfEcolesFRSync.i18n.statusError
+            };
+            $badge.text(statusLabels[status.status] || status.status);
+
+            if (status.record_count !== undefined) {
+                $('#gf-ecoles-record-count').text(Number(status.record_count).toLocaleString());
+            }
+
+            if (status.last_sync) {
+                var d = new Date(status.last_sync * 1000);
+                $('#gf-ecoles-last-sync').text(d.toLocaleString());
+            }
+        }
+    }
+
 })(jQuery);

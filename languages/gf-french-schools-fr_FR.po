@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.4.0\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.5.0\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
-"POT-Creation-Date: 2026-01-27T10:00:00+01:00\n"
-"PO-Revision-Date: 2026-01-27 10:14+0100\n"
+"POT-Creation-Date: 2026-02-07T12:00:00+01:00\n"
+"PO-Revision-Date: 2026-02-07 18:35+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -16,6 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.8\n"
+
+#: gf-french-schools.php
+msgid "Gravity Forms - French Schools requires Gravity Forms %s or higher."
+msgstr "Gravity Forms - Écoles françaises nécessite Gravity Forms %s ou supérieur."
+
+#: gf-french-schools.php
+msgid "Once Monthly"
+msgstr "Une fois par mois"
 
 #: gf-french-schools.php
 msgid "Preselection Settings"
@@ -66,10 +74,192 @@ msgid "Type at least 2 characters"
 msgstr "Saisissez au moins 2 caractères"
 
 #: gf-french-schools.php
+msgid "Error loading results. Please try again."
+msgstr "Erreur lors du chargement des résultats. Veuillez réessayer."
+
+#: gf-french-schools.php
 msgid "Invalid search type"
 msgstr "Type de recherche invalide"
 
-#: includes/class-gf-field-ecoles-fr.php
+#: gf-french-schools.php
+msgid "Invalid status."
+msgstr "Statut invalide."
+
+#: gf-french-schools.php
+msgid "Invalid department."
+msgstr "Département invalide."
+
+#: gf-french-schools.php
+msgid "City is required."
+msgstr "La ville est requise."
+
+#: gf-french-schools.php
+msgid "Unauthorized access."
+msgstr "Accès non autorisé."
+
+#: gf-french-schools.php
+msgid "Security check failed."
+msgstr "Vérification de sécurité échouée."
+
+#: gf-french-schools.php
+msgid "Too many requests. Please wait a moment."
+msgstr "Trop de requêtes. Veuillez patienter un instant."
+
+#: gf-french-schools.php
+msgid "School Type Filters"
+msgstr "Filtres par type d'établissement"
+
+#: gf-french-schools.php
+msgid "Hide primary schools (Ecoles)"
+msgstr "Masquer les écoles primaires (Écoles)"
+
+#: gf-french-schools.php
+msgid "Hide middle and high schools (Collèges and Lycées)"
+msgstr "Masquer les collèges et lycées"
+
+#: gf-french-schools.php
+msgid "Result Display"
+msgstr "Affichage du récapitulatif"
+
+#: gf-french-schools.php
+msgid "Hide the selected school summary block"
+msgstr "Masquer le bloc de récap établissement"
+
+#: gf-french-schools.php
+msgid "Other: Enter school name manually"
+msgstr "Autre : Saisir le nom de l'école manuellement"
+
+#: gf-french-schools.php
+msgid "Manual Entry"
+msgstr "Saisie manuelle"
+
+#: gf-french-schools.php includes/class-gf-field-ecoles-fr.php
+msgid "No"
+msgstr "Non"
+
+#. Settings page - Mode section
+#: gf-french-schools.php
+msgid "Settings saved."
+msgstr "Paramètres enregistrés."
+
+#: gf-french-schools.php
+msgid "Mode"
+msgstr "Mode"
+
+#: gf-french-schools.php
+msgid "Local Only"
+msgstr "Local uniquement"
+
+#: gf-french-schools.php
+msgid "Disable the remote API and use only the local database"
+msgstr "Désactiver l'API distante et utiliser uniquement la base de données locale"
+
+#: gf-french-schools.php
+msgid "When enabled, all searches use the locally downloaded copy of the school directory. The remote API will never be called."
+msgstr "Lorsque cette option est activée, toutes les recherches utilisent la copie locale de l'annuaire scolaire. L'API distante ne sera jamais appelée."
+
+#: gf-french-schools.php
+msgid "This option requires a local database. Please sync the database first using the button below."
+msgstr "Cette option nécessite une base de données locale. Veuillez d'abord synchroniser la base en utilisant le bouton ci-dessous."
+
+#: gf-french-schools.php
+msgid "Save Settings"
+msgstr "Enregistrer les paramètres"
+
+#. Settings page - Sync section
+#: gf-french-schools.php
+msgid "Local Database Sync"
+msgstr "Synchronisation de la base locale"
+
+#: gf-french-schools.php
+msgid "The plugin downloads a copy of the French Education Ministry directory monthly. This local copy is used automatically when the remote API is unavailable, or exclusively when Local Only mode is enabled."
+msgstr "Le plugin télécharge une copie de l'annuaire du Ministère de l'Éducation Nationale chaque mois. Cette copie locale est utilisée automatiquement lorsque l'API distante est indisponible, ou exclusivement lorsque le mode Local uniquement est activé."
+
+#: gf-french-schools.php
+msgid "Sync Status"
+msgstr "État de la synchronisation"
+
+#: gf-french-schools.php
+msgid "Last Successful Sync"
+msgstr "Dernière synchronisation réussie"
+
+#: gf-french-schools.php
+msgid "Never"
+msgstr "Jamais"
+
+#: gf-french-schools.php
+msgid "Records in Local DB"
+msgstr "Enregistrements en base locale"
+
+#: gf-french-schools.php
+msgid "Next Scheduled Sync"
+msgstr "Prochaine synchronisation planifiée"
+
+#: gf-french-schools.php
+msgid "Not scheduled"
+msgstr "Non planifiée"
+
+#: gf-french-schools.php
+msgid "Last Error"
+msgstr "Dernière erreur"
+
+#: gf-french-schools.php
+msgid "Sync Now"
+msgstr "Synchroniser maintenant"
+
+#: gf-french-schools.php
+msgid "Idle — no sync has run yet"
+msgstr "Inactif — aucune synchronisation effectuée"
+
+#: gf-french-schools.php
+msgid "Sync in progress…"
+msgstr "Synchronisation en cours…"
+
+#: gf-french-schools.php
+msgid "OK"
+msgstr "OK"
+
+#: gf-french-schools.php
+msgid "Error"
+msgstr "Erreur"
+
+#: gf-french-schools.php
+msgid "Syncing — this may take a few minutes…"
+msgstr "Synchronisation — cela peut prendre quelques minutes…"
+
+#: gf-french-schools.php
+msgid "Sync completed successfully!"
+msgstr "Synchronisation terminée avec succès !"
+
+#: gf-french-schools.php
+msgid "Sync failed. See error details below."
+msgstr "La synchronisation a échoué. Voir les détails de l'erreur ci-dessous."
+
+#: gf-french-schools.php
+msgid "Unauthorized."
+msgstr "Non autorisé."
+
+#: gf-french-schools.php
+msgid "%s records imported successfully."
+msgstr "%s enregistrements importés avec succès."
+
+#: gf-french-schools.php
+msgid "Gravity Forms - French Schools"
+msgstr "Gravity Forms - Écoles françaises"
+
+#: gf-french-schools.php
+msgid "🐛 Report a Bug"
+msgstr "🐛 Signaler un bug"
+
+#: gf-french-schools.php includes/class-gf-field-ecoles-fr.php
+msgid "Public"
+msgstr "Public"
+
+#: gf-french-schools.php includes/class-gf-field-ecoles-fr.php
+msgid "Private"
+msgstr "Privé"
+
+#: gf-french-schools.php includes/class-gf-field-ecoles-fr.php
 msgid "French Schools"
 msgstr "Écoles françaises"
 
@@ -84,14 +274,6 @@ msgstr "Statut"
 #: includes/class-gf-field-ecoles-fr.php
 msgid "-- Select --"
 msgstr "-- Sélectionner --"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Public"
-msgstr "Public"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Private"
-msgstr "Privé"
 
 #: includes/class-gf-field-ecoles-fr.php
 msgid "School status"
@@ -118,6 +300,26 @@ msgid "Start typing school name..."
 msgstr "Commencez à saisir le nom de l'école..."
 
 #: includes/class-gf-field-ecoles-fr.php
+msgid "Other (School not found)"
+msgstr "Autre (École non trouvée)"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Enter school name manually..."
+msgstr "Saisir le nom de l'école manuellement..."
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Other school name"
+msgstr "Autre nom d'école"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Cancel manual entry"
+msgstr "Annuler la saisie manuelle"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Cancel"
+msgstr "Annuler"
+
+#: includes/class-gf-field-ecoles-fr.php
 msgid "Selected School Information"
 msgstr "Informations sur l'établissement sélectionné"
 
@@ -128,6 +330,10 @@ msgstr "Identifiant"
 #: includes/class-gf-field-ecoles-fr.php
 msgid "Name"
 msgstr "Nom"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Name (Manual Entry)"
+msgstr "Nom (Saisie manuelle)"
 
 #: includes/class-gf-field-ecoles-fr.php
 msgid "Type"
@@ -158,8 +364,12 @@ msgid "Priority Education"
 msgstr "Éducation prioritaire"
 
 #: includes/class-gf-field-ecoles-fr.php
-msgid "No"
-msgstr "Non"
+msgid "Circonscription"
+msgstr "Circonscription"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Email Circonscription"
+msgstr "Email Circonscription"
 
 #: includes/class-gf-field-ecoles-fr.php
 msgid "This field is required. Please select a school."
@@ -186,6 +396,10 @@ msgid "All Information"
 msgstr "Toutes les informations"
 
 #: includes/class-ecoles-api-service.php
+msgid "Unable to connect to the school directory. Please try again later."
+msgstr "Impossible de se connecter à l'annuaire scolaire. Veuillez réessayer plus tard."
+
+#: includes/class-ecoles-api-service.php
 msgid "API request failed with status code %d"
 msgstr "La requête API a échoué avec le code de statut %d"
 
@@ -193,72 +407,26 @@ msgstr "La requête API a échoué avec le code de statut %d"
 msgid "Failed to parse API response"
 msgstr "Échec de l'analyse de la réponse API"
 
-#: gf-french-schools.php
-msgid "School Type Filters"
-msgstr "Filtres par type d'établissement"
+#: includes/class-ecoles-local-db.php
+msgid "A sync is already in progress."
+msgstr "Une synchronisation est déjà en cours."
 
-#: gf-french-schools.php
-msgid "Hide primary schools (Ecoles)"
-msgstr "Masquer les écoles primaires (Écoles)"
+#: includes/class-ecoles-local-db.php
+msgid "Failed to open downloaded CSV file."
+msgstr "Impossible d'ouvrir le fichier CSV téléchargé."
 
-#: gf-french-schools.php
-msgid "Hide middle and high schools (Collèges and Lycées)"
-msgstr "Masquer les collèges et lycées"
+#: includes/class-ecoles-local-db.php
+msgid "CSV file has no header row."
+msgstr "Le fichier CSV n'a pas de ligne d'en-tête."
 
-#: gf-french-schools.php
-msgid "Too many requests. Please wait a moment."
-msgstr "Trop de requêtes. Veuillez patienter un instant."
+#: includes/class-ecoles-local-db.php
+msgid "Only %1$d records imported (minimum %2$d expected). Aborting to protect existing data."
+msgstr "Seulement %1$d enregistrements importés (minimum %2$d attendus). Abandon pour protéger les données existantes."
 
-#: gf-french-schools.php
-msgid "Result Display"
-msgstr "Affichage du récapitulatif"
-
-#: gf-french-schools.php
-msgid "Hide the selected school summary block"
-msgstr "Masquer le bloc de récap établissement"
+#: includes/class-ecoles-local-db.php
+msgid "CSV is missing required columns: %s"
+msgstr "Colonnes requises manquantes dans le CSV : %s"
 
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder."
 msgstr "Impossible de renommer le dossier de mise à jour."
-
-#. New strings for "Autres" (Other/Manual entry) feature
-#: gf-french-schools.php
-msgid "Other: Enter school name manually"
-msgstr "Autre : Saisir le nom de l'école manuellement"
-
-#: gf-french-schools.php
-msgid "Manual Entry"
-msgstr "Saisie manuelle"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Other (School not found)"
-msgstr "Autre (École non trouvée)"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Enter school name manually..."
-msgstr "Saisir le nom de l'école manuellement..."
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Other school name"
-msgstr "Autre nom d'école"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Cancel manual entry"
-msgstr "Annuler la saisie manuelle"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Cancel"
-msgstr "Annuler"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Name (Manual Entry)"
-msgstr "Nom (Saisie manuelle)"
-
-#. New strings for circonscription feature
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Circonscription"
-msgstr "Circonscription"
-
-#: includes/class-gf-field-ecoles-fr.php
-msgid "Email Circonscription"
-msgstr "Email Circonscription"

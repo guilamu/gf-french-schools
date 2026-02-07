@@ -43,6 +43,20 @@ Dans l'éditeur de formulaire, le champ "Écoles françaises" propose les option
 - **Masquer les écoles primaires** : Exclut les écoles maternelles et élémentaires des résultats
 - **Masquer les collèges et lycées** : Exclut les établissements secondaires des résultats
 
+### Page de réglages « Écoles françaises »
+
+Accessible via **Formulaires → French Schools**, cette page permet de :
+
+#### Mode Local uniquement
+- Activer/désactiver le mode « Local Only » pour utiliser exclusivement la base de données locale sans appeler l'API distante
+- Utile en cas d'indisponibilité prolongée de l'API ou pour des raisons de performance
+
+#### Synchronisation de la base locale
+- Visualiser l'état de la synchronisation (statut, dernière synchro, nombre d'enregistrements, prochaine synchro planifiée)
+- Lancer une synchronisation manuelle via le bouton « Synchroniser maintenant »
+- La synchronisation télécharge l'intégralité de l'annuaire (~69 000 établissements) depuis le portail Open Data du Ministère
+- Un cron WordPress planifie automatiquement une synchronisation mensuelle
+
 ## Données collectées
 
 Pour chaque établissement sélectionné, les informations suivantes sont enregistrées :
@@ -110,7 +124,8 @@ Le plugin est entièrement traduisible et inclut une traduction française compl
 │       ├── ecoles-fr-admin.js         # réglages custom dans l’éditeur GF
 │       └── ecoles-fr-frontend.js      # logique cascade, autocomplétion, accessibilité
 ├── includes
-│   ├── class-ecoles-api-service.php   # client OpenDataSoft + cache
+│   ├── class-ecoles-api-service.php   # client OpenDataSoft + cache + fallback local
+│   ├── class-ecoles-local-db.php      # base de données locale, import CSV, sync cron
 │   ├── class-gf-field-ecoles-fr.php   # définition du champ GF, rendu, validation
 │   └── class-github-updater.php       # mise à jour GitHub
 └── languages
@@ -163,6 +178,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.5.0 - 2026-02-07
+- Ajout d'une base de données locale comme filet de sécurité en cas d'indisponibilité de l'API
+- Téléchargement mensuel automatique de l'annuaire complet (~69 000 établissements) via WP-Cron
+- Import CSV sécurisé avec table de staging (les données existantes ne sont remplacées qu'après validation)
+- Basculement automatique vers la base locale en cas d'erreur API
+- Nouvelle page de réglages sous Formulaires → French Schools
+- Mode « Local Only » : possibilité de désactiver totalement l'API distante
+- Bouton de synchronisation manuelle avec affichage du statut en temps réel
+- Correction de l'alignement du padding des champs (16px uniforme)
+- Mise à jour des fichiers de traduction (français)
 
 ### Version 1.4.0 - 2026-01-27
 - Ajout des champs "Circonscription" et "Mail circo" pour chaque établissement
