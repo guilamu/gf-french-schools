@@ -159,7 +159,7 @@ msgid "Local Only"
 msgstr ""
 
 #: gf-french-schools.php
-msgid "Disable the remote API and use only the local database"
+msgid "Disable the remote API and use only the local database."
 msgstr ""
 
 #: gf-french-schools.php

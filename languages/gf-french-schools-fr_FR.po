@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Gravity Forms - French Schools 1.5.3\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2026-02-07T12:00:00+01:00\n"
-"PO-Revision-Date: 2026-02-08 11:35+0100\n"
+"PO-Revision-Date: 2026-02-08 11:41+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -151,8 +151,8 @@ msgid "Local Only"
 msgstr "Local uniquement"
 
 #: gf-french-schools.php
-msgid "Disable the remote API and use only the local database"
-msgstr "Désactiver l'API distante et utiliser uniquement la base de données locale"
+msgid "Disable the remote API and use only the local database."
+msgstr "Désactiver l'API distante et utiliser uniquement la base de données locale."
 
 #: gf-french-schools.php
 msgid "When enabled, all searches use the locally downloaded copy of the school directory. The remote API will never be called."
