@@ -179,6 +179,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Change Log
 
+### Version 1.5.3 - 2026-02-08
+- Utilisation d'un toggle au lieu d'une checkbox pour l'option "Local Only" (cohérence avec le style Gravity Forms)
+- Style du bouton "Sync Now" corrigé pour correspondre aux autres boutons de réglages Gravity Forms
+
 ### Version 1.5.2 - 2026-02-07
 - Ajout de l'icône Dashicon "building" pour l'onglet French Schools dans les réglages Gravity Forms
 

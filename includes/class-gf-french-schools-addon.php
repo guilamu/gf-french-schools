@@ -209,16 +209,12 @@ class GF_French_Schools_AddOn extends GFAddOn
                 'description' => esc_html__('Configure how the plugin searches for schools.', 'gf-french-schools'),
                 'fields'      => array(
                     array(
-                        'name'    => 'local_only',
-                        'type'    => 'checkbox',
-                        'label'   => esc_html__('Local Only', 'gf-french-schools'),
-                        'tooltip' => esc_html__('When enabled, all searches use the locally downloaded copy of the school directory. The remote API will never be called.', 'gf-french-schools'),
-                        'choices' => array(
-                            array(
-                                'label' => esc_html__('Disable the remote API and use only the local database', 'gf-french-schools'),
-                                'name'  => 'local_only',
-                            ),
-                        ),
+                        'name'          => 'local_only',
+                        'type'          => 'toggle',
+                        'label'         => esc_html__('Local Only', 'gf-french-schools'),
+                        'description'   => esc_html__('Disable the remote API and use only the local database.', 'gf-french-schools'),
+                        'tooltip'       => esc_html__('When enabled, all searches use the locally downloaded copy of the school directory. The remote API will never be called.', 'gf-french-schools'),
+                        'default_value' => false,
                     ),
                 ),
             ),
@@ -306,7 +302,7 @@ class GF_French_Schools_AddOn extends GFAddOn
             </table>
 
             <p style="margin-top: 12px;">
-                <button type="button" id="gf-ecoles-sync-btn" class="button button-primary">
+                <button type="button" id="gf-ecoles-sync-btn" class="button">
                     <?php esc_html_e('Sync Now', 'gf-french-schools'); ?>
                 </button>
                 <span id="gf-ecoles-sync-spinner" class="spinner" style="float:none;"></span>
