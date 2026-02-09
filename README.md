@@ -113,25 +113,28 @@ Le plugin est entièrement traduisible et inclut une traduction française compl
 .
 ├── .github
 │   └── workflows
-│       └── release.yml                # GitHub Actions release workflow
-├── gf-french-schools.php
+│       └── release.yml                  # GitHub Actions release workflow
+├── gf-french-schools.php                # fichier principal du plugin
+├── LICENSE                              # licence AGPL-3.0
 ├── README.md
+├── uninstall.php                        # nettoyage lors de la désinstallation
 ├── assets
 │   ├── css
-│   │   ├── ecoles-fr-admin.css        # styles éditeur GF
-│   │   └── ecoles-fr.css              # styles frontend + bloc résultat
+│   │   ├── ecoles-fr-admin.css          # styles éditeur GF
+│   │   └── ecoles-fr.css                # styles frontend + bloc résultat
 │   └── js
-│       ├── ecoles-fr-admin.js         # réglages custom dans l’éditeur GF
-│       └── ecoles-fr-frontend.js      # logique cascade, autocomplétion, accessibilité
+│       ├── ecoles-fr-admin.js           # réglages custom dans l'éditeur GF
+│       └── ecoles-fr-frontend.js        # logique cascade, autocomplétion, accessibilité
 ├── includes
-│   ├── class-ecoles-api-service.php   # client OpenDataSoft + cache + fallback local
-│   ├── class-ecoles-local-db.php      # base de données locale, import CSV, sync cron
-│   ├── class-gf-field-ecoles-fr.php   # définition du champ GF, rendu, validation
-│   └── class-github-updater.php       # mise à jour GitHub
+│   ├── class-ecoles-api-service.php     # client OpenDataSoft + cache + fallback local
+│   ├── class-ecoles-local-db.php        # base de données locale, import CSV, sync cron
+│   ├── class-gf-field-ecoles-fr.php     # définition du champ GF, rendu, validation
+│   ├── class-gf-french-schools-addon.php # page réglages GFAddOn (Local Only, Sync)
+│   └── class-github-updater.php         # mise à jour automatique via GitHub
 └── languages
-	├── gf-french-schools-fr_FR.mo     # binaire FR
-	├── gf-french-schools-fr_FR.po     # sources FR
-	└── gf-french-schools.pot          # modèle de traduction
+    ├── gf-french-schools-fr_FR.mo       # binaire FR
+    ├── gf-french-schools-fr_FR.po       # sources FR
+    └── gf-french-schools.pot            # modèle de traduction
 ```
 
 ## API utilisée
@@ -151,23 +154,6 @@ Ce projet est sous licence **GNU Affero General Public License v3.0 (AGPL-3.0)**
 
 Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-```
-Copyright (C) 2024 Guilamu
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-```
-
 ## Auteur
 
 **Guilamu** - [GitHub](https://github.com/guilamu)
@@ -178,6 +164,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.5.4 - 2026-02-09
+- Réécriture complète du système de chargement des traductions pour résoudre les problèmes de compatibilité :
+  - Utilisation de chemins absolus avec `load_textdomain()` au lieu de `load_plugin_textdomain()`
+  - Chargement sur plusieurs hooks (`plugins_loaded`, `init`, `gform_pre_render`) comme filets de sécurité
+  - Support du rechargement forcé si la locale change entre les hooks
+  - Fallback sur la locale de base (ex: 'fr' si 'fr_FR.mo' n'existe pas)
 
 ### Version 1.5.3 - 2026-02-08
 - Utilisation d'un toggle au lieu d'une checkbox pour l'option "Local Only" (cohérence avec le style Gravity Forms)

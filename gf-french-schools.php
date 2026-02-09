@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.5.3
+ * Version: 1.5.4
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,10 +19,75 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.5.3');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.5.4');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
+
+/**
+ * Load translations using absolute path to handle edge cases where plugin_basename()
+ * doesn't work correctly early in the loading process, or when GF loads very early.
+ *
+ * @param bool $force Force reload even if already loaded (useful when locale changes).
+ */
+function gf_french_schools_load_textdomain($force = false)
+{
+    static $loaded_locale = '';
+
+    // Get locale - use determine_locale() if available (WP 5.0+), fallback to get_locale()
+    $locale = function_exists('determine_locale') ? determine_locale() : get_locale();
+
+    // Skip if already loaded for this locale (unless forced)
+    if (!$force && $loaded_locale === $locale) {
+        return;
+    }
+
+    // Try loading with absolute path first (most reliable)
+    $mofile = GF_FRENCH_SCHOOLS_PATH . 'languages/gf-french-schools-' . $locale . '.mo';
+
+    if (file_exists($mofile)) {
+        // Unload any existing textdomain and reload with correct file
+        unload_textdomain('gf-french-schools');
+        if (load_textdomain('gf-french-schools', $mofile)) {
+            $loaded_locale = $locale;
+            return;
+        }
+    }
+
+    // Try base locale (e.g., 'fr' instead of 'fr_FR')
+    $base_locale = explode('_', $locale)[0];
+    $mofile_base = GF_FRENCH_SCHOOLS_PATH . 'languages/gf-french-schools-' . $base_locale . '.mo';
+
+    if ($base_locale !== $locale && file_exists($mofile_base)) {
+        unload_textdomain('gf-french-schools');
+        if (load_textdomain('gf-french-schools', $mofile_base)) {
+            $loaded_locale = $locale;
+            return;
+        }
+    }
+
+    // Fallback: try standard load_plugin_textdomain
+    load_plugin_textdomain(
+        'gf-french-schools',
+        false,
+        dirname(plugin_basename(GF_FRENCH_SCHOOLS_PLUGIN_FILE)) . '/languages'
+    );
+    $loaded_locale = $locale;
+}
+
+// Load on plugins_loaded with priority 1 to run before GF
+add_action('plugins_loaded', 'gf_french_schools_load_textdomain', 1);
+
+// Also load on init as a safety net for edge cases
+add_action('init', 'gf_french_schools_load_textdomain', 1);
+
+// Final safety net: force reload translations right before GF renders any form
+// This handles edge cases where locale was not correctly set during early hooks
+add_filter('gform_pre_render', function ($form) {
+    // Force reload to ensure correct locale is used (may differ from early hooks)
+    gf_french_schools_load_textdomain(true);
+    return $form;
+}, 1);
 
 // Include the GitHub auto-updater
 require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-github-updater.php';
@@ -40,6 +105,9 @@ function gf_french_schools_init()
     if (!method_exists('GFForms', 'include_addon_framework')) {
         return;
     }
+
+    // Ensure translations are loaded before registering fields
+    gf_french_schools_load_textdomain();
 
     // Enforce minimum Gravity Forms version for compatibility.
     $min_version = '2.5';
@@ -129,19 +197,7 @@ function gf_french_schools_run_sync()
     GF_Ecoles_Local_DB::sync();
 }
 
-/**
- * Load plugin text domain for translations.
- */
-add_action('init', 'gf_french_schools_load_textdomain');
 
-function gf_french_schools_load_textdomain()
-{
-    load_plugin_textdomain(
-        'gf-french-schools',
-        false,
-        dirname(plugin_basename(__FILE__)) . '/languages'
-    );
-}
 
 /**
  * Collect CSS rules for preselected fields during form rendering.
