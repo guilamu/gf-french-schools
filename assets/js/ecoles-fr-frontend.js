@@ -36,22 +36,86 @@
 
     /**
      * Clean display value by removing school type words (for nom field).
+     *
+     * Removes school-type prefixes, status words, contract types,
+     * structure names, and common typos/abbreviations so that only
+     * the actual school name remains.
+     *
+     * NOTE: We use whitespace / string-boundary assertions instead of \b
+     * because JavaScript \b only recognises ASCII word characters [a-zA-Z0-9_].
+     * Accented letters (é, è, ô …) are treated as non-word chars, so \b
+     * silently fails for words like élémentaire, École, Collège, etc.
      */
     function cleanDisplayValue(value) {
         if (!value) return '';
-        // Remove specific phrases first
-        var phrasesToRemove = ["Section d'enseignement général et professionnel adapté"];
         var cleaned = value;
+
+        // Helper: escape regex special characters in a literal string
+        function escapeRe(s) {
+            return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // --- 1. Remove multi-word phrases first (order matters: longer first) ---
+        var phrasesToRemove = [
+            // SEGPA full name
+            "Section d'enseignement général et professionnel adapté",
+            // Section d'enseignement variants
+            "Section d'enseignement professionnel",
+            "Section d'enseignement général",
+            "Section d'Enseignement Professionnel",
+            "Section d'Enseignement Général",
+            // Structure prefixes
+            'Groupe scolaire',
+            'Gpe Scolaire',
+            'Centre scolaire',
+            'Ensemble scolaire',
+            // Contract types
+            'hors contrat',
+            'hors-contrat',
+            'sous contrat',
+            // Abbreviations / typos
+            'E.P.PU',
+            'ECOL EPRIMAIRE'
+        ];
         phrasesToRemove.forEach(function (phrase) {
-            cleaned = cleaned.replace(new RegExp(phrase, 'gi'), '');
+            cleaned = cleaned.replace(new RegExp(escapeRe(phrase), 'gi'), '');
         });
-        // Then remove individual words
-        var wordsToRemove = ['Collège', 'Lycée', 'Ecole', 'École', 'Primaire', 'Maternelle', 'Elementaire', 'Élémentaire'];
+
+        // --- 2. Remove individual words (word-boundary match) ---
+        var wordsToRemove = [
+            // Core school types
+            'Collège', 'Lycée', 'Ecole', 'École', 'Ecolé',
+            // School level
+            'Primaire', 'Maternelle',
+            // Élémentaire and all its variants / typos
+            'Élémentaire', 'Elémentaire', 'Elementaire', 'élémentaire',
+            'éléméntaire', 'elmentaire', 'elementaitre', 'élém',
+            // Primaire typo
+            'pimaire',
+            // Status words
+            'publique', 'public', 'privée', 'privé', 'privee', 'prive',
+            // Lycée type qualifiers
+            'professionnel', 'professionnelle',
+            'polyvalent', 'polyvalente',
+            'général', 'générale', 'general',
+            'technologique',
+            // Other structure / qualifier words
+            'Institut', 'Campus', 'Pôle', 'Pole',
+            'scolaire', 'intercommunale', 'intercommunal',
+            'spéciale', 'spécialisée', 'Bilingue',
+            // Abbreviation
+            'RPI',
+            // d'application (special: starts with d')
+            "d'application"
+        ];
         wordsToRemove.forEach(function (word) {
-            var regex = new RegExp('\\b' + word + '\\b', 'gi');
-            cleaned = cleaned.replace(regex, '');
+            // (?:^|\s) = start of string OR whitespace  (Unicode-safe "before")
+            // (?=\s|$) = followed by whitespace or end   (Unicode-safe "after")
+            var regex = new RegExp('(?:^|\\s)' + escapeRe(word) + '(?=\\s|$)', 'gi');
+            cleaned = cleaned.replace(regex, ' ');
         });
-        // Clean up extra whitespace
+
+        // --- 3. Clean up extra whitespace and trim ---
         return cleaned.replace(/\s+/g, ' ').trim();
     }
 
