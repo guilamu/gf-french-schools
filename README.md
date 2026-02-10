@@ -166,7 +166,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 ## Change Log
 
 ### Version 1.6.0 - 2026-02-10
-- Amélioration de l'affichage des résultats dans la vue d'entrée (Entry View) pour correspondre au style du plugin Chained Selects
+- Amélioration de l'affichage des résultats dans la vue d'entrée (Entry View)
 - Le champ "Éducation prioritaire" affiche maintenant "Non" au lieu d'un vide lorsqu'il n'est pas renseigné
 
 ### Version 1.5.4 - 2026-02-09
@@ -239,3 +239,4 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ### Version 1.0.3 - 2025-12-26
 - Version initiale
+
