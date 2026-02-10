@@ -511,39 +511,34 @@ class GF_Field_Ecoles_FR extends GF_Field
             $lines[] = sprintf('%s: %s', __('City', 'gf-french-schools'), $data['commune'] ?? '');
             $lines[] = sprintf('%s: %s', __('Phone', 'gf-french-schools'), $data['telephone'] ?? '');
             $lines[] = sprintf('%s: %s', __('Email', 'gf-french-schools'), $data['mail'] ?? '');
-            $lines[] = sprintf('%s: %s', __('Priority Education', 'gf-french-schools'), $data['education_prioritaire'] ?? '');
+            $lines[] = sprintf('%s: %s', __('Priority Education', 'gf-french-schools'), !empty($data['education_prioritaire']) ? $data['education_prioritaire'] : __('No', 'gf-french-schools'));
             $lines[] = sprintf('%s: %s', __('Circonscription', 'gf-french-schools'), $data['nom_circonscription'] ?? '');
             $lines[] = sprintf('%s: %s', __('Email Circonscription', 'gf-french-schools'), $data['code_circonscription'] ?? '');
             return implode("\n", $lines);
         }
 
-        // HTML format
-        $html = '<div class="gf-ecoles-fr-entry-detail">';
-        $html .= '<table class="gf-ecoles-fr-entry-table">';
+        // HTML format - using div-based layout similar to Chained Select
+        $html = '';
         // Check if this is a manual entry
         if (!empty($data['autres_nom'])) {
-            $html .= '<tr><th>' . esc_html__('Name (Manual Entry)', 'gf-french-schools') . '</th><td>' . esc_html($data['autres_nom']) . '</td></tr>';
-            $html .= '<tr><th>' . esc_html__('City', 'gf-french-schools') . '</th><td>' . esc_html($data['ville'] ?? '') . '</td></tr>';
-            $html .= '</table>';
-            $html .= '</div>';
-            return $html;
+            $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Name (Manual Entry)', 'gf-french-schools') . ':</b> <span>' . esc_html($data['autres_nom']) . '</span></div>';
+            $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('City', 'gf-french-schools') . ':</b> <span>' . esc_html($data['ville'] ?? '') . '</span></div>';
+            return '<div class="gfef-value">' . $html . '</div>';
         }
-        $html .= '<tr><th>' . esc_html__('ID', 'gf-french-schools') . '</th><td>' . esc_html($data['identifiant'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Name', 'gf-french-schools') . '</th><td>' . esc_html($data['nom'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Type', 'gf-french-schools') . '</th><td>' . esc_html($data['type'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Category', 'gf-french-schools') . '</th><td>' . esc_html($data['nature'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Address', 'gf-french-schools') . '</th><td>' . esc_html($data['adresse'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Postal Code', 'gf-french-schools') . '</th><td>' . esc_html($data['code_postal'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('City', 'gf-french-schools') . '</th><td>' . esc_html($data['commune'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Phone', 'gf-french-schools') . '</th><td>' . esc_html($data['telephone'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Email', 'gf-french-schools') . '</th><td>' . esc_html($data['mail'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Priority Education', 'gf-french-schools') . '</th><td>' . esc_html($data['education_prioritaire'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Circonscription', 'gf-french-schools') . '</th><td>' . esc_html($data['nom_circonscription'] ?? '') . '</td></tr>';
-        $html .= '<tr><th>' . esc_html__('Email Circonscription', 'gf-french-schools') . '</th><td>' . esc_html($data['code_circonscription'] ?? '') . '</td></tr>';
-        $html .= '</table>';
-        $html .= '</div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('ID', 'gf-french-schools') . ':</b> <span>' . esc_html($data['identifiant'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Name', 'gf-french-schools') . ':</b> <span>' . esc_html($data['nom'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Type', 'gf-french-schools') . ':</b> <span>' . esc_html($data['type'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Category', 'gf-french-schools') . ':</b> <span>' . esc_html($data['nature'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Address', 'gf-french-schools') . ':</b> <span>' . esc_html($data['adresse'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Postal Code', 'gf-french-schools') . ':</b> <span>' . esc_html($data['code_postal'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('City', 'gf-french-schools') . ':</b> <span>' . esc_html($data['commune'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Phone', 'gf-french-schools') . ':</b> <span>' . esc_html($data['telephone'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Email', 'gf-french-schools') . ':</b> <span>' . esc_html($data['mail'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Priority Education', 'gf-french-schools') . ':</b> <span>' . esc_html(!empty($data['education_prioritaire']) ? $data['education_prioritaire'] : __('No', 'gf-french-schools')) . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Circonscription', 'gf-french-schools') . ':</b> <span>' . esc_html($data['nom_circonscription'] ?? '') . '</span></div>';
+        $html .= '<div class="gfef-value-row"><b style="display:block;">' . esc_html__('Email Circonscription', 'gf-french-schools') . ':</b> <span>' . esc_html($data['code_circonscription'] ?? '') . '</span></div>';
 
-        return $html;
+        return '<div class="gfef-value">' . $html . '</div>';
     }
 
     /**

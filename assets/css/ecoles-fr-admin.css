@@ -104,3 +104,26 @@
 .gf-ecoles-msg-error {
     color: #721c24;
 }
+
+/* ------------------------------------------------------------------
+   Entry view styles (matching Chained Select addon)
+   ------------------------------------------------------------------ */
+
+@media only screen and (min-width: 782px) {
+    .gfef-value {
+        display: table;
+    }
+
+    .gfef-value-row {
+        display: table-row;
+    }
+
+    .gfef-value b {
+        display: table-cell !important;
+        padding-right: 10px;
+    }
+
+    .gfef-value span {
+        display: table-cell;
+    }
+}

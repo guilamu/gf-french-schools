@@ -160,8 +160,7 @@ class GF_French_Schools_AddOn extends GFAddOn
                 'version' => $this->_version,
                 'enqueue' => array(
                     array(
-                        'admin_page' => array('plugin_settings'),
-                        'tab'        => $this->_slug,
+                        'admin_page' => array('plugin_settings', 'form_editor', 'entry_view'),
                     ),
                 ),
             ),

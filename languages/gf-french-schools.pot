@@ -2,9 +2,9 @@
 # This file is distributed under the AGPL-3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.5.4\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.6.0\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
-"POT-Creation-Date: 2026-02-07T12:00:00+01:00\n"
+"POT-Creation-Date: 2026-02-10T12:00:00+01:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

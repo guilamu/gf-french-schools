@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.5.4\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.6.0\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
-"POT-Creation-Date: 2026-02-07T12:00:00+01:00\n"
-"PO-Revision-Date: 2026-02-08 11:41+0100\n"
+"POT-Creation-Date: 2026-02-10T12:00:00+01:00\n"
+"PO-Revision-Date: 2026-02-10 09:06+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"

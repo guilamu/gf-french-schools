@@ -165,6 +165,10 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.6.0 - 2026-02-10
+- Amélioration de l'affichage des résultats dans la vue d'entrée (Entry View) pour correspondre au style du plugin Chained Selects
+- Le champ "Éducation prioritaire" affiche maintenant "Non" au lieu d'un vide lorsqu'il n'est pas renseigné
+
 ### Version 1.5.4 - 2026-02-09
 - Réécriture complète du système de chargement des traductions pour résoudre les problèmes de compatibilité :
   - Utilisation de chemins absolus avec `load_textdomain()` au lieu de `load_plugin_textdomain()`
