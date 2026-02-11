@@ -165,6 +165,12 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.7.1 - 2026-02-11
+- Correction de la recherche d'écoles pour les arrondissements de Paris (espacement incohérent dans la base de données)
+- Amélioration de l'affichage des noms d'écoles parisiennes (suppression des préfixes E.M.PU, E.E.PU, E.P.PR, etc. et des adresses)
+- Modification de la recherche API pour utiliser LIKE au lieu de search() (meilleure correspondance partielle)
+- Correction du cache pour séparer les résultats locaux et distants
+
 ### Version 1.7.0 - 2026-02-11
 - Support complet du thème Gravity Forms Orbital
 - Correction de l'affichage du dropdown autocomplete masqué par les champs suivants (z-index)

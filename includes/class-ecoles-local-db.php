@@ -452,11 +452,12 @@ class GF_Ecoles_Local_DB
 
         $table = self::get_table_name();
 
+        // Use CONCAT for LIKE wildcards to avoid WordPress 6.x % escaping
         $where = $wpdb->prepare(
-            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE %s",
+            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%')",
             $statut,
             $departement,
-            '%' . $wpdb->esc_like($query) . '%'
+            $wpdb->esc_like($query)
         );
 
         if ($hide_ecoles) {
@@ -502,12 +503,25 @@ class GF_Ecoles_Local_DB
 
         $table = self::get_table_name();
 
+        // Build flexible city LIKE pattern: split by whitespace, escape each part, join with %
+        // This handles inconsistent spacing in database (e.g., "Paris 18e  Arrondissement")
+        $ville_parts = preg_split('/\s+/', trim($ville));
+        $ville_like_parts = array_map(function($part) use ($wpdb) {
+            return $wpdb->esc_like($part);
+        }, $ville_parts);
+        $ville_like = implode('%', $ville_like_parts);
+
+        // Escape query for LIKE
+        $query_escaped = $wpdb->esc_like($query);
+
+        // Build WHERE clause using CONCAT for LIKE wildcards to avoid WordPress % escaping
+        // WordPress 6.x escapes % in prepare() which breaks LIKE patterns
         $where = $wpdb->prepare(
-            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune = %s AND nom_etablissement LIKE %s",
+            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%') AND nom_etablissement LIKE CONCAT('%%', %s, '%%')",
             $statut,
             $departement,
-            $ville,
-            '%' . $wpdb->esc_like($query) . '%'
+            $ville_like,
+            $query_escaped
         );
 
         if ($hide_ecoles) {

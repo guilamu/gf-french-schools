@@ -73,13 +73,27 @@
             'hors contrat',
             'hors-contrat',
             'sous contrat',
-            // Abbreviations / typos
-            'E.P.PU',
+            // Paris abbreviated school types (longest first)
+            'E.P.A.PU',  // École Primaire d'Application Publique
+            'E.M.A.PU',  // École Maternelle d'Application Publique
+            'E.P.S.PR',  // École Primaire Spécialisée Privée
+            'E.M.PU',    // École Maternelle Publique
+            'E.E.PU',    // École Élémentaire Publique
+            'E.P.PU',    // École Primaire Publique
+            'E.M.PR',    // École Maternelle Privée
+            'E.E.PR',    // École Élémentaire Privée
+            'E.P.PR',    // École Primaire Privée
+            // Other abbreviations / typos
             'ECOL EPRIMAIRE'
         ];
         phrasesToRemove.forEach(function (phrase) {
             cleaned = cleaned.replace(new RegExp(escapeRe(phrase), 'gi'), '');
         });
+
+        // --- 1b. Remove Paris-style addresses (number + street type + text at end) ---
+        // Matches: "3 rue Ferdinand Flocon", "22 bis avenue Victor Hugo", etc.
+        var addressPattern = /\s+\d+(?:\s*(?:bis|ter))?\s+(?:rue|avenue|av\.|boulevard|bd|impasse|passage|place|allée|chemin|voie|square|quai|cours|cité)[^,]*/gi;
+        cleaned = cleaned.replace(addressPattern, '');
 
         // --- 2. Remove individual words (word-boundary match) ---
         var wordsToRemove = [

@@ -140,7 +140,10 @@ class GF_Ecoles_API_Service
             return array();
         }
 
-        $cache_key = 'gf_ecoles_ecoles_' . md5($statut . $departement . $ville . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0'));
+        $local_only = get_option('gf_ecoles_fr_local_only', false);
+
+        // Include local_only mode in cache key to separate cached results
+        $cache_key = 'gf_ecoles_ecoles_' . md5($statut . $departement . $ville . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0') . ($local_only ? 'L' : 'R'));
         $cached = get_transient($cache_key);
 
         if (false !== $cached) {
@@ -148,8 +151,12 @@ class GF_Ecoles_API_Service
         }
 
         // Local-only mode: skip remote API entirely.
-        if (get_option('gf_ecoles_fr_local_only', false) && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
-            return GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+        if ($local_only && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
+            $results = GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            if (!empty($results)) {
+                set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+            }
+            return $results;
         }
 
         $select_fields = array(
@@ -167,11 +174,16 @@ class GF_Ecoles_API_Service
             'code_circonscription',
         );
 
+        // Normalize whitespace in city name (database has inconsistent spacing for Paris arrondissements)
+        $ville_pattern = preg_replace('/\s+/', '*', trim($ville));
+
+        // Use 'like' with wildcards for better partial matching (especially for Paris schools)
+        // The 'search()' function does full-text tokenization which fails on names like "F. FLOCON"
         $where = sprintf(
-            'statut_public_prive="%s" and libelle_departement="%s" and nom_commune="%s" and search(nom_etablissement,"%s")',
+            'statut_public_prive="%s" and libelle_departement="%s" and nom_commune like "%s" and nom_etablissement like "*%s*"',
             $this->escape_api_string($statut),
             $this->escape_api_string($departement),
-            $this->escape_api_string($ville),
+            $this->escape_api_string($ville_pattern),
             $this->escape_api_string($query)
         );
 
@@ -294,8 +306,8 @@ class GF_Ecoles_API_Service
         $string = (string) $string;
         // Remove control characters
         $string = preg_replace('/[\x00-\x1F\x7F]/', '', $string);
-        // Escape backslashes and quotes
-        $string = str_replace(array('\\', '"'), array('\\\\', '\\"'), $string);
+        // Escape backslashes first, then quotes and wildcards
+        $string = str_replace(array('\\', '"', '*'), array('\\\\', '\\"', '\\*'), $string);
 
         return $string;
     }
