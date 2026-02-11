@@ -320,10 +320,13 @@
             }, TIMINGS.debounce));
 
             // Ville focus out - hide results after delay
+            // Use longer delay and check if mouse is over results
             $ville.on('blur', function () {
                 setTimeout(function () {
-                    $villeResults.hide();
-                }, 200);
+                    if (!$villeResults.is(':hover')) {
+                        $villeResults.hide();
+                    }
+                }, 350);
             });
 
             // École input handler with debounce
@@ -339,10 +342,13 @@
             }, TIMINGS.debounce));
 
             // École focus out - hide results after delay
+            // Use longer delay and check if mouse is over results
             $ecole.on('blur', function () {
                 setTimeout(function () {
-                    $ecoleResults.hide();
-                }, 200);
+                    if (!$ecoleResults.is(':hover')) {
+                        $ecoleResults.hide();
+                    }
+                }, 350);
             });
 
             /**

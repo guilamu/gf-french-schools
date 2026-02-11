@@ -20,6 +20,11 @@
     opacity: 1;
 }
 
+/* Hide cancel button in form editor - not functional there */
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-autres-cancel {
+    display: none !important;
+}
+
 /* ------------------------------------------------------------------
    Sync settings page (Settings > French Schools)
    ------------------------------------------------------------------ */

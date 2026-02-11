@@ -165,6 +165,14 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.7.0 - 2026-02-11
+- Support complet du thème Gravity Forms Orbital
+- Correction de l'affichage du dropdown autocomplete masqué par les champs suivants (z-index)
+- Correction du gestionnaire blur qui masquait les résultats trop rapidement
+- Correction du placeholder du département quand le statut est présélectionné
+- Changement de l'icône du champ pour correspondre à la page de réglages (dashicons-building)
+- Masquage du bouton Annuler dans l'éditeur de formulaire
+
 ### Version 1.6.1 - 2026-02-10
 - Amélioration majeure du nettoyage des noms d'établissements
 

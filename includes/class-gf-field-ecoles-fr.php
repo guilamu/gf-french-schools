@@ -179,7 +179,7 @@ class GF_Field_Ecoles_FR extends GF_Field
      */
     public function get_form_editor_field_icon()
     {
-        return 'gform-icon--place';
+        return 'dashicons-building';
     }
 
     /**
@@ -314,7 +314,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                 </label>
                 <select id="<?php echo esc_attr($input_id); ?>_departement" class="gf-ecoles-fr-departement" <?php echo $is_admin ? 'disabled="disabled"' : ((empty($statut_value) || $hide_departement) ? 'disabled="disabled"' : ''); ?>
                     aria-label="<?php esc_attr_e('Department', 'gf-french-schools'); ?>">
-                    <option value=""><?php esc_html_e('-- Select status first --', 'gf-french-schools'); ?></option>
+                    <option value=""><?php echo esc_html(!empty($preselected_statut) ? __('-- Select --', 'gf-french-schools') : __('-- Select status first --', 'gf-french-schools')); ?></option>
                     <?php foreach (self::$departements as $dept): ?>
                         <option value="<?php echo esc_attr($dept); ?>" <?php selected($departement_value, $dept); ?>>
                             <?php echo esc_html($dept); ?>

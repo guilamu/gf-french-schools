@@ -30,6 +30,20 @@
     padding-block: 0 5px !important;
     padding-inline: 0 !important;
     flex: none !important;
+    position: relative;
+}
+
+/* Ensure autocomplete fields have higher z-index than siblings below them */
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-ville-field {
+    z-index: 100;
+}
+
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-ecole-field {
+    z-index: 99;
+}
+
+.gf-ecoles-fr-wrapper .gf-ecoles-fr-autres-field {
+    z-index: 98;
 }
 
 /* Hidden fields (preselected values) - matches gf-chained-select-enhancer pattern */
@@ -115,6 +129,14 @@
 .gf-ecoles-fr-autocomplete-wrapper {
     position: relative;
     width: 100%;
+    overflow: visible !important;
+}
+
+/* Ensure all parent containers allow overflow for autocomplete */
+.gf-ecoles-fr-wrapper,
+.gf-ecoles-fr-wrapper > span,
+.gf-ecoles-fr-field {
+    overflow: visible !important;
 }
 
 .gf-ecoles-fr-autocomplete-results {
@@ -122,7 +144,7 @@
     top: 100%;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 999999;
     max-height: 240px;
     overflow-y: auto;
     background-color: #fff;
@@ -383,6 +405,321 @@
     }
 
     .gf-ecoles-fr-autres-cancel {
+        align-self: flex-start;
+    }
+}
+
+/* ==========================================================================
+   Gravity Forms Orbital Theme Support
+   ========================================================================== */
+
+/* Main container for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-wrapper.ginput_complex,
+.gform-theme--orbital .gf-ecoles-fr-wrapper {
+    display: flex !important;
+    flex-direction: column;
+    gap: var(--gf-field-gap, 16px);
+}
+
+/* Field spans for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-wrapper > span:not(.gf-ecoles-fr-hidden),
+.gform-theme--orbital .gf-ecoles-fr-wrapper .gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden) {
+    display: block !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: relative;
+}
+
+/* z-index for Orbital dropdowns */
+.gform-theme--orbital .gf-ecoles-fr-wrapper .gf-ecoles-fr-ville-field {
+    z-index: 100;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper .gf-ecoles-fr-ecole-field {
+    z-index: 99;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper .gf-ecoles-fr-autres-field {
+    z-index: 98;
+}
+
+/* Hide labels in Orbital */
+.gform-theme--orbital .gf-ecoles-fr-wrapper .gf-ecoles-fr-field label {
+    display: none !important;
+}
+
+/* Select styling for Orbital - use CSS variables */
+.gform-theme--orbital .gf-ecoles-fr-wrapper select {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0.75em 2.5em 0.75em 1em !important;
+    font-size: var(--gf-ctrl-font-size, 14px) !important;
+    font-family: var(--gf-ctrl-font-family, inherit) !important;
+    line-height: 1.5 !important;
+    color: var(--gf-ctrl-color, #1e1e1e) !important;
+    background-color: var(--gf-ctrl-bg-color, #fff) !important;
+    border: var(--gf-ctrl-border-width, 1px) solid var(--gf-ctrl-border-color, #686868) !important;
+    border-radius: var(--gf-ctrl-radius, 4px) !important;
+    box-shadow: var(--gf-ctrl-shadow, none) !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23686868' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper select:focus {
+    outline: none !important;
+    border-color: var(--gf-ctrl-border-color-focus, #0073aa) !important;
+    box-shadow: 0 0 0 var(--gf-ctrl-focus-ring-width, 3px) var(--gf-ctrl-focus-ring-color, rgba(0, 115, 170, 0.25)) !important;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper select:disabled {
+    background-color: var(--gf-ctrl-bg-color-disabled, #f5f5f5) !important;
+    color: var(--gf-ctrl-color-disabled, #a0a0a0) !important;
+    border-color: var(--gf-ctrl-border-color-disabled, #ddd) !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Input styling for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-wrapper input[type="text"] {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0.75em 1em !important;
+    font-size: var(--gf-ctrl-font-size, 14px) !important;
+    font-family: var(--gf-ctrl-font-family, inherit) !important;
+    line-height: 1.5 !important;
+    color: var(--gf-ctrl-color, #1e1e1e) !important;
+    background-color: var(--gf-ctrl-bg-color, #fff) !important;
+    border: var(--gf-ctrl-border-width, 1px) solid var(--gf-ctrl-border-color, #686868) !important;
+    border-radius: var(--gf-ctrl-radius, 4px) !important;
+    box-shadow: var(--gf-ctrl-shadow, none) !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper input[type="text"]:focus {
+    outline: none !important;
+    border-color: var(--gf-ctrl-border-color-focus, #0073aa) !important;
+    box-shadow: 0 0 0 var(--gf-ctrl-focus-ring-width, 3px) var(--gf-ctrl-focus-ring-color, rgba(0, 115, 170, 0.25)) !important;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper input[type="text"]:disabled {
+    background-color: var(--gf-ctrl-bg-color-disabled, #f5f5f5) !important;
+    color: var(--gf-ctrl-color-disabled, #a0a0a0) !important;
+    border-color: var(--gf-ctrl-border-color-disabled, #ddd) !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-wrapper input[type="text"]::placeholder {
+    color: var(--gf-ctrl-placeholder-color, #757575) !important;
+    opacity: 1;
+}
+
+/* Autocomplete wrapper for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: visible !important;
+}
+
+/* Autocomplete results for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 999999;
+    max-height: 240px;
+    overflow-y: auto;
+    background-color: var(--gf-ctrl-bg-color, #fff);
+    border: var(--gf-ctrl-border-width, 1px) solid var(--gf-ctrl-border-color, #686868);
+    border-top: none;
+    border-radius: 0 0 var(--gf-ctrl-radius, 4px) var(--gf-ctrl-radius, 4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: -1px;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autocomplete-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gf-ctrl-border-color-secondary, #e5e5e5);
+    font-size: var(--gf-ctrl-font-size, 14px);
+    color: var(--gf-ctrl-color, #1e1e1e);
+    transition: background-color 0.1s ease;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autocomplete-item:hover {
+    background-color: var(--gf-ctrl-bg-color-hover, #f0f6fc);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-ecole-item strong {
+    color: var(--gf-ctrl-color, #1e1e1e);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-ecole-item small {
+    color: var(--gf-ctrl-color-secondary, #666);
+    font-size: 12px;
+}
+
+/* Loading and status messages for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-loading,
+.gform-theme--orbital .gf-ecoles-fr-no-results,
+.gform-theme--orbital .gf-ecoles-fr-error {
+    padding: 16px;
+    text-align: center;
+    font-size: var(--gf-ctrl-font-size, 14px);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-loading {
+    color: var(--gf-color-primary, #0073aa);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-error {
+    color: var(--gf-color-danger, #d63638);
+}
+
+/* Result display for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-result {
+    width: 100%;
+    padding: 20px;
+    background-color: var(--gf-color-surface-secondary, #f9f9f9);
+    border: var(--gf-ctrl-border-width, 1px) solid var(--gf-ctrl-border-color, #686868);
+    border-radius: var(--gf-ctrl-radius, 4px);
+    box-sizing: border-box;
+    margin-top: 8px;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-result-header {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--gf-color-text, #1e1e1e);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gf-ctrl-border-color-secondary, #ddd);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-result-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px;
+    padding: 10px 12px !important;
+    background-color: var(--gf-ctrl-bg-color, #fff);
+    border: 1px solid var(--gf-ctrl-border-color-secondary, #ddd);
+    border-radius: var(--gf-ctrl-radius, 4px);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-result-item .gf-ecoles-fr-result-label {
+    font-size: 11px !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gf-color-text-secondary, #666) !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-result-item .gf-ecoles-fr-result-value {
+    font-size: 14px !important;
+    color: var(--gf-color-text, #1e1e1e) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Autres field for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-autres-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autres-wrapper input[type="text"] {
+    flex: 1;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autres-cancel {
+    padding: 12px 20px;
+    font-size: var(--gf-ctrl-font-size, 14px);
+    font-family: var(--gf-ctrl-font-family, inherit);
+    background-color: var(--gf-color-surface-secondary, #f0f0f0);
+    border: var(--gf-ctrl-border-width, 1px) solid var(--gf-ctrl-border-color, #686868);
+    border-radius: var(--gf-ctrl-radius, 4px);
+    color: var(--gf-color-text, #1e1e1e);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+    white-space: nowrap;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autres-cancel:hover {
+    background-color: var(--gf-color-surface-tertiary, #e0e0e0);
+    border-color: var(--gf-ctrl-border-color-hover, #555);
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autres-cancel:focus {
+    outline: none;
+    border-color: var(--gf-ctrl-border-color-focus, #0073aa);
+    box-shadow: 0 0 0 var(--gf-ctrl-focus-ring-width, 3px) var(--gf-ctrl-focus-ring-color, rgba(0, 115, 170, 0.25));
+}
+
+/* Autres option in dropdown for Orbital */
+.gform-theme--orbital .gf-ecoles-fr-autres-option {
+    border-top: 1px solid var(--gf-ctrl-border-color-secondary, #e5e5e5);
+    margin-top: 5px;
+    padding-top: 12px !important;
+    color: var(--gf-color-primary, #0073aa);
+    font-weight: 500;
+}
+
+.gform-theme--orbital .gf-ecoles-fr-autres-option:hover {
+    background-color: var(--gf-ctrl-bg-color-hover, #f0f7fc) !important;
+}
+
+/* Responsive for Orbital */
+@media (max-width: 600px) {
+    .gform-theme--orbital .gf-ecoles-fr-result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gform-theme--orbital .gf-ecoles-fr-result {
+        padding: 16px;
+    }
+
+    .gform-theme--orbital .gf-ecoles-fr-result-item .gf-ecoles-fr-result-value {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        word-break: break-word;
+    }
+
+    .gform-theme--orbital .gf-ecoles-fr-autres-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gform-theme--orbital .gf-ecoles-fr-autres-cancel {
         align-self: flex-start;
     }
 }
