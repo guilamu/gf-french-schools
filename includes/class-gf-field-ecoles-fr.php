@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Gravity Forms Field: Écoles FR
  *
@@ -275,7 +276,7 @@ class GF_Field_Ecoles_FR extends GF_Field
 
         // Build the field HTML
         ob_start();
-        ?>
+?>
         <div class="gf-ecoles-fr-wrapper ginput_complex ginput_container" id="<?php echo esc_attr($input_id); ?>_container"
             data-field-id="<?php echo esc_attr($field_id); ?>"
             data-form-id="<?php echo esc_attr($form_id); ?>"
@@ -447,7 +448,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                 </div>
             <?php endif; ?>
         </div>
-        <?php
+<?php
         return ob_get_clean();
     }
 
@@ -582,12 +583,14 @@ class GF_Field_Ecoles_FR extends GF_Field
             'other_name' => 'autres_nom',
             'type' => 'type',
             'nature' => 'nature',
+            'categorie' => 'nature',
             'category' => 'nature',
             'adresse' => 'adresse',
             'address' => 'adresse',
             'code_postal' => 'code_postal',
             'postal_code' => 'code_postal',
             'commune' => 'commune',
+            'ville' => 'commune',
             'city' => 'commune',
             'telephone' => 'telephone',
             'phone' => 'telephone',
@@ -624,7 +627,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         return $data['nom'] ?? '';
     }
 
-                /**
+    /**
      * Get merge tag modifiers for this field.
      *
      * @return array
@@ -632,14 +635,14 @@ class GF_Field_Ecoles_FR extends GF_Field
     public function get_modifiers()
     {
         return array(
-            'id',
+            'identifiant',
             'nom',
             'autres_nom',
             'type',
-            'nature',
+            'categorie',
             'adresse',
             'code_postal',
-            'commune',
+            'ville',
             'telephone',
             'mail',
             'education_prioritaire',
@@ -723,15 +726,15 @@ function gf_french_schools_custom_merge_tags($merge_tags, $form_id, $fields, $el
             $field_id = $field->id;
             $field_label = $field->label;
 
-                                                $modifiers = array(
-                'id' => __('School ID', 'gf-french-schools'),
+            $modifiers = array(
+                'identifiant' => __('School ID', 'gf-french-schools'),
                 'nom' => __('School Name', 'gf-french-schools'),
                 'autres_nom' => __('School Name (Manual)', 'gf-french-schools'),
                 'type' => __('School Type', 'gf-french-schools'),
-                'nature' => __('School Category', 'gf-french-schools'),
+                'categorie' => __('School Category', 'gf-french-schools'),
                 'adresse' => __('Address', 'gf-french-schools'),
                 'code_postal' => __('Postal Code', 'gf-french-schools'),
-                'commune' => __('City', 'gf-french-schools'),
+                'ville' => __('City', 'gf-french-schools'),
                 'telephone' => __('Phone', 'gf-french-schools'),
                 'mail' => __('Email', 'gf-french-schools'),
                 'education_prioritaire' => __('Priority Education', 'gf-french-schools'),

@@ -83,14 +83,14 @@ Accédez aux données de l'établissement dans les notifications et confirmation
 | Merge Tag | Description |
 |-----------|-------------|
 | `{Libellé:ID}` | Nom de l'établissement (par défaut) |
-| `{Libellé:ID:id}` | Identifiant UAI |
+| `{Libellé:ID:identifiant}` | Identifiant UAI |
 | `{Libellé:ID:nom}` | Nom de l'établissement |
 | `{Libellé:ID:autres_nom}` | Nom de l'école (saisie manuelle) |
 | `{Libellé:ID:type}` | Type d'établissement |
-| `{Libellé:ID:nature}` | Catégorie |
+| `{Libellé:ID:categorie}` | Catégorie |
 | `{Libellé:ID:adresse}` | Adresse |
 | `{Libellé:ID:code_postal}` | Code postal |
-| `{Libellé:ID:commune}` | Ville |
+| `{Libellé:ID:ville}` | Ville |
 | `{Libellé:ID:telephone}` | Téléphone |
 | `{Libellé:ID:mail}` | Email |
 | `{Libellé:ID:education_prioritaire}` | Statut éducation prioritaire |
@@ -165,6 +165,13 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.7.3 - 2026-02-15
+- Renommage des merge tags pour plus de cohérence avec l'interface :
+  - `id` -> `identifiant`
+  - `nature` -> `categorie`
+  - `commune` -> `ville`
+- Les anciens noms restent fonctionnels pour la rétro-compatibilité.
 
 ### Version 1.7.2 - 2026-02-11
 - Ajout du merge tag `autres_nom` pour accéder au nom d'école saisi manuellement ("School Name (Manual)" / "Nom de l'école (saisie manuelle)")

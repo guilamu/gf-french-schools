@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.7.2
+ * Version: 1.7.3
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -19,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.7.2');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.7.3');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -305,7 +306,6 @@ function gf_french_schools_editor_js()
             'preselectionHint' => __('Preselected fields will be hidden from users on the frontend.', 'gf-french-schools'),
         ),
     ));
-
 }
 
 /**
@@ -317,7 +317,7 @@ function gf_french_schools_field_settings($position, $form_id)
 {
     // Add settings at position 50 (after label settings)
     if ($position == 50) {
-        ?>
+?>
         <li class="ecoles_fr_preselection_setting field_setting">
             <label class="section_label">
                 <?php esc_html_e('Preselection Settings', 'gf-french-schools'); ?>
@@ -379,7 +379,7 @@ function gf_french_schools_field_settings($position, $form_id)
                 </label>
             </div>
         </li>
-        <?php
+<?php
     }
 }
 
@@ -631,7 +631,7 @@ function gf_french_schools_ajax_manual_sync()
 /**
  * Register with Guilamu Bug Reporter
  */
-add_action('plugins_loaded', function() {
+add_action('plugins_loaded', function () {
     if (class_exists('Guilamu_Bug_Reporter')) {
         Guilamu_Bug_Reporter::register(array(
             'slug'        => 'gf-french-schools',
@@ -649,7 +649,8 @@ add_action('plugins_loaded', function() {
  * @param string $file  Plugin file path.
  * @return array Modified links.
  */
-function gf_french_schools_plugin_row_meta($links, $file) {
+function gf_french_schools_plugin_row_meta($links, $file)
+{
     if (plugin_basename(GF_FRENCH_SCHOOLS_PLUGIN_FILE) !== $file) {
         return $links;
     }
@@ -667,4 +668,3 @@ function gf_french_schools_plugin_row_meta($links, $file) {
     return $links;
 }
 add_filter('plugin_row_meta', 'gf_french_schools_plugin_row_meta', 10, 2);
-
