@@ -85,6 +85,7 @@ Accédez aux données de l'établissement dans les notifications et confirmation
 | `{Libellé:ID}` | Nom de l'établissement (par défaut) |
 | `{Libellé:ID:id}` | Identifiant UAI |
 | `{Libellé:ID:nom}` | Nom de l'établissement |
+| `{Libellé:ID:autres_nom}` | Nom de l'école (saisie manuelle) |
 | `{Libellé:ID:type}` | Type d'établissement |
 | `{Libellé:ID:nature}` | Catégorie |
 | `{Libellé:ID:adresse}` | Adresse |
@@ -164,6 +165,10 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.7.2 - 2026-02-11
+- Ajout du merge tag `autres_nom` pour accéder au nom d'école saisi manuellement ("School Name (Manual)" / "Nom de l'école (saisie manuelle)")
+- Le merge tag est maintenant visible dans le dropdown des merge tags de Gravity Forms
 
 ### Version 1.7.1 - 2026-02-11
 - Correction de la recherche d'écoles pour les arrondissements de Paris (espacement incohérent dans la base de données)

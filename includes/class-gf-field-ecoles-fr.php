@@ -624,10 +624,9 @@ class GF_Field_Ecoles_FR extends GF_Field
         return $data['nom'] ?? '';
     }
 
-    /**
+                /**
      * Get merge tag modifiers for this field.
      *
-     * @param array $modifiers Existing modifiers.
      * @return array
      */
     public function get_modifiers()
@@ -635,6 +634,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         return array(
             'id',
             'nom',
+            'autres_nom',
             'type',
             'nature',
             'adresse',
@@ -723,9 +723,10 @@ function gf_french_schools_custom_merge_tags($merge_tags, $form_id, $fields, $el
             $field_id = $field->id;
             $field_label = $field->label;
 
-            $modifiers = array(
+                                                $modifiers = array(
                 'id' => __('School ID', 'gf-french-schools'),
                 'nom' => __('School Name', 'gf-french-schools'),
+                'autres_nom' => __('School Name (Manual)', 'gf-french-schools'),
                 'type' => __('School Type', 'gf-french-schools'),
                 'nature' => __('School Category', 'gf-french-schools'),
                 'adresse' => __('Address', 'gf-french-schools'),
