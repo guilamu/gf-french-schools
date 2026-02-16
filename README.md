@@ -166,6 +166,12 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.0 - 2026-02-16
+- Support complet de la logique conditionnelle : chaque sous-champ (identifiant, nom, type, catégorie, code postal, ville, etc.) est désormais disponible comme paramètre de logique conditionnelle pour les autres champs du formulaire
+- Amélioration du nettoyage de la catégorie : "ECOLE DE NIVEAU ELEMENTAIRE" affiche désormais "Élémentaire" au lieu de "De niveau elementaire"
+- Détection automatique des écoles primaires : lorsque le nom de l'établissement contient "primaire", la catégorie affiche "Primaire" au lieu de "Élémentaire"
+- Blocage de l'auto-complétion navigateur sur tous les champs du formulaire
+
 ### Version 1.7.3 - 2026-02-15
 - Renommage des merge tags pour plus de cohérence avec l'interface :
   - `id` -> `identifiant`

@@ -134,13 +134,38 @@
     }
 
     /**
-     * Clean category value by removing only 'école/ecole' and converting to sentence case.
+     * Clean category value.
+     *
+     * Transforms raw API "libelle_nature" into a user-friendly label:
+     *   - "ECOLE MATERNELLE"            → "Maternelle"
+     *   - "ECOLE DE NIVEAU ELEMENTAIRE" → "Élémentaire"
+     *     … but when the school name contains "primaire" → "Primaire"
+     *
+     * @param {string} value     The raw libelle_nature from the API.
+     * @param {string} [nomEtab] The raw nom_etablissement (used for primaire detection).
+     * @returns {string}
      */
-    function cleanCategoryValue(value) {
+    function cleanCategoryValue(value, nomEtab) {
         if (!value) return '';
+
+        var upper = value.toUpperCase().trim();
+
+        // Explicit mapping for known API values.
+        if (upper === 'ECOLE MATERNELLE') {
+            return 'Maternelle';
+        }
+
+        if (upper === 'ECOLE DE NIVEAU ELEMENTAIRE') {
+            // If the school name contains "primaire", label it "Primaire".
+            if (nomEtab && /primaire/i.test(nomEtab)) {
+                return 'Primaire';
+            }
+            return 'Élémentaire';
+        }
+
+        // Fallback for any other value: strip "ecole/école", sentence-case.
         var cleaned = value.replace(/\b(ecole|école)\b/gi, '');
         cleaned = cleaned.replace(/\s+/g, ' ').trim();
-        // Convert to sentence case (first letter uppercase, rest lowercase)
         if (cleaned.length > 0) {
             cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
         }
@@ -548,7 +573,7 @@
              */
             function selectEcole(ecole) {
                 var cleanNom = cleanDisplayValue(ecole.nom);
-                var cleanNature = cleanCategoryValue(ecole.nature);
+                var cleanNature = cleanCategoryValue(ecole.nature, ecole.nom);
                 var cleanCirco = cleanNomCirconscription(ecole.nom_circonscription);
                 var circoMail = getCirconscriptionMail(ecole.code_circonscription, ecole.mail);
 
@@ -605,6 +630,7 @@
                 };
 
                 $dataInput.val(JSON.stringify(data)).trigger('change');
+                updateSubInputs(data);
             }
 
             /**
@@ -627,7 +653,54 @@
                         ville: selectedVille
                     };
                     $dataInput.val(JSON.stringify(currentData));
+                    clearSubInputs();
                 }
+            }
+
+            /**
+             * Sub-input ID → data-key mapping for conditional logic.
+             */
+            var subInputMap = {
+                1: 'identifiant',
+                2: 'nom',
+                3: 'autres_nom',
+                4: 'type',
+                5: 'nature',
+                6: 'adresse',
+                7: 'code_postal',
+                8: 'commune',
+                9: 'telephone',
+                11: 'mail',
+                12: 'education_prioritaire',
+                13: 'nom_circonscription',
+                14: 'code_circonscription',
+                15: 'statut',
+                16: 'departement',
+                17: 'ville'
+            };
+
+            /**
+             * Populate hidden sub-inputs and trigger conditional logic re-evaluation.
+             */
+            function updateSubInputs(data) {
+                $.each(subInputMap, function (subId, dataKey) {
+                    var el = document.getElementById('input_' + formId + '_' + fieldId + '_' + subId);
+                    if (el) {
+                        el.value = data[dataKey] || '';
+                    }
+                });
+                // Trigger Gravity Forms conditional logic re-evaluation.
+                var firstEl = document.getElementById('input_' + formId + '_' + fieldId + '_1');
+                if (firstEl && typeof gf_input_change === 'function') {
+                    gf_input_change(firstEl, formId, fieldId);
+                }
+            }
+
+            /**
+             * Clear all hidden sub-inputs and trigger conditional logic.
+             */
+            function clearSubInputs() {
+                updateSubInputs({});
             }
 
             /**
@@ -733,6 +806,7 @@
                 };
 
                 $dataInput.val(JSON.stringify(data)).trigger('change');
+                updateSubInputs(data);
 
                 // Show result if not hidden
                 if ($result) {

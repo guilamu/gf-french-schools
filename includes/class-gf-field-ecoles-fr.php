@@ -26,6 +26,45 @@ class GF_Field_Ecoles_FR extends GF_Field
     public $type = 'ecoles_fr';
 
     /**
+     * Sub-field definitions for conditional logic and entry storage.
+     * Keys are sub-input IDs (skipping multiples of 10 per GF convention).
+     *
+     * @var array
+     */
+    private static $input_keys = array(
+        1  => array( 'data_key' => 'identifiant',            'label' => 'School ID' ),
+        2  => array( 'data_key' => 'nom',                    'label' => 'Name' ),
+        3  => array( 'data_key' => 'autres_nom',             'label' => 'Other Name' ),
+        4  => array( 'data_key' => 'type',                   'label' => 'Type' ),
+        5  => array( 'data_key' => 'nature',                 'label' => 'Category' ),
+        6  => array( 'data_key' => 'adresse',                'label' => 'Address' ),
+        7  => array( 'data_key' => 'code_postal',            'label' => 'Postal Code' ),
+        8  => array( 'data_key' => 'commune',                'label' => 'City' ),
+        9  => array( 'data_key' => 'telephone',              'label' => 'Phone' ),
+        11 => array( 'data_key' => 'mail',                   'label' => 'Email' ),
+        12 => array( 'data_key' => 'education_prioritaire',  'label' => 'Priority Education' ),
+        13 => array( 'data_key' => 'nom_circonscription',    'label' => 'Circonscription' ),
+        14 => array( 'data_key' => 'code_circonscription',   'label' => 'Email Circonscription' ),
+        15 => array( 'data_key' => 'statut',                 'label' => 'Status' ),
+        16 => array( 'data_key' => 'departement',            'label' => 'Department' ),
+        17 => array( 'data_key' => 'ville',                  'label' => 'Search City' ),
+    );
+
+    /**
+     * Constructor. Initializes sub-inputs for conditional logic support.
+     *
+     * @param array $data Field data.
+     */
+    public function __construct( $data = array() )
+    {
+        parent::__construct( $data );
+
+        if ( empty( $this->inputs ) ) {
+            $this->inputs = $this->get_default_inputs();
+        }
+    }
+
+    /**
      * List of French departments.
      *
      * @var array
@@ -215,6 +254,165 @@ class GF_Field_Ecoles_FR extends GF_Field
     }
 
     /**
+     * Build the default inputs array for this field.
+     *
+     * @return array
+     */
+    public function get_default_inputs()
+    {
+        $id     = $this->id;
+        $inputs = array();
+        foreach ( self::$input_keys as $sub_id => $config ) {
+            $inputs[] = array(
+                'id'    => $id . '.' . $sub_id,
+                'label' => __( $config['label'], 'gf-french-schools' ),
+                'name'  => $config['data_key'],
+            );
+        }
+        return $inputs;
+    }
+
+    /**
+     * Get the sub-input key map (public accessor).
+     *
+     * @return array
+     */
+    public static function get_input_keys()
+    {
+        return self::$input_keys;
+    }
+
+    /**
+     * Extract school data from an entry value.
+     * Handles both old (JSON string) and new (sub-input array) formats.
+     *
+     * @param mixed $value Entry value (string or array).
+     * @return array Associative array of school data.
+     */
+    private function extract_school_data( $value )
+    {
+        // New format: array of sub-input values keyed by "{id}.{sub_id}".
+        if ( is_array( $value ) ) {
+            $data     = array();
+            $has_data = false;
+            foreach ( self::$input_keys as $sub_id => $config ) {
+                $key = $this->id . '.' . $sub_id;
+                $val = isset( $value[ $key ] ) ? $value[ $key ] : '';
+                if ( ! empty( $val ) ) {
+                    $has_data = true;
+                }
+                $data[ $config['data_key'] ] = $val;
+            }
+            return $has_data ? $data : array();
+        }
+
+        // Old format: JSON string.
+        if ( is_string( $value ) && ! empty( $value ) ) {
+            $decoded = json_decode( $value, true );
+            if ( is_array( $decoded ) ) {
+                return $decoded;
+            }
+        }
+
+        return array();
+    }
+
+    /**
+     * Extract school data from a full entry object.
+     * Handles both old (JSON in main field) and new (sub-inputs) storage.
+     *
+     * @param array $entry The entry object.
+     * @return array Associative array of school data.
+     */
+    private function get_school_data_from_entry( $entry )
+    {
+        // Try new format: read from sub-inputs.
+        $data     = array();
+        $has_data = false;
+        foreach ( self::$input_keys as $sub_id => $config ) {
+            $key = $this->id . '.' . $sub_id;
+            $val = rgar( $entry, $key );
+            if ( ! empty( $val ) ) {
+                $has_data = true;
+            }
+            $data[ $config['data_key'] ] = $val ?: '';
+        }
+        if ( $has_data ) {
+            return $data;
+        }
+
+        // Fall back to old format: JSON in main field.
+        $json = rgar( $entry, $this->id );
+        if ( ! empty( $json ) ) {
+            $decoded = json_decode( $json, true );
+            if ( is_array( $decoded ) ) {
+                return $decoded;
+            }
+        }
+
+        return array();
+    }
+
+    /**
+     * Returns the sub-filters for the current field (entry list / conditional logic).
+     *
+     * @return array
+     */
+    public function get_filter_sub_filters()
+    {
+        $sub_filters = array();
+        if ( ! is_array( $this->inputs ) ) {
+            return $sub_filters;
+        }
+
+        foreach ( $this->inputs as $input ) {
+            $sub_filters[] = array(
+                'key'             => rgar( $input, 'id' ),
+                'text'            => rgar( $input, 'label' ),
+                'preventMultiple' => false,
+                'operators'       => $this->get_filter_operators(),
+            );
+        }
+
+        return $sub_filters;
+    }
+
+    /**
+     * Returns the filter operators for the current field.
+     *
+     * @return array
+     */
+    public function get_filter_operators()
+    {
+        $operators   = parent::get_filter_operators();
+        $operators[] = 'contains';
+        return $operators;
+    }
+
+    /**
+     * Inline script rendered in the form editor to initialise new field instances.
+     *
+     * @return string
+     */
+    public function get_form_editor_inline_script_on_page_render()
+    {
+        $input_defs = array();
+        foreach ( self::$input_keys as $sub_id => $config ) {
+            $input_defs[] = sprintf(
+                '{ id: field.id + ".%d", label: %s, name: %s }',
+                $sub_id,
+                wp_json_encode( __( $config['label'], 'gf-french-schools' ) ),
+                wp_json_encode( $config['data_key'] )
+            );
+        }
+        return sprintf(
+            'function SetDefaultValues_%s( field ) { field.inputs = [ %s ]; return field; }',
+            $this->type,
+            implode( ', ', $input_defs )
+        );
+    }
+
+    /**
      * Get the list of departments.
      *
      * @return array
@@ -238,14 +436,21 @@ class GF_Field_Ecoles_FR extends GF_Field
         $field_id = absint($this->id);
         $is_admin = $this->is_form_editor() || $this->is_entry_detail() || $this->is_entry_detail_edit();
 
-        // Parse existing value
+        // Parse existing value (handles both old JSON and new sub-input array formats).
         $data = array();
-        if (!empty($value)) {
-            $data = json_decode($value, true);
-            if (!is_array($data)) {
-                $data = array();
+        if ( is_array( $value ) ) {
+            foreach ( self::$input_keys as $sub_id => $config ) {
+                $key = $this->id . '.' . $sub_id;
+                $data[ $config['data_key'] ] = isset( $value[ $key ] ) ? $value[ $key ] : '';
+            }
+        } elseif ( ! empty( $value ) ) {
+            $decoded = json_decode( $value, true );
+            if ( is_array( $decoded ) ) {
+                $data = $decoded;
             }
         }
+        // JSON representation used by the frontend JavaScript.
+        $json_value = ! empty( array_filter( $data ) ) ? wp_json_encode( $data ) : '';
 
         // Get preselected values from field settings
         $preselected_statut = !empty($this->preselectedStatut) ? $this->preselectedStatut : '';
@@ -286,9 +491,18 @@ class GF_Field_Ecoles_FR extends GF_Field
             data-hide-colleges-lycees="<?php echo esc_attr($hide_colleges_lycees); ?>"
             data-hide-result="<?php echo esc_attr($hide_result); ?>">
 
-            <!-- Hidden field for storing complete data -->
+            <!-- Hidden field for storing complete data (used by frontend JS) -->
             <input type="hidden" name="input_<?php echo esc_attr($field_id); ?>" id="<?php echo esc_attr($input_id); ?>"
-                value="<?php echo esc_attr($value); ?>" class="gf-ecoles-fr-data" />
+                value="<?php echo esc_attr($json_value); ?>" class="gf-ecoles-fr-data" />
+
+            <!-- Hidden sub-inputs for conditional logic and entry storage -->
+            <?php foreach ( self::$input_keys as $sub_id => $config ) : ?>
+                <input type="hidden"
+                    name="input_<?php echo esc_attr( $field_id ); ?>.<?php echo esc_attr( $sub_id ); ?>"
+                    id="input_<?php echo esc_attr( $form_id ); ?>_<?php echo esc_attr( $field_id ); ?>_<?php echo esc_attr( $sub_id ); ?>"
+                    value="<?php echo esc_attr( isset( $data[ $config['data_key'] ] ) ? $data[ $config['data_key'] ] : '' ); ?>"
+                    class="gf-ecoles-fr-subinput" />
+            <?php endforeach; ?>
 
             <!-- Statut -->
             <span class="gf-ecoles-fr-field gf-ecoles-fr-statut-field<?php echo $hide_statut ? ' gf-ecoles-fr-hidden' : ''; ?>">
@@ -296,6 +510,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                     <?php esc_html_e('Status', 'gf-french-schools'); ?>
                 </label>
                 <select id="<?php echo esc_attr($input_id); ?>_statut" class="gf-ecoles-fr-statut" <?php echo $disabled; ?>
+                    autocomplete="nope"
                     aria-label="<?php esc_attr_e('School status', 'gf-french-schools'); ?>">
                     <option value=""><?php esc_html_e('-- Select --', 'gf-french-schools'); ?></option>
                     <option value="Public" <?php selected($statut_value, 'Public'); ?>>
@@ -314,6 +529,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                     <?php esc_html_e('Department', 'gf-french-schools'); ?>
                 </label>
                 <select id="<?php echo esc_attr($input_id); ?>_departement" class="gf-ecoles-fr-departement" <?php echo $is_admin ? 'disabled="disabled"' : ((empty($statut_value) || $hide_departement) ? 'disabled="disabled"' : ''); ?>
+                    autocomplete="nope"
                     aria-label="<?php esc_attr_e('Department', 'gf-french-schools'); ?>">
                     <option value=""><?php echo esc_html(!empty($preselected_statut) ? __('-- Select --', 'gf-french-schools') : __('-- Select status first --', 'gf-french-schools')); ?></option>
                     <?php foreach (self::$departements as $dept): ?>
@@ -332,7 +548,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                 <div class="gf-ecoles-fr-autocomplete-wrapper">
                     <input type="text" id="<?php echo esc_attr($input_id); ?>_ville" class="gf-ecoles-fr-ville"
                         value="<?php echo esc_attr($ville_value); ?>"
-                        placeholder="<?php esc_attr_e('Start typing city name...', 'gf-french-schools'); ?>" autocomplete="off"
+                        placeholder="<?php esc_attr_e('Start typing city name...', 'gf-french-schools'); ?>" autocomplete="nope"
                         <?php echo $is_admin ? 'disabled="disabled"' : ((empty($departement_value) && !$hide_departement) ? 'disabled="disabled"' : ''); ?>
                         aria-label="<?php esc_attr_e('City', 'gf-french-schools'); ?>" />
                     <div class="gf-ecoles-fr-autocomplete-results" id="<?php echo esc_attr($input_id); ?>_ville_results">
@@ -349,7 +565,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                     <input type="text" id="<?php echo esc_attr($input_id); ?>_ecole" class="gf-ecoles-fr-ecole"
                         value="<?php echo esc_attr($ecole_value); ?>"
                         placeholder="<?php esc_attr_e('Start typing school name...', 'gf-french-schools'); ?>"
-                        autocomplete="off" <?php echo $is_admin ? 'disabled="disabled"' : ((empty($ville_value) || !empty($autres_nom_value)) ? 'disabled="disabled"' : ''); ?>
+                        autocomplete="nope" <?php echo $is_admin ? 'disabled="disabled"' : ((empty($ville_value) || !empty($autres_nom_value)) ? 'disabled="disabled"' : ''); ?>
                         aria-label="<?php esc_attr_e('School', 'gf-french-schools'); ?>" />
                     <div class="gf-ecoles-fr-autocomplete-results" id="<?php echo esc_attr($input_id); ?>_ecole_results">
                     </div>
@@ -365,7 +581,7 @@ class GF_Field_Ecoles_FR extends GF_Field
                     <input type="text" id="<?php echo esc_attr($input_id); ?>_autres" class="gf-ecoles-fr-autres"
                         value="<?php echo esc_attr($data['autres_nom'] ?? ''); ?>"
                         placeholder="<?php esc_attr_e('Enter school name manually...', 'gf-french-schools'); ?>"
-                        autocomplete="off"
+                        autocomplete="nope"
                         aria-label="<?php esc_attr_e('Other school name', 'gf-french-schools'); ?>" />
                     <button type="button" class="gf-ecoles-fr-autres-cancel" aria-label="<?php esc_attr_e('Cancel manual entry', 'gf-french-schools'); ?>">
                         <?php esc_html_e('Cancel', 'gf-french-schools'); ?>
@@ -455,21 +671,20 @@ class GF_Field_Ecoles_FR extends GF_Field
     /**
      * Get field value for entry save.
      *
-     * @param array  $value      The field value.
+     * With sub-inputs defined, GF calls this once per sub-input.
+     * Each sub-input value is a simple string.
+     *
+     * @param string $value      The sub-input value.
      * @param array  $form       The form object.
-     * @param string $input_name The input name.
+     * @param string $input_name The input name (e.g. "input_5.1").
      * @param int    $lead_id    The entry ID.
      * @param array  $lead       The entry object.
      * @return string
      */
-    public function get_value_save_entry($value, $form, $input_name, $lead_id, $lead)
+    public function get_value_save_entry( $value, $form, $input_name, $lead_id, $lead )
     {
-        // Value is already JSON from the hidden input
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                return $value;
-            }
+        if ( is_string( $value ) ) {
+            return wp_strip_all_tags( $value );
         }
         return '';
     }
@@ -484,15 +699,11 @@ class GF_Field_Ecoles_FR extends GF_Field
      * @param string       $media    The media type.
      * @return string
      */
-    public function get_value_entry_detail($value, $currency = '', $use_text = false, $format = 'html', $media = 'screen')
+    public function get_value_entry_detail( $value, $currency = '', $use_text = false, $format = 'html', $media = 'screen' )
     {
-        if (empty($value)) {
+        $data = $this->extract_school_data( $value );
+        if ( empty( $data ) ) {
             return '';
-        }
-
-        $data = json_decode($value, true);
-        if (!is_array($data)) {
-            return esc_html($value);
         }
 
         if ($format === 'text') {
@@ -557,19 +768,21 @@ class GF_Field_Ecoles_FR extends GF_Field
      * @param bool         $nl2br      Whether to convert newlines to BR.
      * @return string
      */
-    public function get_value_merge_tag($value, $input_id, $entry, $form, $modifier, $raw_value, $url_encode, $esc_html, $format, $nl2br)
+    public function get_value_merge_tag( $value, $input_id, $entry, $form, $modifier, $raw_value, $url_encode, $esc_html, $format, $nl2br )
     {
-        if (empty($value)) {
+        // Sub-input merge tag (e.g. {Label:5.2}) — value is already the sub-input value.
+        if ( (string) $input_id !== (string) (int) $input_id ) {
+            return $value ?: '';
+        }
+
+        // Main field merge tag — reconstruct data from entry.
+        $data = $this->get_school_data_from_entry( $entry );
+        if ( empty( $data ) ) {
             return '';
         }
 
-        $data = json_decode($value, true);
-        if (!is_array($data)) {
-            return $value;
-        }
-
-        // If no modifier, return school name (or manual entry name)
-        if (empty($modifier)) {
+        // If no modifier, return school name (or manual entry name).
+        if ( empty( $modifier ) ) {
             return $data['nom'] ?? $data['autres_nom'] ?? '';
         }
 
@@ -658,25 +871,23 @@ class GF_Field_Ecoles_FR extends GF_Field
      * @param string|array $value The field value.
      * @param array        $form  The form object.
      */
-    public function validate($value, $form)
+    public function validate( $value, $form )
     {
-        if ($this->isRequired) {
-            if (empty($value)) {
-                $this->failed_validation = true;
-                $this->validation_message = empty($this->errorMessage)
-                    ? __('This field is required. Please select a school.', 'gf-french-schools')
-                    : $this->errorMessage;
-                return;
-            }
+        if ( ! $this->isRequired ) {
+            return;
+        }
 
-            $data = json_decode($value, true);
-            // Accept either a school from the API (has identifiant) or a manual entry (has autres_nom)
-            if (!is_array($data) || (empty($data['identifiant']) && empty($data['autres_nom']))) {
-                $this->failed_validation = true;
-                $this->validation_message = empty($this->errorMessage)
-                    ? __('This field is required. Please select a school.', 'gf-french-schools')
-                    : $this->errorMessage;
-            }
+        $data = $this->extract_school_data( $value );
+
+        // Accept either a school from the API (has identifiant) or a manual entry (has autres_nom).
+        $identifiant = isset( $data['identifiant'] ) ? $data['identifiant'] : '';
+        $autres_nom  = isset( $data['autres_nom'] ) ? $data['autres_nom'] : '';
+
+        if ( empty( $identifiant ) && empty( $autres_nom ) ) {
+            $this->failed_validation  = true;
+            $this->validation_message = empty( $this->errorMessage )
+                ? __( 'This field is required. Please select a school.', 'gf-french-schools' )
+                : $this->errorMessage;
         }
     }
 
@@ -689,29 +900,29 @@ class GF_Field_Ecoles_FR extends GF_Field
      * @param bool   $is_csv   Whether exporting to CSV.
      * @return string
      */
-    public function get_value_export($entry, $input_id = '', $use_text = false, $is_csv = false)
+    public function get_value_export( $entry, $input_id = '', $use_text = false, $is_csv = false )
     {
-        if (empty($this->id)) {
+        if ( empty( $this->id ) ) {
             return '';
         }
 
-        $value = rgar($entry, $this->id);
-        if (empty($value)) {
+        // Sub-input export (e.g. $input_id = "5.2").
+        if ( ! empty( $input_id ) && (string) $input_id !== (string) (int) $input_id ) {
+            return rgar( $entry, $input_id );
+        }
+
+        $data = $this->get_school_data_from_entry( $entry );
+        if ( empty( $data ) ) {
             return '';
         }
 
-        $data = json_decode($value, true);
-        if (!is_array($data)) {
-            return $value;
+        // Check if this is a manual entry.
+        if ( ! empty( $data['autres_nom'] ) ) {
+            return sprintf( '%s (%s)', $data['autres_nom'], __( 'Manual Entry', 'gf-french-schools' ) );
         }
 
-        // Check if this is a manual entry
-        if (!empty($data['autres_nom'])) {
-            return sprintf('%s (%s)', $data['autres_nom'], __('Manual Entry', 'gf-french-schools'));
-        }
-
-        // Return school name and ID for export
-        return sprintf('%s (%s)', $data['nom'] ?? '', $data['identifiant'] ?? '');
+        // Return school name and ID for export.
+        return sprintf( '%s (%s)', $data['nom'] ?? '', $data['identifiant'] ?? '' );
     }
 }
 /**
