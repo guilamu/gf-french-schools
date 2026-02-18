@@ -681,12 +681,16 @@
 
             /**
              * Populate hidden sub-inputs and trigger conditional logic re-evaluation.
+             * Also fires jQuery change events so that gwcopycat (GP Copy Cat) can
+             * detect value changes on sub-inputs and copy them to target fields.
              */
             function updateSubInputs(data) {
                 $.each(subInputMap, function (subId, dataKey) {
                     var el = document.getElementById('input_' + formId + '_' + fieldId + '_' + subId);
                     if (el) {
                         el.value = data[dataKey] || '';
+                        // Fire a jQuery change event so gwcopycat picks up the new value.
+                        $(el).trigger('change');
                     }
                 });
                 // Trigger Gravity Forms conditional logic re-evaluation.

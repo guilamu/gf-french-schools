@@ -47,7 +47,7 @@ class GF_Ecoles_API_Service
             return array();
         }
 
-        $cache_key = 'gf_ecoles_villes_' . md5($statut . $departement . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0'));
+        $cache_key = 'gf_ecoles_villes_' . md5(GF_FRENCH_SCHOOLS_VERSION . $statut . $departement . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0'));
         $cached = get_transient($cache_key);
 
         if (false !== $cached) {
@@ -59,11 +59,20 @@ class GF_Ecoles_API_Service
             return GF_Ecoles_Local_DB::search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
         }
 
+        // Build per-word LIKE clauses so that "les pa" matches "Les Pavillons Sous Bois".
+        // suggest() treats the whole query as a single token, failing on multi-word inputs
+        // like "les pa". Splitting into words and requiring each to appear anywhere in
+        // nom_commune gives the expected prefix-per-word behaviour.
+        $words = preg_split('/\s+/', trim($query), -1, PREG_SPLIT_NO_EMPTY);
+        $word_clauses = array();
+        foreach ($words as $word) {
+            $word_clauses[] = sprintf('nom_commune like "*%s*"', $this->escape_api_string($word));
+        }
         $where = sprintf(
-            'statut_public_prive="%s" and libelle_departement="%s" and suggest(nom_commune,"%s")',
+            'statut_public_prive="%s" and libelle_departement="%s" and %s',
             $this->escape_api_string($statut),
             $this->escape_api_string($departement),
-            $this->escape_api_string($query)
+            implode(' and ', $word_clauses)
         );
 
         // Add school type filters
@@ -105,7 +114,9 @@ class GF_Ecoles_API_Service
             }
         }
 
-        set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+        if (!empty($results)) {
+            set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+        }
 
         return $results;
     }
@@ -143,7 +154,7 @@ class GF_Ecoles_API_Service
         $local_only = get_option('gf_ecoles_fr_local_only', false);
 
         // Include local_only mode in cache key to separate cached results
-        $cache_key = 'gf_ecoles_ecoles_' . md5($statut . $departement . $ville . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0') . ($local_only ? 'L' : 'R'));
+        $cache_key = 'gf_ecoles_ecoles_' . md5(GF_FRENCH_SCHOOLS_VERSION . $statut . $departement . $ville . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0') . ($local_only ? 'L' : 'R'));
         $cached = get_transient($cache_key);
 
         if (false !== $cached) {

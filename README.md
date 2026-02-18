@@ -166,6 +166,11 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.1 - 2026-02-18
+- Correction de la recherche de villes avec article : "les pa" trouve désormais "Les Pavillons Sous Bois", "les l" trouve "Les Lilas", etc.
+- La recherche distante (API) et la base locale effectuent désormais une correspondance mot par mot : chaque mot saisi doit apparaître dans le nom de la ville, au lieu d'un test de sous-chaîne continue qui échouait dès qu'un espace séparait deux mots.
+- Compatibilité gwcopycat (GP Copy Cat) : les sous-champs cachés déclenchent désormais un événement jQuery `change` lors de la sélection d'un établissement, permettant leur copie vers d'autres champs.
+
 ### Version 1.8.0 - 2026-02-16
 - Support complet de la logique conditionnelle : chaque sous-champ (identifiant, nom, type, catégorie, code postal, ville, etc.) est désormais disponible comme paramètre de logique conditionnelle pour les autres champs du formulaire
 - Amélioration du nettoyage de la catégorie : "ECOLE DE NIVEAU ELEMENTAIRE" affiche désormais "Élémentaire" au lieu de "De niveau elementaire"

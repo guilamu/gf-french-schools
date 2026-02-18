@@ -452,13 +452,27 @@ class GF_Ecoles_Local_DB
 
         $table = self::get_table_name();
 
-        // Use CONCAT for LIKE wildcards to avoid WordPress 6.x % escaping
-        $where = $wpdb->prepare(
-            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%')",
+        // Split the query into individual words so that "les pa" matches
+        // "Les Pavillons Sous Bois" (each word is checked independently).
+        $words = preg_split('/\s+/', trim($query), -1, PREG_SPLIT_NO_EMPTY);
+
+        // Base conditions (statut + departement).
+        $base_where = $wpdb->prepare(
+            'statut_public_prive = %s AND libelle_departement = %s',
             $statut,
-            $departement,
-            $wpdb->esc_like($query)
+            $departement
         );
+
+        // One LIKE clause per word using CONCAT to avoid WP 6.x % escaping.
+        $word_clauses = array();
+        foreach ($words as $word) {
+            $word_clauses[] = $wpdb->prepare(
+                "nom_commune LIKE CONCAT('%%', %s, '%%')",
+                $wpdb->esc_like($word)
+            );
+        }
+
+        $where = $base_where . ' AND ' . implode(' AND ', $word_clauses);
 
         if ($hide_ecoles) {
             $where .= " AND type_etablissement != 'Ecole'";
