@@ -59,9 +59,10 @@ class GF_Field_Ecoles_FR extends GF_Field
     {
         parent::__construct( $data );
 
-        if ( empty( $this->inputs ) ) {
-            $this->inputs = $this->get_default_inputs();
-        }
+        // Always synchronize inputs with the canonical $input_keys definition.
+        // This ensures that sub-inputs added in newer versions are picked up
+        // by forms created with older versions of the plugin.
+        $this->inputs = $this->get_default_inputs();
     }
 
     /**
