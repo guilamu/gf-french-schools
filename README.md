@@ -166,6 +166,10 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.2 - 2026-02-20
+- Correction de l'enregistrement du champ « Email Circonscription » : la valeur était affichée côté frontend mais n'était pas sauvegardée dans l'entrée pour les formulaires créés avant l'ajout de ce sous-champ
+- Le constructeur du champ synchronise désormais systématiquement les sous-inputs avec la définition canonique, garantissant la prise en charge des sous-champs ajoutés dans les nouvelles versions
+
 ### Version 1.8.1 - 2026-02-18
 - Correction de la recherche de villes avec article : "les pa" trouve désormais "Les Pavillons Sous Bois", "les l" trouve "Les Lilas", etc.
 - La recherche distante (API) et la base locale effectuent désormais une correspondance mot par mot : chaque mot saisi doit apparaître dans le nom de la ville, au lieu d'un test de sous-chaîne continue qui échouait dès qu'un espace séparait deux mots.
