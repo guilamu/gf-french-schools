@@ -166,6 +166,10 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.3 - 2026-02-23
+- Correction de l'avertissement WordPress 6.7 « `_load_textdomain_just_in_time` called incorrectly » : le filtre `cron_schedules` peut s'exécuter avant `plugins_loaded`, il est donc incorrect d'y appeler `__()` ; la chaîne de libellé est désormais statique
+- La déclaration des actions de cron (`GF_Ecoles_Local_DB::CRON_HOOK`) est déplacée à l'intérieur de `plugins_loaded` pour éviter tout accès à la classe avant l'initialisation des traductions
+
 ### Version 1.8.2 - 2026-02-20
 - Correction de l'enregistrement du champ « Email Circonscription » : la valeur était affichée côté frontend mais n'était pas sauvegardée dans l'entrée pour les formulaires créés avant l'ajout de ce sous-champ
 - Le constructeur du champ synchronise désormais systématiquement les sous-inputs avec la définition canonique, garantissant la prise en charge des sous-champs ajoutés dans les nouvelles versions

@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.8.2
+ * Version: 1.8.3
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.8.2');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.8.3');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -181,7 +181,7 @@ function gf_french_schools_cron_schedules($schedules)
     if (!isset($schedules['monthly'])) {
         $schedules['monthly'] = array(
             'interval' => 30 * DAY_IN_SECONDS,
-            'display'  => __('Once Monthly', 'gf-french-schools'),
+            'display' => 'Once Monthly', // Cannot use __() here: cron_schedules fires before init
         );
     }
     return $schedules;
@@ -190,8 +190,12 @@ function gf_french_schools_cron_schedules($schedules)
 /**
  * Handle the monthly cron sync event.
  */
-add_action(GF_Ecoles_Local_DB::CRON_HOOK, 'gf_french_schools_run_sync');
-add_action('gf_ecoles_fr_initial_sync', 'gf_french_schools_run_sync');
+// Register cron hooks inside plugins_loaded to avoid accessing class constants
+// before translations are initialized (WordPress 6.7+ requirement).
+add_action('plugins_loaded', function () {
+    add_action(GF_Ecoles_Local_DB::CRON_HOOK, 'gf_french_schools_run_sync');
+    add_action('gf_ecoles_fr_initial_sync', 'gf_french_schools_run_sync');
+});
 
 function gf_french_schools_run_sync()
 {
@@ -317,7 +321,7 @@ function gf_french_schools_field_settings($position, $form_id)
 {
     // Add settings at position 50 (after label settings)
     if ($position == 50) {
-?>
+        ?>
         <li class="ecoles_fr_preselection_setting field_setting">
             <label class="section_label">
                 <?php esc_html_e('Preselection Settings', 'gf-french-schools'); ?>
@@ -379,7 +383,7 @@ function gf_french_schools_field_settings($position, $form_id)
                 </label>
             </div>
         </li>
-<?php
+        <?php
     }
 }
 
@@ -614,7 +618,7 @@ function gf_french_schools_ajax_manual_sync()
     if (is_wp_error($result)) {
         wp_send_json_error(array(
             'message' => $result->get_error_message(),
-            'status'  => $status,
+            'status' => $status,
         ));
     } else {
         wp_send_json_success(array(
@@ -634,9 +638,9 @@ function gf_french_schools_ajax_manual_sync()
 add_action('plugins_loaded', function () {
     if (class_exists('Guilamu_Bug_Reporter')) {
         Guilamu_Bug_Reporter::register(array(
-            'slug'        => 'gf-french-schools',
-            'name'        => 'Gravity Forms - French Schools',
-            'version'     => GF_FRENCH_SCHOOLS_VERSION,
+            'slug' => 'gf-french-schools',
+            'name' => 'Gravity Forms - French Schools',
+            'version' => GF_FRENCH_SCHOOLS_VERSION,
             'github_repo' => 'guilamu/gf-french-schools',
         ));
     }
