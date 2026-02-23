@@ -266,7 +266,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         foreach ( self::$input_keys as $sub_id => $config ) {
             $inputs[] = array(
                 'id'    => $id . '.' . $sub_id,
-                'label' => __( $config['label'], 'gf-french-schools' ),
+                'label' => $config['label'],
                 'name'  => $config['data_key'],
             );
         }

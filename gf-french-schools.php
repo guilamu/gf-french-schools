@@ -76,10 +76,7 @@ function gf_french_schools_load_textdomain($force = false)
     $loaded_locale = $locale;
 }
 
-// Load on plugins_loaded with priority 1 to run before GF
-add_action('plugins_loaded', 'gf_french_schools_load_textdomain', 1);
-
-// Also load on init as a safety net for edge cases
+// Load on init, as recommended by WP 6.7+ to avoid early translation loading warning
 add_action('init', 'gf_french_schools_load_textdomain', 1);
 
 // Final safety net: force reload translations right before GF renders any form
@@ -181,7 +178,7 @@ function gf_french_schools_cron_schedules($schedules)
     if (!isset($schedules['monthly'])) {
         $schedules['monthly'] = array(
             'interval' => 30 * DAY_IN_SECONDS,
-            'display' => 'Once Monthly', // Cannot use __() here: cron_schedules fires before init
+            'display'  => __('Once Monthly', 'gf-french-schools'),
         );
     }
     return $schedules;
@@ -190,12 +187,8 @@ function gf_french_schools_cron_schedules($schedules)
 /**
  * Handle the monthly cron sync event.
  */
-// Register cron hooks inside plugins_loaded to avoid accessing class constants
-// before translations are initialized (WordPress 6.7+ requirement).
-add_action('plugins_loaded', function () {
-    add_action(GF_Ecoles_Local_DB::CRON_HOOK, 'gf_french_schools_run_sync');
-    add_action('gf_ecoles_fr_initial_sync', 'gf_french_schools_run_sync');
-});
+add_action(GF_Ecoles_Local_DB::CRON_HOOK, 'gf_french_schools_run_sync');
+add_action('gf_ecoles_fr_initial_sync', 'gf_french_schools_run_sync');
 
 function gf_french_schools_run_sync()
 {
@@ -321,7 +314,7 @@ function gf_french_schools_field_settings($position, $form_id)
 {
     // Add settings at position 50 (after label settings)
     if ($position == 50) {
-        ?>
+?>
         <li class="ecoles_fr_preselection_setting field_setting">
             <label class="section_label">
                 <?php esc_html_e('Preselection Settings', 'gf-french-schools'); ?>
@@ -383,7 +376,7 @@ function gf_french_schools_field_settings($position, $form_id)
                 </label>
             </div>
         </li>
-        <?php
+<?php
     }
 }
 
@@ -477,7 +470,7 @@ function gf_french_schools_get_client_ip()
 
     foreach ($headers as $header) {
         if (!empty($_SERVER[$header])) {
-            $ip = sanitize_text_field(wp_unslash($_SERVER[$header]));
+            $ip = sanitize_text_field((string) wp_unslash($_SERVER[$header]));
 
             if (strpos($ip, ',') !== false) {
                 $parts = explode(',', $ip);
@@ -618,7 +611,7 @@ function gf_french_schools_ajax_manual_sync()
     if (is_wp_error($result)) {
         wp_send_json_error(array(
             'message' => $result->get_error_message(),
-            'status' => $status,
+            'status'  => $status,
         ));
     } else {
         wp_send_json_success(array(
@@ -638,9 +631,9 @@ function gf_french_schools_ajax_manual_sync()
 add_action('plugins_loaded', function () {
     if (class_exists('Guilamu_Bug_Reporter')) {
         Guilamu_Bug_Reporter::register(array(
-            'slug' => 'gf-french-schools',
-            'name' => 'Gravity Forms - French Schools',
-            'version' => GF_FRENCH_SCHOOLS_VERSION,
+            'slug'        => 'gf-french-schools',
+            'name'        => 'Gravity Forms - French Schools',
+            'version'     => GF_FRENCH_SCHOOLS_VERSION,
             'github_repo' => 'guilamu/gf-french-schools',
         ));
     }
