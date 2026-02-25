@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.8.3
+ * Version: 1.8.4
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.8.3');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.8.4');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -178,7 +178,7 @@ function gf_french_schools_cron_schedules($schedules)
     if (!isset($schedules['monthly'])) {
         $schedules['monthly'] = array(
             'interval' => 30 * DAY_IN_SECONDS,
-            'display'  => __('Once Monthly', 'gf-french-schools'),
+            'display' => __('Once Monthly', 'gf-french-schools'),
         );
     }
     return $schedules;
@@ -314,7 +314,7 @@ function gf_french_schools_field_settings($position, $form_id)
 {
     // Add settings at position 50 (after label settings)
     if ($position == 50) {
-?>
+        ?>
         <li class="ecoles_fr_preselection_setting field_setting">
             <label class="section_label">
                 <?php esc_html_e('Preselection Settings', 'gf-french-schools'); ?>
@@ -376,7 +376,7 @@ function gf_french_schools_field_settings($position, $form_id)
                 </label>
             </div>
         </li>
-<?php
+        <?php
     }
 }
 
@@ -460,30 +460,43 @@ function gf_french_schools_enqueue_scripts($form, $is_ajax)
 }
 
 /**
- * Resolve client IP with proxy awareness.
+ * Resolve client IP.
+ *
+ * Proxy-forwarding headers (X-Forwarded-For, CF-Connecting-IP, etc.) can be
+ * freely spoofed by any client, which would allow bypassing the transient-based
+ * rate limiter. These headers are only trusted when REMOTE_ADDR is listed in
+ * the `gf_french_schools_trusted_proxies` filter (e.g. known Cloudflare CIDRs
+ * or a local load-balancer IP). By default the filter returns an empty list, so
+ * REMOTE_ADDR is always used as-is.
  *
  * @return string
  */
 function gf_french_schools_get_client_ip()
 {
-    $headers = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR');
+    $remote_addr = sanitize_text_field((string) wp_unslash($_SERVER['REMOTE_ADDR'] ?? ''));
 
-    foreach ($headers as $header) {
-        if (!empty($_SERVER[$header])) {
-            $ip = sanitize_text_field((string) wp_unslash($_SERVER[$header]));
+    /**
+     * Allowlist of trusted reverse-proxy IP addresses.
+     * When REMOTE_ADDR matches one of these, forwarding headers are trusted.
+     *
+     * @param string[] $trusted_proxies Array of trusted proxy IPs.
+     */
+    $trusted_proxies = (array) apply_filters('gf_french_schools_trusted_proxies', array());
 
-            if (strpos($ip, ',') !== false) {
-                $parts = explode(',', $ip);
-                $ip = trim($parts[0]);
-            }
-
-            if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                return $ip;
+    if (!empty($trusted_proxies) && in_array($remote_addr, $trusted_proxies, true)) {
+        $forward_headers = array('HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP');
+        foreach ($forward_headers as $header) {
+            if (!empty($_SERVER[$header])) {
+                $ip = sanitize_text_field((string) wp_unslash($_SERVER[$header]));
+                $ip = trim(explode(',', $ip)[0]); // take left-most (client) IP
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
             }
         }
     }
 
-    return 'unknown';
+    return filter_var($remote_addr, FILTER_VALIDATE_IP) ? $remote_addr : 'unknown';
 }
 
 /**
@@ -515,6 +528,22 @@ function gf_french_schools_ajax_search()
     $form_id = isset($_POST['form_id']) ? absint(wp_unslash($_POST['form_id'])) : 0;
     $form = $form_id ? GFAPI::get_form($form_id) : false;
     if (!$form) {
+        wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
+        return;
+    }
+
+    // Verify the form actually contains an ecoles_fr field.
+    // This prevents scripted use of the endpoint with arbitrary valid form IDs.
+    $has_ecoles_field = false;
+    if (!empty($form['fields']) && is_array($form['fields'])) {
+        foreach ($form['fields'] as $_field) {
+            if ($_field->type === 'ecoles_fr') {
+                $has_ecoles_field = true;
+                break;
+            }
+        }
+    }
+    if (!$has_ecoles_field) {
         wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
         return;
     }
@@ -611,7 +640,7 @@ function gf_french_schools_ajax_manual_sync()
     if (is_wp_error($result)) {
         wp_send_json_error(array(
             'message' => $result->get_error_message(),
-            'status'  => $status,
+            'status' => $status,
         ));
     } else {
         wp_send_json_success(array(
@@ -631,9 +660,9 @@ function gf_french_schools_ajax_manual_sync()
 add_action('plugins_loaded', function () {
     if (class_exists('Guilamu_Bug_Reporter')) {
         Guilamu_Bug_Reporter::register(array(
-            'slug'        => 'gf-french-schools',
-            'name'        => 'Gravity Forms - French Schools',
-            'version'     => GF_FRENCH_SCHOOLS_VERSION,
+            'slug' => 'gf-french-schools',
+            'name' => 'Gravity Forms - French Schools',
+            'version' => GF_FRENCH_SCHOOLS_VERSION,
             'github_repo' => 'guilamu/gf-french-schools',
         ));
     }

@@ -166,6 +166,10 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.4 - 2026-02-25
+- Sécurité : correction du contournement du rate-limiting par usurpation des en-têtes proxy (`X-Forwarded-For`, `CF-Connecting-IP`, etc.) — ces en-têtes ne sont désormais pris en compte que si `REMOTE_ADDR` figure dans la liste blanche `gf_french_schools_trusted_proxies` (filtre WordPress)
+- Sécurité : l'endpoint AJAX de recherche vérifie maintenant que le formulaire soumis contient bien un champ `ecoles_fr`, empêchant l'utilisation scriptée de l'endpoint avec n'importe quel `form_id` valide
+
 ### Version 1.8.3 - 2026-02-23
 - Correction de l'avertissement WordPress 6.7 « `_load_textdomain_just_in_time` called incorrectly » : suppression de l'appel `__()` dans `get_default_inputs()` qui déclenchait le chargement des traductions lors de la construction du champ (avant `init`), via `gform_loaded` → `plugins_loaded`
 - Le chargement du textdomain est désormais effectué uniquement sur le hook `init` (et non plus `plugins_loaded`) conformément aux recommandations WordPress 6.7+
