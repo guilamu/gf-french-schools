@@ -188,9 +188,11 @@
             /^Circonscription d'inspection du 1er degré de\s+/i,
             /^Circonscription d'inspection du 1er degré du\s+/i,
             /^Circonscription d'inspection du 1er degré d'/i,
+            /^Circonscription d'inspection du 1er degré\s+/i,
             /^Circonscription d'inspection du 1r degré de\s+/i,
             /^Circonscription d'inspection du 1r degré du\s+/i,
             /^Circonscription d'inspection du 1r degré d'/i,
+            /^Circonscription d'inspection du 1r degré\s+/i,
             /^Circonscription\s+/i
         ];
 

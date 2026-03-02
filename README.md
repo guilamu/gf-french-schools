@@ -166,6 +166,9 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.5 - 2026-03-02
+- Correction du nettoyage des noms de circonscriptions : ajout du patron manquant « Circonscription d'inspection du 1er degré » (sans article de/du/d') qui laissait un résidu « d'inspection du 1er degré » dans le nom affiché
+
 ### Version 1.8.4 - 2026-02-25
 - Sécurité : correction du contournement du rate-limiting par usurpation des en-têtes proxy (`X-Forwarded-For`, `CF-Connecting-IP`, etc.) — ces en-têtes ne sont désormais pris en compte que si `REMOTE_ADDR` figure dans la liste blanche `gf_french_schools_trusted_proxies` (filtre WordPress)
 - Sécurité : l'endpoint AJAX de recherche vérifie maintenant que le formulaire soumis contient bien un champ `ecoles_fr`, empêchant l'utilisation scriptée de l'endpoint avec n'importe quel `form_id` valide
