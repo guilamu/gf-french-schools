@@ -75,6 +75,10 @@ Pour chaque établissement sélectionné, les informations suivantes sont enregi
 | Éducation prioritaire | REP, REP+, ou Non |
 | Circonscription | Nom de la circonscription (nettoyé du préfixe standard) |
 | Mail circo | Email Circonscription (code + domaine académique) |
+| Statut | Public ou Privé |
+| Département | Nom du département |
+| N° Département | Numéro officiel du département (ex : 93, 2A, 974) |
+| Ville recherchée | Ville saisie lors de la recherche |
 
 ## Merge Tags
 
@@ -96,9 +100,38 @@ Accédez aux données de l'établissement dans les notifications et confirmation
 | `{Libellé:ID:education_prioritaire}` | Statut éducation prioritaire |
 | `{Libellé:ID:nom_circonscription}` | Nom de la circonscription |
 | `{Libellé:ID:code_circonscription}` | Email Circonscription |
+| `{Libellé:ID:statut}` | Statut (Public/Privé) |
+| `{Libellé:ID:departement}` | Nom du département |
+| `{Libellé:ID:numero_departement}` | Numéro du département (ex : 93, 2A, 974) |
 | `{Libellé:ID:all}` | Toutes les informations |
 
 Remplacez `Libellé` par le libellé de votre champ et `ID` par le numéro d'identifiant du champ.
+
+### Sous-champs (Sub-inputs)
+
+Chaque donnée est également accessible via son numéro de sous-champ `{Libellé:ID.N}` :
+
+| Sous-champ | Description |
+|------------|-------------|
+| `{Libellé:ID.1}` | Identifiant UAI |
+| `{Libellé:ID.2}` | Nom de l'établissement |
+| `{Libellé:ID.3}` | Nom de l'école (saisie manuelle) |
+| `{Libellé:ID.4}` | Type d'établissement |
+| `{Libellé:ID.5}` | Catégorie |
+| `{Libellé:ID.6}` | Adresse |
+| `{Libellé:ID.7}` | Code postal |
+| `{Libellé:ID.8}` | Commune |
+| `{Libellé:ID.9}` | Téléphone |
+| `{Libellé:ID.11}` | Email |
+| `{Libellé:ID.12}` | Éducation prioritaire |
+| `{Libellé:ID.13}` | Nom de la circonscription |
+| `{Libellé:ID.14}` | Email Circonscription |
+| `{Libellé:ID.15}` | Statut (Public/Privé) |
+| `{Libellé:ID.16}` | Nom du département |
+| `{Libellé:ID.17}` | Ville recherchée |
+| `{Libellé:ID.18}` | Numéro du département |
+
+> **Note :** le sous-champ `.10` n'existe pas (convention Gravity Forms).
 
 ## Mises à jour automatiques
 
@@ -165,6 +198,11 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 - [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
 
 ## Change Log
+
+### Version 1.8.6 - 2026-03-03
+- Ajout du numéro de département comme sous-champ (`{Libellé:ID.18}`) et merge tag (`{Libellé:ID:numero_departement}`), permettant de récupérer le code officiel du département (ex : « 93 » pour Seine-Saint-Denis, « 2A » pour Corse-du-Sud, « 974 » pour La Réunion)
+- Ajout des merge tags `{Libellé:ID:statut}` et `{Libellé:ID:departement}` pour accéder au statut et au nom du département via modificateur
+- Documentation complétée : tous les merge tags et sous-champs disponibles sont désormais listés dans le README
 
 ### Version 1.8.5 - 2026-03-02
 - Correction du nettoyage des noms de circonscriptions : ajout du patron manquant « Circonscription d'inspection du 1er degré » (sans article de/du/d') qui laissait un résidu « d'inspection du 1er degré » dans le nom affiché

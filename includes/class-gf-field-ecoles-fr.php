@@ -48,6 +48,7 @@ class GF_Field_Ecoles_FR extends GF_Field
         15 => array( 'data_key' => 'statut',                 'label' => 'Status' ),
         16 => array( 'data_key' => 'departement',            'label' => 'Department' ),
         17 => array( 'data_key' => 'ville',                  'label' => 'Search City' ),
+        18 => array( 'data_key' => 'numero_departement',     'label' => 'Department Number' ),
     );
 
     /**
@@ -70,6 +71,121 @@ class GF_Field_Ecoles_FR extends GF_Field
      *
      * @var array
      */
+    /**
+     * Mapping of department name to official department number.
+     *
+     * @var array
+     */
+    private static $departement_numbers = array(
+        'Ain'                     => '01',
+        'Aisne'                   => '02',
+        'Allier'                  => '03',
+        'Alpes-de-Haute-Provence' => '04',
+        'Alpes-Maritimes'         => '06',
+        'Ardèche'                 => '07',
+        'Ardennes'                => '08',
+        'Ariège'                  => '09',
+        'Aube'                    => '10',
+        'Aude'                    => '11',
+        'Aveyron'                 => '12',
+        'Bas-Rhin'                => '67',
+        'Bouches-du-Rhône'        => '13',
+        'Calvados'                => '14',
+        'Cantal'                  => '15',
+        'Charente'                => '16',
+        'Charente-Maritime'       => '17',
+        'Cher'                    => '18',
+        'Corrèze'                 => '19',
+        'Corse-du-Sud'            => '2A',
+        "Côte-d'Or"               => '21',
+        "Côtes-d'Armor"           => '22',
+        'Creuse'                  => '23',
+        'Deux-Sèvres'             => '79',
+        'Dordogne'                => '24',
+        'Doubs'                   => '25',
+        'Drôme'                   => '26',
+        'Essonne'                 => '91',
+        'Eure'                    => '27',
+        'Eure-et-Loir'            => '28',
+        'Finistère'               => '29',
+        'Gard'                    => '30',
+        'Gers'                    => '32',
+        'Gironde'                 => '33',
+        'Guadeloupe'              => '971',
+        'Guyane'                  => '973',
+        'Haut-Rhin'               => '68',
+        'Haute-Corse'             => '2B',
+        'Haute-Garonne'           => '31',
+        'Haute-Loire'             => '43',
+        'Haute-Marne'             => '52',
+        'Haute-Saône'             => '70',
+        'Haute-Savoie'            => '74',
+        'Haute-Vienne'            => '87',
+        'Hautes-Alpes'            => '05',
+        'Hautes-Pyrénées'         => '65',
+        'Hauts-de-Seine'          => '92',
+        'Hérault'                 => '34',
+        'Ille-et-Vilaine'         => '35',
+        'Indre'                   => '36',
+        'Indre-et-Loire'          => '37',
+        'Isère'                   => '38',
+        'Jura'                    => '39',
+        'La Réunion'              => '974',
+        'Landes'                  => '40',
+        'Loir-et-Cher'            => '41',
+        'Loire'                   => '42',
+        'Loire-Atlantique'        => '44',
+        'Loiret'                  => '45',
+        'Lot'                     => '46',
+        'Lot-et-Garonne'          => '47',
+        'Lozère'                  => '48',
+        'Maine-et-Loire'          => '49',
+        'Manche'                  => '50',
+        'Marne'                   => '51',
+        'Martinique'              => '972',
+        'Mayenne'                 => '53',
+        'Mayotte'                 => '976',
+        'Meurthe-et-Moselle'      => '54',
+        'Meuse'                   => '55',
+        'Morbihan'                => '56',
+        'Moselle'                 => '57',
+        'Nièvre'                  => '58',
+        'Nord'                    => '59',
+        'Nouvelle Calédonie'      => '988',
+        'Oise'                    => '60',
+        'Orne'                    => '61',
+        'Paris'                   => '75',
+        'Pas-de-Calais'           => '62',
+        'Polynésie Française'     => '987',
+        'Puy-de-Dôme'             => '63',
+        'Pyrénées-Atlantiques'    => '64',
+        'Pyrénées-Orientales'     => '66',
+        'Rhône'                   => '69',
+        'Saint-Barthélémy'        => '977',
+        'Saint-Martin'            => '978',
+        'Saône-et-Loire'          => '71',
+        'Sarthe'                  => '72',
+        'Savoie'                  => '73',
+        'Seine-Maritime'          => '76',
+        'Seine-Saint-Denis'       => '93',
+        'Seine-et-Marne'          => '77',
+        'Somme'                   => '80',
+        'St-Pierre-et-Miquelon'   => '975',
+        'Tarn'                    => '81',
+        'Tarn-et-Garonne'         => '82',
+        'Territoire de Belfort'   => '90',
+        "Val-d'Oise"              => '95',
+        'Val-de-Marne'            => '94',
+        'Var'                     => '83',
+        'Vaucluse'                => '84',
+        'Vendée'                  => '85',
+        'Vienne'                  => '86',
+        'Vosges'                  => '88',
+        'Wallis et Futuna'        => '986',
+        'Yonne'                   => '89',
+        'Yvelines'                => '78',
+    );
+
     private static $departements = array(
         'Ain',
         'Aisne',
@@ -421,6 +537,27 @@ class GF_Field_Ecoles_FR extends GF_Field
     public static function get_departements()
     {
         return self::$departements;
+    }
+
+    /**
+     * Get the official department number for a given department name.
+     *
+     * @param string $name Department name.
+     * @return string Department number, or empty string if not found.
+     */
+    public static function get_departement_number( $name )
+    {
+        return isset( self::$departement_numbers[ $name ] ) ? self::$departement_numbers[ $name ] : '';
+    }
+
+    /**
+     * Get the full department name → number mapping.
+     *
+     * @return array
+     */
+    public static function get_departement_numbers()
+    {
+        return self::$departement_numbers;
     }
 
     /**
@@ -816,6 +953,10 @@ class GF_Field_Ecoles_FR extends GF_Field
             'circonscription' => 'nom_circonscription',
             'code_circonscription' => 'code_circonscription',
             'mail_circonscription' => 'code_circonscription',
+            'statut' => 'statut',
+            'departement' => 'departement',
+            'numero_departement' => 'numero_departement',
+            'department_number' => 'numero_departement',
             'all' => 'all',
         );
 
@@ -834,6 +975,10 @@ class GF_Field_Ecoles_FR extends GF_Field
 
         if (isset($modifier_map[$modifier_lower])) {
             $data_key = $modifier_map[$modifier_lower];
+            // For numero_departement, compute from department name if not stored.
+            if ( $data_key === 'numero_departement' && empty( $data['numero_departement'] ) && ! empty( $data['departement'] ) ) {
+                return self::get_departement_number( $data['departement'] );
+            }
             return $data[$data_key] ?? '';
         }
 
@@ -862,6 +1007,9 @@ class GF_Field_Ecoles_FR extends GF_Field
             'education_prioritaire',
             'nom_circonscription',
             'code_circonscription',
+            'statut',
+            'departement',
+            'numero_departement',
             'all',
         );
     }
@@ -952,6 +1100,9 @@ function gf_french_schools_custom_merge_tags($merge_tags, $form_id, $fields, $el
                 'education_prioritaire' => __('Priority Education', 'gf-french-schools'),
                 'nom_circonscription' => __('Circonscription', 'gf-french-schools'),
                 'code_circonscription' => __('Email Circonscription', 'gf-french-schools'),
+                'statut' => __('Status', 'gf-french-schools'),
+                'departement' => __('Department', 'gf-french-schools'),
+                'numero_departement' => __('Department Number', 'gf-french-schools'),
                 'all' => __('All Information', 'gf-french-schools'),
             );
 

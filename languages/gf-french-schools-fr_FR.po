@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.8.5\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.8.6\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2026-02-11T12:00:00+01:00\n"
 "PO-Revision-Date: 2026-03-02 15:50+0100\n"
@@ -398,6 +398,10 @@ msgstr "Catégorie d'établissement"
 #: includes/class-gf-field-ecoles-fr.php
 msgid "All Information"
 msgstr "Toutes les informations"
+
+#: includes/class-gf-field-ecoles-fr.php
+msgid "Department Number"
+msgstr "Numéro de département"
 
 #: includes/class-ecoles-api-service.php
 msgid "Unable to connect to the school directory. Please try again later."

@@ -18,6 +18,41 @@
     }, (window.gfEcolesFR && gfEcolesFR.timings) ? gfEcolesFR.timings : {});
 
     /**
+     * Department name → official department number mapping.
+     */
+    var departementNumbers = {
+        'Ain': '01', 'Aisne': '02', 'Allier': '03', 'Alpes-de-Haute-Provence': '04',
+        'Hautes-Alpes': '05', 'Alpes-Maritimes': '06', 'Ard\u00e8che': '07', 'Ardennes': '08',
+        'Ari\u00e8ge': '09', 'Aube': '10', 'Aude': '11', 'Aveyron': '12',
+        'Bouches-du-Rh\u00f4ne': '13', 'Calvados': '14', 'Cantal': '15', 'Charente': '16',
+        'Charente-Maritime': '17', 'Cher': '18', 'Corr\u00e8ze': '19', 'Corse-du-Sud': '2A',
+        "C\u00f4te-d'Or": '21', "C\u00f4tes-d'Armor": '22', 'Creuse': '23', 'Dordogne': '24',
+        'Doubs': '25', 'Dr\u00f4me': '26', 'Eure': '27', 'Eure-et-Loir': '28',
+        'Finist\u00e8re': '29', 'Gard': '30', 'Haute-Garonne': '31', 'Gers': '32',
+        'Gironde': '33', 'H\u00e9rault': '34', 'Ille-et-Vilaine': '35', 'Indre': '36',
+        'Indre-et-Loire': '37', 'Is\u00e8re': '38', 'Jura': '39', 'Landes': '40',
+        'Loir-et-Cher': '41', 'Loire': '42', 'Haute-Loire': '43', 'Loire-Atlantique': '44',
+        'Loiret': '45', 'Lot': '46', 'Lot-et-Garonne': '47', 'Loz\u00e8re': '48',
+        'Maine-et-Loire': '49', 'Manche': '50', 'Marne': '51', 'Haute-Marne': '52',
+        'Mayenne': '53', 'Meurthe-et-Moselle': '54', 'Meuse': '55', 'Morbihan': '56',
+        'Moselle': '57', 'Ni\u00e8vre': '58', 'Nord': '59', 'Oise': '60',
+        'Orne': '61', 'Pas-de-Calais': '62', 'Puy-de-D\u00f4me': '63',
+        'Pyr\u00e9n\u00e9es-Atlantiques': '64', 'Hautes-Pyr\u00e9n\u00e9es': '65',
+        'Pyr\u00e9n\u00e9es-Orientales': '66', 'Bas-Rhin': '67', 'Haut-Rhin': '68',
+        'Rh\u00f4ne': '69', 'Haute-Sa\u00f4ne': '70', 'Sa\u00f4ne-et-Loire': '71', 'Sarthe': '72',
+        'Savoie': '73', 'Haute-Savoie': '74', 'Paris': '75', 'Seine-Maritime': '76',
+        'Seine-et-Marne': '77', 'Yvelines': '78', 'Deux-S\u00e8vres': '79', 'Somme': '80',
+        'Tarn': '81', 'Tarn-et-Garonne': '82', 'Var': '83', 'Vaucluse': '84',
+        'Vend\u00e9e': '85', 'Vienne': '86', 'Haute-Vienne': '87', 'Vosges': '88',
+        'Yonne': '89', 'Territoire de Belfort': '90', 'Essonne': '91',
+        'Hauts-de-Seine': '92', 'Seine-Saint-Denis': '93', 'Val-de-Marne': '94',
+        "Val-d'Oise": '95', 'Guadeloupe': '971', 'Martinique': '972', 'Guyane': '973',
+        'La R\u00e9union': '974', 'St-Pierre-et-Miquelon': '975', 'Mayotte': '976',
+        'Saint-Barth\u00e9l\u00e9my': '977', 'Saint-Martin': '978',
+        'Wallis et Futuna': '986', 'Polyn\u00e9sie Fran\u00e7aise': '987', 'Nouvelle Cal\u00e9donie': '988'
+    };
+
+    /**
      * Debounce function to limit API calls.
      * @param {Function} func
      * @param {number} wait
@@ -616,6 +651,7 @@
                 var data = {
                     statut: $statut.val(),
                     departement: $departement.val(),
+                    numero_departement: departementNumbers[$departement.val()] || '',
                     ville: selectedVille,
                     identifiant: ecole.identifiant,
                     nom: cleanNom,
@@ -652,6 +688,7 @@
                     currentData = {
                         statut: $statut.val(),
                         departement: $departement.val(),
+                        numero_departement: departementNumbers[$departement.val()] || '',
                         ville: selectedVille
                     };
                     $dataInput.val(JSON.stringify(currentData));
@@ -678,7 +715,8 @@
                 14: 'code_circonscription',
                 15: 'statut',
                 16: 'departement',
-                17: 'ville'
+                17: 'ville',
+                18: 'numero_departement'
             };
 
             /**
@@ -807,6 +845,7 @@
                 var data = {
                     statut: $statut.val(),
                     departement: $departement.val(),
+                    numero_departement: departementNumbers[$departement.val()] || '',
                     ville: selectedVille,
                     autres_nom: autresNom
                 };
