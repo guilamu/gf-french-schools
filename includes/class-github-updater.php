@@ -35,11 +35,32 @@ class GF_French_Schools_GitHub_Updater
     private const GITHUB_REPO = 'gf-french-schools';
 
     /**
+     * Plugin slug.
+     *
+     * @var string
+     */
+    private const PLUGIN_SLUG = 'gf-french-schools';
+
+    /**
      * Plugin file path relative to plugins directory.
      *
      * @var string
      */
     private const PLUGIN_FILE = 'gf-french-schools/gf-french-schools.php';
+
+    /**
+     * Tested up to WordPress version.
+     *
+     * @var string
+     */
+    private const TESTED_WP = '6.7';
+
+    /**
+     * Minimum PHP version.
+     *
+     * @var string
+     */
+    private const REQUIRES_PHP = '7.4';
 
     /**
      * Cache key for GitHub release data.
@@ -151,14 +172,18 @@ class GF_French_Schools_GitHub_Updater
 
         // Build update object
         return array(
-            'version' => $new_version,
-            'package' => $release_data['zipball_url'],
-            'url' => $release_data['html_url'],
-            'tested' => '6.7',
-            'requires_php' => '7.4',
+            'id'            => 'github.com/' . self::GITHUB_USER . '/' . self::GITHUB_REPO,
+            'slug'          => self::PLUGIN_SLUG,
+            'plugin'        => self::PLUGIN_FILE,
+            'new_version'   => $new_version,
+            'version'       => $new_version,
+            'package'       => $release_data['zipball_url'],
+            'url'           => $release_data['html_url'],
+            'tested'        => self::TESTED_WP,
+            'requires_php'  => self::REQUIRES_PHP,
             'compatibility' => new stdClass(),
-            'icons' => array(),
-            'banners' => array(),
+            'icons'         => array(),
+            'banners'       => array(),
         );
     }
 
@@ -178,7 +203,7 @@ class GF_French_Schools_GitHub_Updater
         }
 
         // Check this is our plugin
-        if (!isset($args->slug) || 'gf-french-schools' !== $args->slug) {
+        if (!isset($args->slug) || self::PLUGIN_SLUG !== $args->slug) {
             return $res;
         }
 
@@ -192,14 +217,14 @@ class GF_French_Schools_GitHub_Updater
         // Build response object
         $res = new stdClass();
         $res->name = 'Gravity Forms - French Schools';
-        $res->slug = 'gf-french-schools';
+        $res->slug = self::PLUGIN_SLUG;
         $res->version = $new_version;
         $res->author = '<a href="https://github.com/guilamu">Guilamu</a>';
         $res->homepage = sprintf('https://github.com/%s/%s', self::GITHUB_USER, self::GITHUB_REPO);
         $res->download_link = $release_data['zipball_url'];
         $res->requires = '5.8';
-        $res->tested = '6.7';
-        $res->requires_php = '7.4';
+        $res->tested = self::TESTED_WP;
+        $res->requires_php = self::REQUIRES_PHP;
         $res->last_updated = $release_data['published_at'] ?? '';
         $res->sections = array(
             'description' => 'Adds a "French Schools" field type to Gravity Forms allowing users to search and select French educational institutions via the official Education Ministry API.',

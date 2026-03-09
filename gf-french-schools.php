@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.8.6
+ * Version: 1.8.7
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.8.6');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.8.7');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -178,7 +178,7 @@ function gf_french_schools_cron_schedules($schedules)
     if (!isset($schedules['monthly'])) {
         $schedules['monthly'] = array(
             'interval' => 30 * DAY_IN_SECONDS,
-            'display' => __('Once Monthly', 'gf-french-schools'),
+            'display' => 'Once Monthly',
         );
     }
     return $schedules;

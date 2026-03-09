@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.8.6\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.8.7\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2026-02-11T12:00:00+01:00\n"
-"PO-Revision-Date: 2026-03-02 15:50+0100\n"
+"PO-Revision-Date: 2026-03-09 09:48+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -15,15 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.8\n"
 
 #: gf-french-schools.php
 msgid "Gravity Forms - French Schools requires Gravity Forms %s or higher."
 msgstr "Gravity Forms - Écoles françaises nécessite Gravity Forms %s ou supérieur."
-
-#: gf-french-schools.php
-msgid "Once Monthly"
-msgstr "Une fois par mois"
 
 #: gf-french-schools.php
 msgid "Preselection Settings"

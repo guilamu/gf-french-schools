@@ -199,6 +199,11 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.7 - 2026-03-09
+- Correction de l'avertissement WordPress 6.7+ « Translation loading triggered too early » : suppression de l'appel `__()` dans le filtre `cron_schedules` qui déclenchait le chargement des traductions avant `init`
+- Correction de l'avertissement PHP « Undefined property: stdClass::$slug » sur la page update-core.php : ajout des champs obligatoires `id`, `slug`, `plugin` et `new_version` à l'objet de mise à jour retourné par le GitHub updater
+- Centralisation des constantes `TESTED_WP`, `REQUIRES_PHP` et `PLUGIN_SLUG` dans la classe `GF_French_Schools_GitHub_Updater`
+
 ### Version 1.8.6 - 2026-03-03
 - Ajout du numéro de département comme sous-champ (`{Libellé:ID.18}`) et merge tag (`{Libellé:ID:numero_departement}`), permettant de récupérer le code officiel du département (ex : « 93 » pour Seine-Saint-Denis, « 2A » pour Corse-du-Sud, « 974 » pour La Réunion)
 - Ajout des merge tags `{Libellé:ID:statut}` et `{Libellé:ID:departement}` pour accéder au statut et au nom du département via modificateur
