@@ -199,6 +199,12 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.8 - 2026-03-27
+- Correction du bug de cache : les résultats vides de recherche d'écoles étaient mis en cache pendant 1 heure, provoquant des faux « aucun résultat » pour des écoles existantes
+- Nouvelle option « Repli API » : lorsque le mode local seul est activé et qu'une recherche ne retourne aucun résultat, le plugin peut interroger silencieusement l'API distante en dernier recours (option désactivée par défaut, visible uniquement quand « Local Only » est actif)
+- Recherche floue (fuzzy search) sur la base locale : tolère les fautes de frappe dans les noms de villes et d'écoles grâce à un algorithme de distance de Levenshtein (ex : « mobtreuil » → « Montreuil »). Activé automatiquement quand la recherche exacte ne retourne aucun résultat (minimum 3 caractères)
+- Refactoring interne : extraction des appels API distants dans des méthodes privées `get_villes_from_api()` et `get_ecoles_from_api()`
+
 ### Version 1.8.7 - 2026-03-09
 - Correction de l'avertissement WordPress 6.7+ « Translation loading triggered too early » : suppression de l'appel `__()` dans le filtre `cron_schedules` qui déclenchait le chargement des traductions avant `init`
 - Correction de l'avertissement PHP « Undefined property: stdClass::$slug » sur la page update-core.php : ajout des champs obligatoires `id`, `slug`, `plugin` et `new_version` à l'objet de mise à jour retourné par le GitHub updater

@@ -493,7 +493,150 @@ class GF_Ecoles_Local_DB
             );
         }
 
+        // Fuzzy fallback: if exact LIKE found nothing, try Levenshtein matching.
+        if (empty($results) && mb_strlen($query) >= 3) {
+            $results = self::fuzzy_search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+        }
+
         return $results;
+    }
+
+    /**
+     * Fuzzy search for cities using Levenshtein distance.
+     *
+     * Fetches all distinct city names for the given department/status and
+     * ranks them by edit distance against the query.
+     *
+     * @param string $statut              School status.
+     * @param string $departement         Department name.
+     * @param string $query               Search query.
+     * @param bool   $hide_ecoles         Whether to hide "Ecole" type schools.
+     * @param bool   $hide_colleges_lycees Whether to hide "Collège"/"Lycée".
+     * @return array Matched cities.
+     */
+    private static function fuzzy_search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees)
+    {
+        global $wpdb;
+
+        $table = self::get_table_name();
+
+        $where = $wpdb->prepare(
+            'statut_public_prive = %s AND libelle_departement = %s',
+            $statut,
+            $departement
+        );
+
+        if ($hide_ecoles) {
+            $where .= " AND type_etablissement != 'Ecole'";
+        }
+        if ($hide_colleges_lycees) {
+            $where .= " AND type_etablissement != 'Collège' AND type_etablissement != 'Lycée'";
+        }
+
+        $sql = "SELECT DISTINCT nom_commune FROM {$table} WHERE {$where} ORDER BY nom_commune"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $all_cities = $wpdb->get_col($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+        if (empty($all_cities)) {
+            return array();
+        }
+
+        $query_normalized = self::normalize_for_fuzzy($query);
+        $query_words = preg_split('/\s+/', $query_normalized, -1, PREG_SPLIT_NO_EMPTY);
+        $query_len = mb_strlen($query_normalized);
+
+        // Maximum allowed Levenshtein distance scales with query length.
+        $max_distance = max(1, (int) floor($query_len / 3));
+        // Cap at 3 to avoid overly broad matches.
+        $max_distance = min($max_distance, 3);
+
+        $scored = array();
+
+        foreach ($all_cities as $city) {
+            $city_normalized = self::normalize_for_fuzzy($city);
+
+            // Strategy 1: Levenshtein on full normalized string (for short queries).
+            $distance = levenshtein(
+                mb_substr($query_normalized, 0, 255),
+                mb_substr($city_normalized, 0, 255)
+            );
+
+            if ($distance <= $max_distance) {
+                $scored[] = array('city' => $city, 'distance' => $distance);
+                continue;
+            }
+
+            // Strategy 2: Match each query word against each city word with tolerance.
+            // "mobtreuil" should match "Montreuil" even as part of a longer city name.
+            $city_words = preg_split('/[\s\-]+/', $city_normalized, -1, PREG_SPLIT_NO_EMPTY);
+            $all_words_matched = true;
+            $total_word_distance = 0;
+
+            foreach ($query_words as $qw) {
+                $qw_len = mb_strlen($qw);
+                $word_max = max(1, (int) floor($qw_len / 3));
+                $word_max = min($word_max, 3);
+                $best_word_dist = PHP_INT_MAX;
+
+                foreach ($city_words as $cw) {
+                    // Compare the query word against a prefix of the city word (for partial typing).
+                    $cw_trimmed = mb_substr($cw, 0, mb_strlen($qw) + $word_max);
+                    $d = levenshtein(
+                        mb_substr($qw, 0, 255),
+                        mb_substr($cw_trimmed, 0, 255)
+                    );
+                    if ($d < $best_word_dist) {
+                        $best_word_dist = $d;
+                    }
+                }
+
+                if ($best_word_dist > $word_max) {
+                    $all_words_matched = false;
+                    break;
+                }
+                $total_word_distance += $best_word_dist;
+            }
+
+            if ($all_words_matched) {
+                $scored[] = array('city' => $city, 'distance' => $total_word_distance);
+            }
+        }
+
+        // Sort by distance (best match first) and limit results.
+        usort($scored, function ($a, $b) {
+            return $a['distance'] - $b['distance'];
+        });
+
+        $results = array();
+        foreach (array_slice($scored, 0, 20) as $item) {
+            $results[] = array(
+                'value' => $item['city'],
+                'label' => $item['city'],
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * Normalize a string for fuzzy comparison.
+     *
+     * Lowercases, strips accents, and removes non-alphanumeric characters
+     * except spaces and hyphens.
+     *
+     * @param string $str Input string.
+     * @return string Normalized string.
+     */
+    private static function normalize_for_fuzzy($str)
+    {
+        $str = mb_strtolower($str, 'UTF-8');
+        // Remove accents using transliteration.
+        if (function_exists('remove_accents')) {
+            $str = remove_accents($str);
+        }
+        // Keep only letters, numbers, spaces and hyphens.
+        $str = preg_replace('/[^\p{L}\p{N}\s\-]/u', '', $str);
+        $str = preg_replace('/\s+/', ' ', trim($str));
+        return $str;
     }
 
     /**
@@ -551,20 +694,136 @@ class GF_Ecoles_Local_DB
 
         $results = array();
         foreach ($rows as $item) {
-            $results[] = array(
-                'identifiant'          => $item['identifiant'] ?? '',
-                'nom'                  => $item['nom_etablissement'] ?? '',
-                'type'                 => $item['type_etablissement'] ?? '',
-                'nature'               => $item['libelle_nature'] ?? '',
-                'adresse'              => $item['adresse'] ?? '',
-                'code_postal'          => $item['code_postal'] ?? '',
-                'commune'              => $item['nom_commune'] ?? '',
-                'telephone'            => $item['telephone'] ?? '',
-                'mail'                 => $item['mail'] ?? '',
-                'education_prioritaire' => $item['education_prioritaire'] ?? '',
-                'nom_circonscription'  => $item['nom_circonscription'] ?? '',
-                'code_circonscription' => $item['code_circonscription'] ?? '',
-            );
+            $results[] = self::format_school_row($item);
+        }
+
+        // Fuzzy fallback: if exact LIKE found nothing, try Levenshtein matching on school names.
+        if (empty($results) && mb_strlen($query) >= 3) {
+            $results = self::fuzzy_search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Format a database row into the standard school result array.
+     *
+     * @param array $item Database row.
+     * @return array Formatted school data.
+     */
+    private static function format_school_row($item)
+    {
+        return array(
+            'identifiant'          => $item['identifiant'] ?? '',
+            'nom'                  => $item['nom_etablissement'] ?? '',
+            'type'                 => $item['type_etablissement'] ?? '',
+            'nature'               => $item['libelle_nature'] ?? '',
+            'adresse'              => $item['adresse'] ?? '',
+            'code_postal'          => $item['code_postal'] ?? '',
+            'commune'              => $item['nom_commune'] ?? '',
+            'telephone'            => $item['telephone'] ?? '',
+            'mail'                 => $item['mail'] ?? '',
+            'education_prioritaire' => $item['education_prioritaire'] ?? '',
+            'nom_circonscription'  => $item['nom_circonscription'] ?? '',
+            'code_circonscription' => $item['code_circonscription'] ?? '',
+        );
+    }
+
+    /**
+     * Fuzzy search for schools using Levenshtein distance on school names.
+     *
+     * Fetches all schools in the given city and ranks them by edit distance
+     * against the query words.
+     *
+     * @param string $statut              School status.
+     * @param string $departement         Department name.
+     * @param string $ville               City name.
+     * @param string $query               Search query.
+     * @param bool   $hide_ecoles         Whether to hide "Ecole" type schools.
+     * @param bool   $hide_colleges_lycees Whether to hide "Collège"/"Lycée".
+     * @return array Matched schools.
+     */
+    private static function fuzzy_search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees)
+    {
+        global $wpdb;
+
+        $table = self::get_table_name();
+
+        $ville_parts = preg_split('/\s+/', trim($ville));
+        $ville_like_parts = array_map(function ($part) use ($wpdb) {
+            return $wpdb->esc_like($part);
+        }, $ville_parts);
+        $ville_like = implode('%', $ville_like_parts);
+
+        $where = $wpdb->prepare(
+            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%')",
+            $statut,
+            $departement,
+            $ville_like
+        );
+
+        if ($hide_ecoles) {
+            $where .= " AND type_etablissement != 'Ecole'";
+        }
+        if ($hide_colleges_lycees) {
+            $where .= " AND type_etablissement != 'Collège' AND type_etablissement != 'Lycée'";
+        }
+
+        $sql = "SELECT * FROM {$table} WHERE {$where}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $all_schools = $wpdb->get_results($sql, ARRAY_A); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+        if (empty($all_schools)) {
+            return array();
+        }
+
+        $query_normalized = self::normalize_for_fuzzy($query);
+        $query_words = preg_split('/\s+/', $query_normalized, -1, PREG_SPLIT_NO_EMPTY);
+
+        $scored = array();
+
+        foreach ($all_schools as $school) {
+            $name_normalized = self::normalize_for_fuzzy($school['nom_etablissement'] ?? '');
+            $name_words = preg_split('/[\s\-]+/', $name_normalized, -1, PREG_SPLIT_NO_EMPTY);
+
+            $all_words_matched = true;
+            $total_distance = 0;
+
+            foreach ($query_words as $qw) {
+                $qw_len = mb_strlen($qw);
+                $word_max = max(1, (int) floor($qw_len / 3));
+                $word_max = min($word_max, 3);
+                $best_dist = PHP_INT_MAX;
+
+                foreach ($name_words as $nw) {
+                    $nw_trimmed = mb_substr($nw, 0, mb_strlen($qw) + $word_max);
+                    $d = levenshtein(
+                        mb_substr($qw, 0, 255),
+                        mb_substr($nw_trimmed, 0, 255)
+                    );
+                    if ($d < $best_dist) {
+                        $best_dist = $d;
+                    }
+                }
+
+                if ($best_dist > $word_max) {
+                    $all_words_matched = false;
+                    break;
+                }
+                $total_distance += $best_dist;
+            }
+
+            if ($all_words_matched) {
+                $scored[] = array('school' => $school, 'distance' => $total_distance);
+            }
+        }
+
+        usort($scored, function ($a, $b) {
+            return $a['distance'] - $b['distance'];
+        });
+
+        $results = array();
+        foreach (array_slice($scored, 0, 20) as $item) {
+            $results[] = self::format_school_row($item['school']);
         }
 
         return $results;

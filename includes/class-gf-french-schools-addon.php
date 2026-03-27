@@ -215,6 +215,23 @@ class GF_French_Schools_AddOn extends GFAddOn
                         'tooltip'       => esc_html__('When enabled, all searches use the locally downloaded copy of the school directory. The remote API will never be called.', 'gf-french-schools'),
                         'default_value' => false,
                     ),
+                    array(
+                        'name'          => 'local_fallback_api',
+                        'type'          => 'toggle',
+                        'label'         => esc_html__('API Fallback', 'gf-french-schools'),
+                        'description'   => esc_html__('When Local Only mode returns no results, silently query the remote API as a last resort.', 'gf-french-schools'),
+                        'tooltip'       => esc_html__('If the local database returns no results for a search, the plugin will try the remote API before showing "no results". This helps when the local copy is incomplete or outdated.', 'gf-french-schools'),
+                        'default_value' => false,
+                        'dependency'    => array(
+                            'live'   => true,
+                            'fields' => array(
+                                array(
+                                    'field'  => 'local_only',
+                                    'values' => array( '1' ),
+                                ),
+                            ),
+                        ),
+                    ),
                 ),
             ),
             array(
@@ -356,8 +373,15 @@ class GF_French_Schools_AddOn extends GFAddOn
             $settings['local_only'] = '';
         }
 
+        // Sync fallback API option.
+        $local_fallback_api = !empty($settings['local_fallback_api']) && $local_only;
+        if (!$local_only) {
+            $settings['local_fallback_api'] = '';
+        }
+
         parent::update_plugin_settings($settings);
         update_option('gf_ecoles_fr_local_only', $local_only);
+        update_option('gf_ecoles_fr_local_fallback_api', $local_fallback_api);
     }
 
     /**

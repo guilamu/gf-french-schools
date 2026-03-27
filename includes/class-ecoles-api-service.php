@@ -56,9 +56,30 @@ class GF_Ecoles_API_Service
 
         // Local-only mode: skip remote API entirely.
         if (get_option('gf_ecoles_fr_local_only', false) && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
-            return GF_Ecoles_Local_DB::search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+            $results = GF_Ecoles_Local_DB::search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+            // Fallback to remote API if local returned nothing and fallback is enabled.
+            if (empty($results) && get_option('gf_ecoles_fr_local_fallback_api', false)) {
+                return $this->get_villes_from_api($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
+            }
+            return $results;
         }
 
+        return $this->get_villes_from_api($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
+    }
+
+    /**
+     * Fetch cities from the remote API.
+     *
+     * @param string $statut              School status.
+     * @param string $departement         Department name.
+     * @param string $query               Search query.
+     * @param bool   $hide_ecoles         Whether to hide "Ecole" type schools.
+     * @param bool   $hide_colleges_lycees Whether to hide "Collège"/"Lycée" type schools.
+     * @param string $cache_key           Transient cache key.
+     * @return array|WP_Error
+     */
+    private function get_villes_from_api($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key)
+    {
         // Build per-word LIKE clauses so that "les pa" matches "Les Pavillons Sous Bois".
         // suggest() treats the whole query as a single token, failing on multi-word inputs
         // like "les pa". Splitting into words and requiring each to appear anywhere in
@@ -164,12 +185,33 @@ class GF_Ecoles_API_Service
         // Local-only mode: skip remote API entirely.
         if ($local_only && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
             $results = GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            // Fallback to remote API if local returned nothing and fallback is enabled.
+            if (empty($results) && get_option('gf_ecoles_fr_local_fallback_api', false)) {
+                return $this->get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
+            }
             if (!empty($results)) {
                 set_transient($cache_key, $results, self::CACHE_EXPIRATION);
             }
             return $results;
         }
 
+        return $this->get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
+    }
+
+    /**
+     * Fetch schools from the remote API.
+     *
+     * @param string $statut              School status.
+     * @param string $departement         Department name.
+     * @param string $ville               City name.
+     * @param string $query               Search query.
+     * @param bool   $hide_ecoles         Whether to hide "Ecole" type schools.
+     * @param bool   $hide_colleges_lycees Whether to hide "Collège"/"Lycée" type schools.
+     * @param string $cache_key           Transient cache key.
+     * @return array|WP_Error
+     */
+    private function get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key)
+    {
         $select_fields = array(
             'identifiant_de_l_etablissement',
             'nom_etablissement',
@@ -246,7 +288,9 @@ class GF_Ecoles_API_Service
             }
         }
 
-        set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+        if (!empty($results)) {
+            set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+        }
 
         return $results;
     }

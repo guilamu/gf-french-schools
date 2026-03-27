@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.8.7\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.8.8\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2026-02-11T12:00:00+01:00\n"
-"PO-Revision-Date: 2026-03-09 09:48+0100\n"
+"PO-Revision-Date: 2026-03-27 15:31+0100\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -434,6 +434,18 @@ msgstr "Colonnes requises manquantes dans le CSV : %s"
 #: includes/class-gf-french-schools-addon.php
 msgid "Configure how the plugin searches for schools."
 msgstr "Configurez la manière dont le plugin recherche les établissements."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "API Fallback"
+msgstr "Repli API"
+
+#: includes/class-gf-french-schools-addon.php
+msgid "When Local Only mode returns no results, silently query the remote API as a last resort."
+msgstr "Lorsque le mode local seul ne retourne aucun résultat, interroger silencieusement l'API distante en dernier recours."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "If the local database returns no results for a search, the plugin will try the remote API before showing \"no results\". This helps when the local copy is incomplete or outdated."
+msgstr "Si la base de données locale ne retourne aucun résultat pour une recherche, le plugin essaiera l'API distante avant d'afficher « aucun résultat ». Utile lorsque la copie locale est incomplète ou obsolète."
 
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder."
