@@ -53,7 +53,7 @@ class GF_Ecoles_Local_DB
     /**
      * CSV export URL selecting only the columns we need.
      */
-    const EXPORT_URL = 'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/exports/csv?select=identifiant_de_l_etablissement%2Cnom_etablissement%2Ctype_etablissement%2Clibelle_nature%2Cstatut_public_prive%2Cadresse_1%2Ccode_postal%2Cnom_commune%2Clibelle_departement%2Ctelephone%2Cmail%2Cappartenance_education_prioritaire%2Cnom_circonscription%2Ccode_circonscription&delimiter=%3B';
+    const EXPORT_URL = 'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/exports/csv?select=identifiant_de_l_etablissement%2Cnom_etablissement%2Ctype_etablissement%2Clibelle_nature%2Cstatut_public_prive%2Cadresse_1%2Ccode_postal%2Cnom_commune%2Ccode_commune%2Clibelle_departement%2Ctelephone%2Cmail%2Cappartenance_education_prioritaire%2Cnom_circonscription%2Ccode_circonscription&delimiter=%3B';
 
     /**
      * Minimum accepted record count for a sync to be considered valid.
@@ -103,7 +103,8 @@ class GF_Ecoles_Local_DB
             adresse VARCHAR(255) NOT NULL DEFAULT '',
             code_postal VARCHAR(10) NOT NULL DEFAULT '',
             nom_commune VARCHAR(100) NOT NULL DEFAULT '',
-            libelle_departement VARCHAR(100) NOT NULL DEFAULT '',
+            code_commune VARCHAR(10) NOT NULL DEFAULT '',
+            libelle_departement VARCHAR(100) NOT NULL DEFAULT '',,
             telephone VARCHAR(30) NOT NULL DEFAULT '',
             mail VARCHAR(255) NOT NULL DEFAULT '',
             education_prioritaire VARCHAR(50) NOT NULL DEFAULT '',
@@ -113,6 +114,7 @@ class GF_Ecoles_Local_DB
             UNIQUE KEY identifiant (identifiant),
             KEY idx_search_ville (statut_public_prive, libelle_departement, nom_commune),
             KEY idx_search_ecole (statut_public_prive, libelle_departement, nom_commune, nom_etablissement(50)),
+            KEY idx_search_code_commune (statut_public_prive, libelle_departement, code_commune, nom_etablissement(50)),
             KEY idx_type (type_etablissement)
         ) {$charset_collate};";
 
@@ -314,6 +316,7 @@ class GF_Ecoles_Local_DB
             'adresse'                => array('adresse_1', 'adresse 1'),
             'code_postal'            => array('code_postal', 'code postal'),
             'nom_commune'            => array('nom_commune', 'nom commune'),
+            'code_commune'           => array('code_commune', 'code commune'),
             'libelle_departement'    => array('libelle_departement', 'libelle departement', 'libellé département'),
             'telephone'              => array('telephone', 'téléphone'),
             'mail'                   => array('mail'),
@@ -481,15 +484,16 @@ class GF_Ecoles_Local_DB
             $where .= " AND type_etablissement != 'Collège' AND type_etablissement != 'Lycée'";
         }
 
-        $sql = "SELECT DISTINCT nom_commune FROM {$table} WHERE {$where} ORDER BY nom_commune LIMIT 20"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $sql = "SELECT DISTINCT nom_commune, code_commune FROM {$table} WHERE {$where} ORDER BY nom_commune LIMIT 20"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-        $rows = $wpdb->get_col($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $rows = $wpdb->get_results($sql, ARRAY_A); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
         $results = array();
-        foreach ($rows as $commune) {
+        foreach ($rows as $row) {
             $results[] = array(
-                'value' => $commune,
-                'label' => $commune,
+                'value' => $row['nom_commune'],
+                'label' => $row['nom_commune'],
+                'code_commune' => $row['code_commune'] ?? '',
             );
         }
 
@@ -650,7 +654,7 @@ class GF_Ecoles_Local_DB
      * @param bool   $hide_colleges_lycees Whether to hide "Collège" and "Lycée".
      * @return array List of schools.
      */
-    public static function search_schools($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
+    public static function search_schools($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false, $code_commune = '')
     {
         global $wpdb;
 
@@ -659,27 +663,42 @@ class GF_Ecoles_Local_DB
         }
 
         $table = self::get_table_name();
+        $code_commune = preg_replace('/[^0-9A-Za-z]/', '', $code_commune);
 
-        // Build flexible city LIKE pattern: split by whitespace, escape each part, join with %
-        // This handles inconsistent spacing in database (e.g., "Paris 18e  Arrondissement")
-        $ville_parts = preg_split('/\s+/', trim($ville));
-        $ville_like_parts = array_map(function($part) use ($wpdb) {
-            return $wpdb->esc_like($part);
-        }, $ville_parts);
-        $ville_like = implode('%', $ville_like_parts);
+        // Use code_commune when available for reliable matching.
+        // Some schools have incorrect nom_commune in the national database.
+        if (!empty($code_commune)) {
+            $query_escaped = $wpdb->esc_like($query);
+            $where = $wpdb->prepare(
+                "statut_public_prive = %s AND libelle_departement = %s AND code_commune = %s AND nom_etablissement LIKE CONCAT('%%', %s, '%%')",
+                $statut,
+                $departement,
+                $code_commune,
+                $query_escaped
+            );
+        } else {
+            // Fallback to nom_commune matching
+            // Build flexible city LIKE pattern: split by whitespace, escape each part, join with %
+            // This handles inconsistent spacing in database (e.g., "Paris 18e  Arrondissement")
+            $ville_parts = preg_split('/\s+/', trim($ville));
+            $ville_like_parts = array_map(function($part) use ($wpdb) {
+                return $wpdb->esc_like($part);
+            }, $ville_parts);
+            $ville_like = implode('%', $ville_like_parts);
 
-        // Escape query for LIKE
-        $query_escaped = $wpdb->esc_like($query);
+            // Escape query for LIKE
+            $query_escaped = $wpdb->esc_like($query);
 
-        // Build WHERE clause using CONCAT for LIKE wildcards to avoid WordPress % escaping
-        // WordPress 6.x escapes % in prepare() which breaks LIKE patterns
-        $where = $wpdb->prepare(
-            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%') AND nom_etablissement LIKE CONCAT('%%', %s, '%%')",
-            $statut,
-            $departement,
-            $ville_like,
-            $query_escaped
-        );
+            // Build WHERE clause using CONCAT for LIKE wildcards to avoid WordPress % escaping
+            // WordPress 6.x escapes % in prepare() which breaks LIKE patterns
+            $where = $wpdb->prepare(
+                "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%') AND nom_etablissement LIKE CONCAT('%%', %s, '%%')",
+                $statut,
+                $departement,
+                $ville_like,
+                $query_escaped
+            );
+        }
 
         if ($hide_ecoles) {
             $where .= " AND type_etablissement != 'Ecole'";
@@ -699,7 +718,7 @@ class GF_Ecoles_Local_DB
 
         // Fuzzy fallback: if exact LIKE found nothing, try Levenshtein matching on school names.
         if (empty($results) && mb_strlen($query) >= 3) {
-            $results = self::fuzzy_search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            $results = self::fuzzy_search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune);
         }
 
         return $results;
@@ -743,24 +762,35 @@ class GF_Ecoles_Local_DB
      * @param bool   $hide_colleges_lycees Whether to hide "Collège"/"Lycée".
      * @return array Matched schools.
      */
-    private static function fuzzy_search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees)
+    private static function fuzzy_search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune = '')
     {
         global $wpdb;
 
         $table = self::get_table_name();
+        $code_commune = preg_replace('/[^0-9A-Za-z]/', '', $code_commune);
 
-        $ville_parts = preg_split('/\s+/', trim($ville));
-        $ville_like_parts = array_map(function ($part) use ($wpdb) {
-            return $wpdb->esc_like($part);
-        }, $ville_parts);
-        $ville_like = implode('%', $ville_like_parts);
+        // Use code_commune when available for reliable matching.
+        if (!empty($code_commune)) {
+            $where = $wpdb->prepare(
+                "statut_public_prive = %s AND libelle_departement = %s AND code_commune = %s",
+                $statut,
+                $departement,
+                $code_commune
+            );
+        } else {
+            $ville_parts = preg_split('/\s+/', trim($ville));
+            $ville_like_parts = array_map(function ($part) use ($wpdb) {
+                return $wpdb->esc_like($part);
+            }, $ville_parts);
+            $ville_like = implode('%', $ville_like_parts);
 
-        $where = $wpdb->prepare(
-            "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%')",
-            $statut,
-            $departement,
-            $ville_like
-        );
+            $where = $wpdb->prepare(
+                "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%')",
+                $statut,
+                $departement,
+                $ville_like
+            );
+        }
 
         if ($hide_ecoles) {
             $where .= " AND type_etablissement != 'Ecole'";

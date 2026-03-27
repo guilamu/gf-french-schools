@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.8.8
+ * Version: 1.8.9
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.8.8');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.8.9');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -582,6 +582,9 @@ function gf_french_schools_ajax_search()
 
     $ville = sanitize_text_field(wp_unslash($_POST['ville'] ?? ''));
     $query = sanitize_text_field(wp_unslash($_POST['query'] ?? ''));
+    $code_commune = sanitize_text_field(wp_unslash($_POST['code_commune'] ?? ''));
+    // Strict sanitization: code_commune should only contain alphanumeric characters
+    $code_commune = preg_replace('/[^0-9A-Za-z]/', '', $code_commune);
 
     // Get school type filter settings
     $hide_ecoles = filter_var(wp_unslash($_POST['hide_ecoles'] ?? false), FILTER_VALIDATE_BOOLEAN);
@@ -604,7 +607,7 @@ function gf_french_schools_ajax_search()
                 wp_send_json_error(array('message' => __('City is required.', 'gf-french-schools')));
                 return;
             }
-            $results = $api_service->search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            $results = $api_service->search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune);
             break;
     }
 

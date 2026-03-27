@@ -106,9 +106,9 @@ class GF_Ecoles_API_Service
 
         $url = add_query_arg(
             array(
-                'select' => 'nom_commune',
+                'select' => 'nom_commune, code_commune',
                 'where' => $where,
-                'group_by' => 'nom_commune',
+                'group_by' => 'nom_commune, code_commune',
                 'limit' => 20,
             ),
             self::API_BASE . '/records'
@@ -131,6 +131,7 @@ class GF_Ecoles_API_Service
                 $results[] = array(
                     'value' => $item['nom_commune'],
                     'label' => $item['nom_commune'],
+                    'code_commune' => $item['code_commune'] ?? '',
                 );
             }
         }
@@ -161,12 +162,13 @@ class GF_Ecoles_API_Service
      * @param bool   $hide_colleges_lycees Whether to hide "Collège" and "Lycée" type schools.
      * @return array|WP_Error List of schools or error.
      */
-    public function get_ecoles($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
+    public function get_ecoles($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false, $code_commune = '')
     {
         $statut = $this->validate_statut($statut);
         $departement = $this->validate_departement($departement);
         $ville = $this->sanitize_query($ville);
         $query = $this->sanitize_query($query);
+        $code_commune = preg_replace('/[^0-9A-Za-z]/', '', $code_commune);
 
         if (empty($statut) || empty($departement) || empty($ville) || strlen($query) < 2) {
             return array();
@@ -175,7 +177,7 @@ class GF_Ecoles_API_Service
         $local_only = get_option('gf_ecoles_fr_local_only', false);
 
         // Include local_only mode in cache key to separate cached results
-        $cache_key = 'gf_ecoles_ecoles_' . md5(GF_FRENCH_SCHOOLS_VERSION . $statut . $departement . $ville . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0') . ($local_only ? 'L' : 'R'));
+        $cache_key = 'gf_ecoles_ecoles_' . md5(GF_FRENCH_SCHOOLS_VERSION . $statut . $departement . $ville . $code_commune . $query . ($hide_ecoles ? '1' : '0') . ($hide_colleges_lycees ? '1' : '0') . ($local_only ? 'L' : 'R'));
         $cached = get_transient($cache_key);
 
         if (false !== $cached) {
@@ -184,10 +186,10 @@ class GF_Ecoles_API_Service
 
         // Local-only mode: skip remote API entirely.
         if ($local_only && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
-            $results = GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+            $results = GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune);
             // Fallback to remote API if local returned nothing and fallback is enabled.
             if (empty($results) && get_option('gf_ecoles_fr_local_fallback_api', false)) {
-                return $this->get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
+                return $this->get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key, $code_commune);
             }
             if (!empty($results)) {
                 set_transient($cache_key, $results, self::CACHE_EXPIRATION);
@@ -195,7 +197,7 @@ class GF_Ecoles_API_Service
             return $results;
         }
 
-        return $this->get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
+        return $this->get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key, $code_commune);
     }
 
     /**
@@ -210,7 +212,7 @@ class GF_Ecoles_API_Service
      * @param string $cache_key           Transient cache key.
      * @return array|WP_Error
      */
-    private function get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key)
+    private function get_ecoles_from_api($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key, $code_commune = '')
     {
         $select_fields = array(
             'identifiant_de_l_etablissement',
@@ -227,18 +229,33 @@ class GF_Ecoles_API_Service
             'code_circonscription',
         );
 
-        // Normalize whitespace in city name (database has inconsistent spacing for Paris arrondissements)
-        $ville_pattern = preg_replace('/\s+/', '*', trim($ville));
+        // Use code_commune when available for reliable matching.
+        // Some schools have incorrect nom_commune in the national database
+        // (e.g. Pierrefitte-sur-Seine schools listed as "Saint-Denis")
+        // but code_commune is always correct.
+        if (!empty($code_commune)) {
+            $where = sprintf(
+                'statut_public_prive="%s" and libelle_departement="%s" and code_commune="%s" and nom_etablissement like "*%s*"',
+                $this->escape_api_string($statut),
+                $this->escape_api_string($departement),
+                $this->escape_api_string($code_commune),
+                $this->escape_api_string($query)
+            );
+        } else {
+            // Fallback to nom_commune matching when code_commune is not available
+            // Normalize whitespace in city name (database has inconsistent spacing for Paris arrondissements)
+            $ville_pattern = preg_replace('/\s+/', '*', trim($ville));
 
-        // Use 'like' with wildcards for better partial matching (especially for Paris schools)
-        // The 'search()' function does full-text tokenization which fails on names like "F. FLOCON"
-        $where = sprintf(
-            'statut_public_prive="%s" and libelle_departement="%s" and nom_commune like "%s" and nom_etablissement like "*%s*"',
-            $this->escape_api_string($statut),
-            $this->escape_api_string($departement),
-            $this->escape_api_string($ville_pattern),
-            $this->escape_api_string($query)
-        );
+            // Use 'like' with wildcards for better partial matching (especially for Paris schools)
+            // The 'search()' function does full-text tokenization which fails on names like "F. FLOCON"
+            $where = sprintf(
+                'statut_public_prive="%s" and libelle_departement="%s" and nom_commune like "%s" and nom_etablissement like "*%s*"',
+                $this->escape_api_string($statut),
+                $this->escape_api_string($departement),
+                $this->escape_api_string($ville_pattern),
+                $this->escape_api_string($query)
+            );
+        }
 
         // Add school type filters
         if ($hide_ecoles) {
@@ -263,7 +280,7 @@ class GF_Ecoles_API_Service
             // Fallback to local database when API is unavailable.
             if (class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data()) {
                 $this->log_error('Falling back to local database for school search', $url);
-                return GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+                return GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune);
             }
             return $response;
         }
@@ -298,9 +315,9 @@ class GF_Ecoles_API_Service
     /**
      * English alias for school search to ease future naming alignment.
      */
-    public function search_schools($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false)
+    public function search_schools($statut, $departement, $ville, $query, $hide_ecoles = false, $hide_colleges_lycees = false, $code_commune = '')
     {
-        return $this->get_ecoles($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees);
+        return $this->get_ecoles($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune);
     }
 
     /**

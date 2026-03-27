@@ -199,6 +199,11 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.8.9 - 2026-03-27
+- Correction d'un problème d'écoles introuvables dans certaines communes : la recherche d'écoles utilise désormais le `code_commune` (code INSEE) au lieu du `nom_commune` pour filtrer les résultats, contournant les erreurs de `nom_commune` dans la base nationale (ex : écoles de Pierrefitte-sur-Seine listées sous « Saint-Denis »)
+- Ajout de la colonne `code_commune` dans la base de données locale et l'export CSV synchronisé
+- Rétro-compatibilité : si `code_commune` n'est pas disponible, le filtrage par `nom_commune` reste actif
+
 ### Version 1.8.8 - 2026-03-27
 - Correction du bug de cache : les résultats vides de recherche d'écoles étaient mis en cache pendant 1 heure, provoquant des faux « aucun résultat » pour des écoles existantes
 - Nouvelle option « Repli API » : lorsque le mode local seul est activé et qu'une recherche ne retourne aucun résultat, le plugin peut interroger silencieusement l'API distante en dernier recours (option désactivée par défaut, visible uniquement quand « Local Only » est actif)

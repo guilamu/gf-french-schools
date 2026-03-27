@@ -299,6 +299,7 @@
             }
 
             var selectedVille = '';
+            var selectedCodeCommune = '';
             var schoolsData = [];
             var activeVilleRequest = null;
             var activeEcoleRequest = null;
@@ -370,6 +371,7 @@
                         .removeClass('disabled')
                         .val('');
                     selectedVille = '';
+                    selectedCodeCommune = '';
                     $ecole.prop('disabled', true)
                         .addClass('disabled')
                         .val('');
@@ -498,11 +500,13 @@
                 villes.forEach(function (ville) {
                     var $item = $('<div class="gf-ecoles-fr-autocomplete-item"></div>')
                         .text(ville.label)
+                        .data('code-commune', ville.code_commune || '')
                         .on('mousedown', function (e) {
                             e.preventDefault(); // prevent blur before selection is applied
 
                             $ville.val(ville.value);
                             selectedVille = ville.value;
+                            selectedCodeCommune = ville.code_commune || '';
                             $villeResults.empty().hide();
 
                             // Enable school field and hide "Autres" field
@@ -535,6 +539,7 @@
                     statut: $statut.val(),
                     departement: $departement.val(),
                     ville: selectedVille,
+                    code_commune: selectedCodeCommune,
                     query: query,
                     hide_ecoles: hideEcoles ? 'true' : 'false',
                     hide_colleges_lycees: hideCollegesLycees ? 'true' : 'false'
@@ -764,6 +769,7 @@
                                 .addClass('disabled')
                                 .val('');
                             selectedVille = '';
+                            selectedCodeCommune = '';
                             $villeResults.empty().hide();
                             break;
                         case 'ecole':
