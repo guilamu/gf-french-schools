@@ -273,6 +273,9 @@ class GF_Ecoles_Local_DB
         $table = self::get_table_name();
         $staging = $table . '_staging';
 
+        // Ensure the main table schema is up to date before cloning it.
+        self::maybe_upgrade_db();
+
         // Create staging table as a copy of the main table structure.
         $wpdb->query("DROP TABLE IF EXISTS {$staging}"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $wpdb->query("CREATE TABLE {$staging} LIKE {$table}"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
