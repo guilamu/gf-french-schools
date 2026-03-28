@@ -413,7 +413,7 @@ class GF_Ecoles_Local_DB
             }
         }
 
-        $sql = "INSERT INTO {$table} (`" . implode('`,`', $columns) . "`) VALUES " . implode(',', $placeholders); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        $sql = "INSERT IGNORE INTO {$table} (`" . implode('`,`', $columns) . "`) VALUES " . implode(',', $placeholders); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
         $wpdb->query($wpdb->prepare($sql, $values)); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
     }
