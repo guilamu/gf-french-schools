@@ -252,6 +252,11 @@ class GF_Ecoles_API_Service
             set_transient($cache_key, $results, self::CACHE_EXPIRATION);
         }
 
+        // Fuzzy fallback: when API returns no results, try local DB fuzzy matching.
+        if (empty($results) && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data() && mb_strlen($query) >= 3) {
+            $results = GF_Ecoles_Local_DB::search_cities($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees);
+        }
+
         return $results;
     }
 
@@ -430,6 +435,11 @@ class GF_Ecoles_API_Service
 
         if (!empty($results)) {
             set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+        }
+
+        // Fuzzy fallback: when API returns no results, try local DB fuzzy matching.
+        if (empty($results) && class_exists('GF_Ecoles_Local_DB') && GF_Ecoles_Local_DB::has_data() && mb_strlen($query) >= 3) {
+            $results = GF_Ecoles_Local_DB::search_schools($statut, $departement, $ville, $query, $hide_ecoles, $hide_colleges_lycees, $code_commune);
         }
 
         return $results;

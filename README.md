@@ -201,6 +201,7 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ### Version 1.9.1 - 2026-03-28
 - Ajout du lien « View details » sur la page Extensions, ouvrant une popup modale avec les onglets Description, Installation et Changelog (parsés depuis le README.md local via Parsedown)
+- Amélioration de la recherche floue (fuzzy search) : les fautes de frappe dans les mots partiellement saisis sont désormais détectées (ex : « aubertill » → « Aubervilliers ») ; l'API distante repasse sur la base locale quand elle ne retourne aucun résultat
 
 ### Version 1.9.0 - 2026-03-28
 - Reconnaissance automatique des abréviations courantes dans les noms d'écoles : la recherche est désormais bidirectionnelle (ex : "St Exupéry" trouve "Saint-Exupéry" et inversement)

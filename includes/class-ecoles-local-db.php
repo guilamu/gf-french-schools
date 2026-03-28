@@ -591,6 +591,20 @@ class GF_Ecoles_Local_DB
                     if ($d < $best_word_dist) {
                         $best_word_dist = $d;
                     }
+
+                    // Also try exact-length prefix: trim city word to query length.
+                    // This catches typos within a partially-typed word, e.g.
+                    // "aubertill" vs "aubervill" (prefix of "aubervilliers") → distance 1.
+                    if (mb_strlen($cw) > $qw_len) {
+                        $cw_exact = mb_substr($cw, 0, $qw_len);
+                        $d2 = levenshtein(
+                            mb_substr($qw, 0, 255),
+                            mb_substr($cw_exact, 0, 255)
+                        );
+                        if ($d2 < $best_word_dist) {
+                            $best_word_dist = $d2;
+                        }
+                    }
                 }
 
                 if ($best_word_dist > $word_max) {
@@ -857,6 +871,18 @@ class GF_Ecoles_Local_DB
                     );
                     if ($d < $best_dist) {
                         $best_dist = $d;
+                    }
+
+                    // Also try exact-length prefix to catch typos in partial input.
+                    if (mb_strlen($nw) > $qw_len) {
+                        $nw_exact = mb_substr($nw, 0, $qw_len);
+                        $d2 = levenshtein(
+                            mb_substr($qw, 0, 255),
+                            mb_substr($nw_exact, 0, 255)
+                        );
+                        if ($d2 < $best_dist) {
+                            $best_dist = $d2;
+                        }
                     }
                 }
 
