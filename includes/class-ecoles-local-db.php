@@ -51,6 +51,16 @@ class GF_Ecoles_Local_DB
     const CRON_HOOK = 'gf_ecoles_fr_monthly_sync';
 
     /**
+     * DB schema version. Bump when the table structure changes.
+     */
+    const DB_VERSION = 2;
+
+    /**
+     * Option key storing the current DB schema version.
+     */
+    const OPTION_DB_VERSION = 'gf_ecoles_fr_db_version';
+
+    /**
      * CSV export URL selecting only the columns we need.
      */
     const EXPORT_URL = 'https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/exports/csv?select=identifiant_de_l_etablissement%2Cnom_etablissement%2Ctype_etablissement%2Clibelle_nature%2Cstatut_public_prive%2Cadresse_1%2Ccode_postal%2Cnom_commune%2Ccode_commune%2Clibelle_departement%2Ctelephone%2Cmail%2Cappartenance_education_prioritaire%2Cnom_circonscription%2Ccode_circonscription&delimiter=%3B';
@@ -104,7 +114,7 @@ class GF_Ecoles_Local_DB
             code_postal VARCHAR(10) NOT NULL DEFAULT '',
             nom_commune VARCHAR(100) NOT NULL DEFAULT '',
             code_commune VARCHAR(10) NOT NULL DEFAULT '',
-            libelle_departement VARCHAR(100) NOT NULL DEFAULT '',,
+            libelle_departement VARCHAR(100) NOT NULL DEFAULT '',
             telephone VARCHAR(30) NOT NULL DEFAULT '',
             mail VARCHAR(255) NOT NULL DEFAULT '',
             education_prioritaire VARCHAR(50) NOT NULL DEFAULT '',
@@ -120,6 +130,24 @@ class GF_Ecoles_Local_DB
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
+
+        update_option(self::OPTION_DB_VERSION, self::DB_VERSION);
+    }
+
+    /**
+     * Check if DB schema needs upgrading and run dbDelta if so.
+     *
+     * Safe to call on every request; only triggers when the stored
+     * version is behind the code version.
+     *
+     * @return void
+     */
+    public static function maybe_upgrade_db()
+    {
+        $installed_version = (int) get_option(self::OPTION_DB_VERSION, 0);
+        if ($installed_version < self::DB_VERSION) {
+            self::create_table();
+        }
     }
 
     /**

@@ -93,6 +93,9 @@ require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-github-updater.php';
 // Include the local database fallback.
 require_once GF_FRENCH_SCHOOLS_PATH . 'includes/class-ecoles-local-db.php';
 
+// Upgrade DB schema if needed (safe no-op when already up to date).
+GF_Ecoles_Local_DB::maybe_upgrade_db();
+
 /**
  * Initialize the plugin after Gravity Forms is loaded.
  */
