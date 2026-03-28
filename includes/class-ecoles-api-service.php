@@ -28,6 +28,118 @@ class GF_Ecoles_API_Service
     const CACHE_EXPIRATION = 3600;
 
     /**
+     * Map of common abbreviations found in French school names.
+     * Keys are lowercase, accent-stripped for matching.
+     *
+     * @var array<string, string>
+     */
+    private static $abbreviation_map = array(
+        'st'    => 'Saint',
+        'ste'   => 'Sainte',
+        'sts'   => 'Saints',
+        'gen'   => 'Général',
+        'gal'   => 'Général',
+        'cdt'   => 'Commandant',
+        'cmdt'  => 'Commandant',
+        'lt'    => 'Lieutenant',
+        'col'   => 'Colonel',
+        'mal'   => 'Maréchal',
+        'mcl'   => 'Maréchal',
+        'dr'    => 'Docteur',
+        'pr'    => 'Professeur',
+        'prof'  => 'Professeur',
+        'mgr'   => 'Monseigneur',
+        'mme'   => 'Madame',
+        'mlle'  => 'Mademoiselle',
+        'pdt'   => 'Président',
+        'cpt'   => 'Capitaine',
+        'sgt'   => 'Sergent',
+        'adj'   => 'Adjudant',
+    );
+
+    /**
+     * Reverse map: full forms (lowercase, accent-stripped) to their common abbreviation.
+     *
+     * @var array<string, string>
+     */
+    private static $reverse_abbreviation_map = array(
+        'saint'        => 'St',
+        'sainte'       => 'Ste',
+        'saints'       => 'Sts',
+        'general'      => 'Gén',
+        'commandant'   => 'Cdt',
+        'lieutenant'   => 'Lt',
+        'colonel'      => 'Col',
+        'marechal'     => 'Mal',
+        'docteur'      => 'Dr',
+        'professeur'   => 'Pr',
+        'monseigneur'  => 'Mgr',
+        'madame'       => 'Mme',
+        'mademoiselle' => 'Mlle',
+        'president'    => 'Pdt',
+        'capitaine'    => 'Cpt',
+        'sergent'      => 'Sgt',
+        'adjudant'     => 'Adj',
+    );
+
+    /**
+     * Generate alternative query strings by expanding/contracting abbreviations.
+     *
+     * Handles bidirectional matching: if the user types "St", also searches
+     * for "Saint", and vice-versa. This covers common abbreviations found
+     * in French school names (military titles, honorifics, etc.).
+     *
+     * @param string $query Original search query.
+     * @return array Array of distinct query variants (always includes the original).
+     */
+    public static function get_query_variants($query)
+    {
+        $query = trim($query);
+        if (empty($query)) {
+            return array($query);
+        }
+
+        $words = preg_split('/\s+/', $query, -1, PREG_SPLIT_NO_EMPTY);
+
+        $expanded_words = array();
+        $contracted_words = array();
+        $has_expansion = false;
+        $has_contraction = false;
+
+        foreach ($words as $word) {
+            // Normalize for lookup: lowercase, remove accents, strip trailing dot.
+            $lower = mb_strtolower($word, 'UTF-8');
+            $normalized = function_exists('remove_accents') ? remove_accents($lower) : $lower;
+            $normalized_no_dot = rtrim($normalized, '.');
+
+            if (isset(self::$abbreviation_map[$normalized_no_dot])) {
+                // Word is an abbreviation → expand to full form.
+                $expanded_words[] = self::$abbreviation_map[$normalized_no_dot];
+                $contracted_words[] = $word;
+                $has_expansion = true;
+            } elseif (isset(self::$reverse_abbreviation_map[$normalized])) {
+                // Word is a full form → contract to abbreviation.
+                $expanded_words[] = $word;
+                $contracted_words[] = self::$reverse_abbreviation_map[$normalized];
+                $has_contraction = true;
+            } else {
+                $expanded_words[] = $word;
+                $contracted_words[] = $word;
+            }
+        }
+
+        $variants = array($query);
+        if ($has_expansion) {
+            $variants[] = implode(' ', $expanded_words);
+        }
+        if ($has_contraction) {
+            $variants[] = implode(' ', $contracted_words);
+        }
+
+        return array_unique($variants);
+    }
+
+    /**
      * Get list of cities matching the query.
      *
      * @param string $statut              School status (Public/Privé).
@@ -229,17 +341,28 @@ class GF_Ecoles_API_Service
             'code_circonscription',
         );
 
+        // Build name matching condition with abbreviation variants.
+        // e.g. "St Exupery" also searches for "Saint Exupery" and vice-versa.
+        $variants = self::get_query_variants($query);
+        $name_clauses = array();
+        foreach ($variants as $variant) {
+            $name_clauses[] = sprintf('nom_etablissement like "*%s*"', $this->escape_api_string($variant));
+        }
+        $name_condition = count($name_clauses) > 1
+            ? '(' . implode(' or ', $name_clauses) . ')'
+            : $name_clauses[0];
+
         // Use code_commune when available for reliable matching.
         // Some schools have incorrect nom_commune in the national database
         // (e.g. Pierrefitte-sur-Seine schools listed as "Saint-Denis")
         // but code_commune is always correct.
         if (!empty($code_commune)) {
             $where = sprintf(
-                'statut_public_prive="%s" and libelle_departement="%s" and code_commune="%s" and nom_etablissement like "*%s*"',
+                'statut_public_prive="%s" and libelle_departement="%s" and code_commune="%s" and %s',
                 $this->escape_api_string($statut),
                 $this->escape_api_string($departement),
                 $this->escape_api_string($code_commune),
-                $this->escape_api_string($query)
+                $name_condition
             );
         } else {
             // Fallback to nom_commune matching when code_commune is not available
@@ -249,11 +372,11 @@ class GF_Ecoles_API_Service
             // Use 'like' with wildcards for better partial matching (especially for Paris schools)
             // The 'search()' function does full-text tokenization which fails on names like "F. FLOCON"
             $where = sprintf(
-                'statut_public_prive="%s" and libelle_departement="%s" and nom_commune like "%s" and nom_etablissement like "*%s*"',
+                'statut_public_prive="%s" and libelle_departement="%s" and nom_commune like "%s" and %s',
                 $this->escape_api_string($statut),
                 $this->escape_api_string($departement),
                 $this->escape_api_string($ville_pattern),
-                $this->escape_api_string($query)
+                $name_condition
             );
         }
 

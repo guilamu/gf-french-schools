@@ -665,17 +665,33 @@ class GF_Ecoles_Local_DB
         $table = self::get_table_name();
         $code_commune = preg_replace('/[^0-9A-Za-z]/', '', $code_commune);
 
+        // Generate abbreviation variants for bidirectional matching.
+        // e.g. "St Exupery" also matches "Saint Exupéry" and vice-versa.
+        $variants = class_exists('GF_Ecoles_API_Service')
+            ? GF_Ecoles_API_Service::get_query_variants($query)
+            : array($query);
+
+        $name_clauses = array();
+        foreach ($variants as $variant) {
+            $variant_escaped = $wpdb->esc_like($variant);
+            $name_clauses[] = $wpdb->prepare(
+                "nom_etablissement LIKE CONCAT('%%', %s, '%%')",
+                $variant_escaped
+            );
+        }
+        $name_condition = count($name_clauses) > 1
+            ? '(' . implode(' OR ', $name_clauses) . ')'
+            : $name_clauses[0];
+
         // Use code_commune when available for reliable matching.
         // Some schools have incorrect nom_commune in the national database.
         if (!empty($code_commune)) {
-            $query_escaped = $wpdb->esc_like($query);
             $where = $wpdb->prepare(
-                "statut_public_prive = %s AND libelle_departement = %s AND code_commune = %s AND nom_etablissement LIKE CONCAT('%%', %s, '%%')",
+                "statut_public_prive = %s AND libelle_departement = %s AND code_commune = %s AND ",
                 $statut,
                 $departement,
-                $code_commune,
-                $query_escaped
-            );
+                $code_commune
+            ) . $name_condition;
         } else {
             // Fallback to nom_commune matching
             // Build flexible city LIKE pattern: split by whitespace, escape each part, join with %
@@ -686,18 +702,14 @@ class GF_Ecoles_Local_DB
             }, $ville_parts);
             $ville_like = implode('%', $ville_like_parts);
 
-            // Escape query for LIKE
-            $query_escaped = $wpdb->esc_like($query);
-
             // Build WHERE clause using CONCAT for LIKE wildcards to avoid WordPress % escaping
             // WordPress 6.x escapes % in prepare() which breaks LIKE patterns
             $where = $wpdb->prepare(
-                "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%') AND nom_etablissement LIKE CONCAT('%%', %s, '%%')",
+                "statut_public_prive = %s AND libelle_departement = %s AND nom_commune LIKE CONCAT('%%', %s, '%%') AND ",
                 $statut,
                 $departement,
-                $ville_like,
-                $query_escaped
-            );
+                $ville_like
+            ) . $name_condition;
         }
 
         if ($hide_ecoles) {
@@ -806,7 +818,20 @@ class GF_Ecoles_Local_DB
             return array();
         }
 
-        $query_normalized = self::normalize_for_fuzzy($query);
+        // Expand abbreviations in query before fuzzy matching so that
+        // "st" is compared as "saint" against school names containing "saint".
+        $expanded_query = $query;
+        if (class_exists('GF_Ecoles_API_Service')) {
+            $variants = GF_Ecoles_API_Service::get_query_variants($query);
+            // Use the expanded variant (longest) for fuzzy comparison.
+            foreach ($variants as $variant) {
+                if (mb_strlen($variant) > mb_strlen($expanded_query)) {
+                    $expanded_query = $variant;
+                }
+            }
+        }
+
+        $query_normalized = self::normalize_for_fuzzy($expanded_query);
         $query_words = preg_split('/\s+/', $query_normalized, -1, PREG_SPLIT_NO_EMPTY);
 
         $scored = array();

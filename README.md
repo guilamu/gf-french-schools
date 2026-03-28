@@ -199,6 +199,11 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.9.0 - 2026-03-28
+- Reconnaissance automatique des abréviations courantes dans les noms d'écoles : la recherche est désormais bidirectionnelle (ex : "St Exupéry" trouve "Saint-Exupéry" et inversement)
+- Abréviations supportées : St/Saint, Ste/Sainte, Gén/Gal/Général, Cdt/Commandant, Lt/Lieutenant, Col/Colonel, Mal/Maréchal, Dr/Docteur, Pr/Professeur, Mgr/Monseigneur, Mme/Madame, Mlle/Mademoiselle, Pdt/Président, Cpt/Capitaine, Sgt/Sergent, Adj/Adjudant
+- Fonctionne sur les 3 modes de recherche : API distante, base locale (LIKE) et recherche floue (Levenshtein)
+
 ### Version 1.8.9 - 2026-03-27
 - Correction d'un problème d'écoles introuvables dans certaines communes : la recherche d'écoles utilise désormais le `code_commune` (code INSEE) au lieu du `nom_commune` pour filtrer les résultats, contournant les erreurs de `nom_commune` dans la base nationale (ex : écoles de Pierrefitte-sur-Seine listées sous « Saint-Denis »)
 - Ajout de la colonne `code_commune` dans la base de données locale et l'export CSV synchronisé
