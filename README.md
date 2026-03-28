@@ -199,6 +199,9 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.9.1 - 2026-03-28
+- Ajout du lien « View details » sur la page Extensions, ouvrant une popup modale avec les onglets Description, Installation et Changelog (parsés depuis le README.md local via Parsedown)
+
 ### Version 1.9.0 - 2026-03-28
 - Reconnaissance automatique des abréviations courantes dans les noms d'écoles : la recherche est désormais bidirectionnelle (ex : "St Exupéry" trouve "Saint-Exupéry" et inversement)
 - Abréviations supportées : St/Saint, Ste/Sainte, Gén/Gal/Général, Cdt/Commandant, Lt/Lieutenant, Col/Colonel, Mal/Maréchal, Dr/Docteur, Pr/Professeur, Mgr/Monseigneur, Mme/Madame, Mlle/Mademoiselle, Pdt/Président, Cpt/Capitaine, Sgt/Sergent, Adj/Adjudant

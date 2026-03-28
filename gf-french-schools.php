@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.9.0
+ * Version: 1.9.1
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.9.0');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.9.1');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -683,6 +683,18 @@ function gf_french_schools_plugin_row_meta($links, $file)
     if (plugin_basename(GF_FRENCH_SCHOOLS_PLUGIN_FILE) !== $file) {
         return $links;
     }
+
+    // "View details" thickbox link — same pattern as WordPress.org-hosted plugins.
+    $links[] = sprintf(
+        '<a href="%s" class="thickbox open-plugin-details-modal" aria-label="%s" data-title="%s">%s</a>',
+        esc_url(self_admin_url(
+            'plugin-install.php?tab=plugin-information&plugin=gf-french-schools'
+            . '&TB_iframe=true&width=772&height=926'
+        )),
+        esc_attr__('More information about Gravity Forms - French Schools', 'gf-french-schools'),
+        esc_attr__('Gravity Forms - French Schools', 'gf-french-schools'),
+        esc_html__('View details', 'gf-french-schools')
+    );
 
     if (class_exists('Guilamu_Bug_Reporter')) {
         $links[] = sprintf(
