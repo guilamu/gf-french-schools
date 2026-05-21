@@ -199,6 +199,12 @@ Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## Change Log
 
+### Version 1.9.2 - 2026-05-21
+- Optimisation des performances en mode « Local Only » : les résultats de recherche de villes sont désormais mis en cache (transient) pour éviter de re-interroger les 68 000 enregistrements à chaque frappe
+- Optimisation de la vérification `has_data()` : remplacement de `COUNT(*)` par `SELECT 1 LIMIT 1` avec cache statique par requête
+- Optimisation de l'endpoint AJAX : la validation du formulaire (chargement + scan des champs) est désormais mise en cache pendant 5 minutes au lieu d'être exécutée à chaque frappe
+- Limitation des résultats de la recherche floue (fuzzy search) : `LIMIT 500` pour les villes et `LIMIT 200` pour les écoles, évitant les pics de mémoire/CPU sur les départements volumineux
+
 ### Version 1.9.1 - 2026-03-28
 - Ajout du lien « View details » sur la page Extensions, ouvrant une popup modale avec les onglets Description, Installation et Changelog (parsés depuis le README.md local via Parsedown)
 - Amélioration de la recherche floue (fuzzy search) : les fautes de frappe dans les mots partiellement saisis sont désormais détectées (ex : « aubertill » → « Aubervilliers ») ; l'API distante repasse sur la base locale quand elle ne retourne aucun résultat

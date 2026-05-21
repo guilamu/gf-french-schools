@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.9.1
+ * Version: 1.9.2
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.9.1');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.9.2');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -528,27 +528,36 @@ function gf_french_schools_ajax_search()
     }
 
     // Require a valid form context for all requests.
+    // Cache the validation result so GFAPI::get_form() and field scanning
+    // don't run on every keystroke — the form structure doesn't change.
     $form_id = isset($_POST['form_id']) ? absint(wp_unslash($_POST['form_id'])) : 0;
-    $form = $form_id ? GFAPI::get_form($form_id) : false;
-    if (!$form) {
-        wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
-        return;
-    }
+    $form_cache_key = 'gf_ecoles_fv_' . $form_id;
+    $form_valid = $form_id ? get_transient($form_cache_key) : false;
 
-    // Verify the form actually contains an ecoles_fr field.
-    // This prevents scripted use of the endpoint with arbitrary valid form IDs.
-    $has_ecoles_field = false;
-    if (!empty($form['fields']) && is_array($form['fields'])) {
-        foreach ($form['fields'] as $_field) {
-            if ($_field->type === 'ecoles_fr') {
-                $has_ecoles_field = true;
-                break;
+    if ($form_valid === false) {
+        $form = $form_id ? GFAPI::get_form($form_id) : false;
+        if (!$form) {
+            wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
+            return;
+        }
+
+        // Verify the form actually contains an ecoles_fr field.
+        $has_ecoles_field = false;
+        if (!empty($form['fields']) && is_array($form['fields'])) {
+            foreach ($form['fields'] as $_field) {
+                if ($_field->type === 'ecoles_fr') {
+                    $has_ecoles_field = true;
+                    break;
+                }
             }
         }
-    }
-    if (!$has_ecoles_field) {
-        wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
-        return;
+        if (!$has_ecoles_field) {
+            wp_send_json_error(array('message' => __('Unauthorized access.', 'gf-french-schools')));
+            return;
+        }
+
+        // Cache for 5 minutes — form edits are picked up promptly.
+        set_transient($form_cache_key, '1', 300);
     }
 
     // Simple rate limiting (filterable).

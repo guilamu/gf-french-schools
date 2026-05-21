@@ -173,6 +173,10 @@ class GF_Ecoles_API_Service
             if (empty($results) && get_option('gf_ecoles_fr_local_fallback_api', false)) {
                 return $this->get_villes_from_api($statut, $departement, $query, $hide_ecoles, $hide_colleges_lycees, $cache_key);
             }
+            // Cache local results so subsequent identical queries are instant.
+            if (!empty($results)) {
+                set_transient($cache_key, $results, self::CACHE_EXPIRATION);
+            }
             return $results;
         }
 

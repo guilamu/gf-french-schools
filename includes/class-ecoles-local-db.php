@@ -21,6 +21,14 @@ class GF_Ecoles_Local_DB
 {
 
     /**
+     * Static cache for has_data() result within a single request.
+     *
+     * @var bool|null
+     */
+    private static $has_data_cache = null;
+
+
+    /**
      * Base table name (without prefix).
      */
     const TABLE_NAME = 'gf_ecoles_fr';
@@ -173,10 +181,16 @@ class GF_Ecoles_Local_DB
      */
     public static function has_data()
     {
+        if (self::$has_data_cache !== null) {
+            return self::$has_data_cache;
+        }
+
         global $wpdb;
         $table = self::get_table_name();
-        $count = $wpdb->get_var("SELECT COUNT(*) FROM {$table}"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        return !empty($count) && (int) $count > 0;
+        // Use EXISTS-style check instead of COUNT(*) on 68k rows.
+        $exists = $wpdb->get_var("SELECT 1 FROM {$table} LIMIT 1"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        self::$has_data_cache = !empty($exists);
+        return self::$has_data_cache;
     }
 
     // ------------------------------------------------------------------
@@ -568,7 +582,7 @@ class GF_Ecoles_Local_DB
             $where .= " AND type_etablissement != 'Collège' AND type_etablissement != 'Lycée'";
         }
 
-        $sql = "SELECT DISTINCT nom_commune FROM {$table} WHERE {$where} ORDER BY nom_commune"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $sql = "SELECT DISTINCT nom_commune FROM {$table} WHERE {$where} ORDER BY nom_commune LIMIT 500"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $all_cities = $wpdb->get_col($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
         if (empty($all_cities)) {
@@ -856,7 +870,7 @@ class GF_Ecoles_Local_DB
             $where .= " AND type_etablissement != 'Collège' AND type_etablissement != 'Lycée'";
         }
 
-        $sql = "SELECT * FROM {$table} WHERE {$where}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $sql = "SELECT * FROM {$table} WHERE {$where} LIMIT 200"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $all_schools = $wpdb->get_results($sql, ARRAY_A); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
         if (empty($all_schools)) {
