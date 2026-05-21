@@ -4,81 +4,101 @@ Extension Gravity Forms permettant aux utilisateurs de rechercher et sélectionn
 
 ![Plugin Screenshot](https://github.com/guilamu/gf-french-schools/blob/main/screenshot.jpg)
 
-## Description
+## Search & Select Schools
 
-Ce plugin ajoute un nouveau type de champ "Écoles françaises" à Gravity Forms. Il permet aux utilisateurs de :
+- Choose the school status (Public or Private) and a French department
+- Search cities by autocomplete with fuzzy matching for typo tolerance
+- Search schools by autocomplete with abbreviation expansion (St ↔ Saint, Dr ↔ Docteur, etc.)
+- Match ~69 000 schools from the official [Annuaire de l'Éducation Nationale](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/)
+- Enter a school name manually when no result is found
 
-- Sélectionner le statut de l'établissement (Public/Privé)
-- Choisir un département français
-- Rechercher une ville par auto-complétion
-- Rechercher un établissement scolaire par auto-complétion
-- Afficher les informations détaillées de l'établissement sélectionné
+## Configure & Filter
 
-Les données proviennent de l'[Annuaire de l'Éducation Nationale](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/) via l'API OpenDataSoft.
+- Set a preselected status and/or department to hide those fields from users
+- Filter by school type: hide primary schools (Écoles) or middle/high schools (Collèges/Lycées)
+- Enable **Local Only** mode via **Forms → Settings → French Schools** to use the local database exclusively
+- Enable **API Fallback** to silently query the remote API when local returns no results
+- Trigger manual sync or rely on the automatic monthly WP-Cron synchronization
 
-## Prérequis
+## Collect & Use Data
 
-- WordPress 5.8 ou supérieur
-- PHP 7.4 ou supérieur
-- [Gravity Forms](https://www.gravityforms.com/) 2.5 ou supérieur
+- Collect 16 data points per school: ID, name, type, category, address, postal code, city, phone, email, priority education status, circonscription, and more
+- Access all data via merge tags in notifications and confirmations (e.g., `{Label:ID:nom}`, `{Label:ID:all}`)
+- Use sub-inputs for conditional logic on any data point (e.g., show a field only when type = "Collège")
+- Compatible with GP Copy Cat for copying sub-input values to other fields
+
+## Key Features
+
+- **Multilingual:** Works with content in any language
+- **Translation-Ready:** All strings are internationalized; French translation included
+- **Secure:** AJAX endpoint validates nonce, form context, rate-limits requests, and restricts proxy header trust to an explicit allowlist
+- **GitHub Updates:** Automatic updates from GitHub releases
+- **Offline Resilient:** Local database fallback with ~69 000 schools, automatic monthly sync, and fuzzy search with Levenshtein distance
+
+## Requirements
+
+- WordPress 5.8 or higher
+- PHP 7.4 or higher
+- [Gravity Forms](https://www.gravityforms.com/) 2.5 or higher
 
 ## Installation
 
-1. Téléchargez le plugin depuis [GitHub Releases](https://github.com/guilamu/gf-french-schools/releases)
-2. Uploadez le dossier `gf-french-schools` dans `/wp-content/plugins/`
-3. Activez le plugin dans le menu "Extensions" de WordPress
-4. Le nouveau type de champ "Écoles françaises" sera disponible dans l'éditeur de formulaires Gravity Forms
+1. Download the plugin from [GitHub Releases](https://github.com/guilamu/gf-french-schools/releases)
+2. Upload the `gf-french-schools` folder to `/wp-content/plugins/`
+3. Activate the plugin through the **Plugins** menu in WordPress
+4. Go to **Forms → Settings → French Schools** and configure the operating mode (API, Local Only, or hybrid)
+5. The new "French Schools" field type is now available in the Gravity Forms form editor
 
 ## Configuration
 
-### Paramètres du champ
+### Field Settings
 
-Dans l'éditeur de formulaire, le champ "Écoles françaises" propose les options suivantes :
+In the form editor, the "French Schools" field offers these options:
 
-#### Présélection
-- **Statut présélectionné** : Définir Public ou Privé par défaut (le champ sera masqué)
-- **Département présélectionné** : Définir un département par défaut (le champ sera masqué)
+#### Preselection
+- **Preselected Status:** Set Public or Private as default (the field will be hidden from users)
+- **Preselected Department:** Set a department as default (the field will be hidden from users)
 
-#### Filtres par type d'établissement
-- **Masquer les écoles primaires** : Exclut les écoles maternelles et élémentaires des résultats
-- **Masquer les collèges et lycées** : Exclut les établissements secondaires des résultats
+#### School Type Filters
+- **Hide primary schools:** Excludes Écoles maternelles and élémentaires from results
+- **Hide middle and high schools:** Excludes Collèges and Lycées from results
 
-### Page de réglages « Écoles françaises »
+### Settings Page
 
-Accessible via **Formulaires → French Schools**, cette page permet de :
+Accessible via **Forms → Settings → French Schools**:
 
-#### Mode Local uniquement
-- Activer/désactiver le mode « Local Only » pour utiliser exclusivement la base de données locale sans appeler l'API distante
-- Utile en cas d'indisponibilité prolongée de l'API ou pour des raisons de performance
+#### Local Only Mode
+- Enable/disable Local Only mode to use the local database exclusively without calling the remote API
+- Useful for API downtime or performance optimization
 
-#### Synchronisation de la base locale
-- Visualiser l'état de la synchronisation (statut, dernière synchro, nombre d'enregistrements, prochaine synchro planifiée)
-- Lancer une synchronisation manuelle via le bouton « Synchroniser maintenant »
-- La synchronisation télécharge l'intégralité de l'annuaire (~69 000 établissements) depuis le portail Open Data du Ministère
-- Un cron WordPress planifie automatiquement une synchronisation mensuelle
+#### Local Database Sync
+- View sync status (status, last sync, record count, next scheduled sync)
+- Trigger a manual sync via the "Sync Now" button
+- The sync downloads the full directory (~69 000 schools) from the Open Data portal
+- A WordPress cron schedules an automatic monthly sync
 
-## Données collectées
+## Collected Data
 
-Pour chaque établissement sélectionné, les informations suivantes sont enregistrées :
+For each selected school, the following data is stored:
 
-| Champ | Description |
+| Field | Description |
 |-------|-------------|
-| Identifiant | Code UAI de l'établissement |
-| Nom | Nom de l'établissement |
+| Identifiant | School UAI code |
+| Nom | School name |
 | Type | Collège, Lycée, École, etc. |
 | Catégorie | Maternelle, Élémentaire, etc. |
-| Adresse | Adresse postale |
-| Code postal | Code postal |
-| Ville | Commune |
-| Téléphone | Numéro de téléphone |
-| E-mail | Adresse email |
-| Éducation prioritaire | REP, REP+, ou Non |
-| Circonscription | Nom de la circonscription (nettoyé du préfixe standard) |
-| Mail circo | Email Circonscription (code + domaine académique) |
-| Statut | Public ou Privé |
-| Département | Nom du département |
-| N° Département | Numéro officiel du département (ex : 93, 2A, 974) |
-| Ville recherchée | Ville saisie lors de la recherche |
+| Adresse | Postal address |
+| Code postal | Postal code |
+| Ville | City |
+| Téléphone | Phone number |
+| E-mail | Email address |
+| Éducation prioritaire | REP, REP+, or Non |
+| Circonscription | Circonscription name (cleaned of standard prefix) |
+| Mail circo | Circonscription email (code + academic domain) |
+| Statut | Public or Private |
+| Département | Department name |
+| N° Département | Official department number (e.g., 93, 2A, 974) |
+| Ville recherchée | City entered during search |
 
 ## Merge Tags
 
@@ -133,234 +153,264 @@ Chaque donnée est également accessible via son numéro de sous-champ `{Libell�
 
 > **Note :** le sous-champ `.10` n'existe pas (convention Gravity Forms).
 
-## Mises à jour automatiques
+## FAQ
 
-Le plugin supporte les mises à jour automatiques depuis GitHub. Lorsqu'une nouvelle version est publiée, WordPress vous proposera la mise à jour dans la page Extensions.
+### Which API is used?
 
-## Traduction
+The plugin queries the [French Education Ministry OpenDataSoft API](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/) (`v2.1`). No authentication or API key is required — the data is free and publicly accessible.
 
-Le plugin est entièrement traduisible et inclut une traduction française complète.
+- **Endpoint:** `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records`
+- **Documentation:** [OpenDataSoft API v2.1](https://help.opendatasoft.com/apis/ods-explore-v2/)
 
-## Structure du projet
+### What happens if the API is down?
+
+The plugin automatically falls back to the local database (if synced). You can also enable **Local Only** mode in **Forms → Settings → French Schools** to never call the API at all.
+
+### Can I customize the search debounce delay?
+
+Yes, use the `gf_french_schools_timings` filter:
+
+```php
+add_filter( 'gf_french_schools_timings', function( $timings ) {
+    $timings['debounce'] = 500; // milliseconds (default: 300)
+    return $timings;
+} );
+```
+
+### Can I change the rate limit?
+
+Yes, use the `gf_french_schools_rate_limit` and `gf_french_schools_rate_window` filters:
+
+```php
+add_filter( 'gf_french_schools_rate_limit', function( $limit ) {
+    return 50; // max requests per window (default: 30)
+} );
+
+add_filter( 'gf_french_schools_rate_window', function( $window ) {
+    return 120; // window in seconds (default: 60)
+} );
+```
+
+### Can I trust proxy headers for rate limiting?
+
+By default, only `REMOTE_ADDR` is used. To trust forwarding headers (e.g., behind Cloudflare), use the `gf_french_schools_trusted_proxies` filter:
+
+```php
+add_filter( 'gf_french_schools_trusted_proxies', function( $proxies ) {
+    $proxies[] = '172.16.0.1'; // your load balancer IP
+    return $proxies;
+} );
+```
+
+### The search feels slow in Local Only mode. What can I do?
+
+Make sure you are running version 1.9.2 or later, which includes transient caching for local results, optimized `has_data()` checks, and cached form validation. After the first search, identical queries are served instantly from cache.
+
+## Project Structure
 
 ```
 .
-├── .github
-│   └── workflows
-│       └── release.yml                  # GitHub Actions release workflow
-├── gf-french-schools.php                # fichier principal du plugin
-├── LICENSE                              # licence AGPL-3.0
-├── README.md
-├── uninstall.php                        # nettoyage lors de la désinstallation
+├── gf-french-schools.php                # Main plugin file
+├── uninstall.php                        # Cleanup on uninstall
 ├── assets
 │   ├── css
-│   │   ├── ecoles-fr-admin.css          # styles éditeur GF
-│   │   └── ecoles-fr.css                # styles frontend + bloc résultat
+│   │   ├── ecoles-fr-admin.css          # Form editor & settings styles
+│   │   └── ecoles-fr.css               # Frontend styles & result block
 │   └── js
-│       ├── ecoles-fr-admin.js           # réglages custom dans l'éditeur GF
-│       └── ecoles-fr-frontend.js        # logique cascade, autocomplétion, accessibilité
+│       ├── ecoles-fr-admin.js           # Form editor custom settings
+│       └── ecoles-fr-frontend.js        # Cascade logic, autocomplete, accessibility
 ├── includes
-│   ├── class-ecoles-api-service.php     # client OpenDataSoft + cache + fallback local
-│   ├── class-ecoles-local-db.php        # base de données locale, import CSV, sync cron
-│   ├── class-gf-field-ecoles-fr.php     # définition du champ GF, rendu, validation
-│   ├── class-gf-french-schools-addon.php # page réglages GFAddOn (Local Only, Sync)
-│   └── class-github-updater.php         # mise à jour automatique via GitHub
+│   ├── class-ecoles-api-service.php     # OpenDataSoft API client + cache + local fallback
+│   ├── class-ecoles-local-db.php        # Local database, CSV import, cron sync
+│   ├── class-gf-field-ecoles-fr.php     # GF field definition, rendering, validation
+│   ├── class-gf-french-schools-addon.php # GFAddOn settings page (Local Only, Sync)
+│   ├── class-github-updater.php         # GitHub auto-updates
+│   └── Parsedown.php                   # Markdown parser for plugin details modal
 └── languages
-    ├── gf-french-schools-fr_FR.mo       # binaire FR
-    ├── gf-french-schools-fr_FR.po       # sources FR
-    └── gf-french-schools.pot            # modèle de traduction
+    ├── gf-french-schools-fr_FR.mo       # French translation (binary)
+    ├── gf-french-schools-fr_FR.po       # French translation (source)
+    └── gf-french-schools.pot            # Translation template
 ```
 
-## API utilisée
+## Changelog
 
-- **Endpoint** : `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records`
-- **Documentation** : [OpenDataSoft API v2.1](https://help.opendatasoft.com/apis/ods-explore-v2/)
-- Aucune authentification requise
-- Gratuit et accessible publiquement
+### 1.9.2 - 2026-05-21
+- **Improved:** Local Only mode now caches city search results in transients — identical queries are served instantly instead of re-querying 68 000 rows
+- **Improved:** `has_data()` check uses `SELECT 1 LIMIT 1` with static cache instead of `COUNT(*)` on every request
+- **Improved:** AJAX form validation (form loading + field scan) is cached for 5 minutes instead of running on every keystroke
+- **Improved:** Fuzzy search fallback queries limited to 500 cities / 200 schools to prevent memory/CPU spikes
 
-## Contribuer
+### 1.9.1 - 2026-03-28
+- **New:** "View details" link on the Plugins page opens a modal with Description, Installation, and Changelog tabs (parsed from local README.md via Parsedown)
+- **Improved:** Fuzzy search detects typos in partially typed words (e.g., "aubertill" → "Aubervilliers"); remote API falls back to local DB when it returns no results
 
-Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request sur [GitHub](https://github.com/guilamu/gf-french-schools).
+### 1.9.0 - 2026-03-28
+- **New:** Automatic abbreviation recognition in school names — bidirectional search (e.g., "St Exupéry" finds "Saint-Exupéry" and vice-versa)
+- **New:** Supported abbreviations: St/Saint, Ste/Sainte, Gén/Gal/Général, Cdt/Commandant, Lt/Lieutenant, Col/Colonel, Mal/Maréchal, Dr/Docteur, Pr/Professeur, Mgr/Monseigneur, Mme/Madame, Mlle/Mademoiselle, Pdt/Président, Cpt/Capitaine, Sgt/Sergent, Adj/Adjudant
+- **Improved:** Works across all 3 search modes: remote API, local DB (LIKE), and fuzzy search (Levenshtein)
 
-## Licence
+### 1.8.9 - 2026-03-27
+- **Fixed:** Schools not found in some cities — school search now uses `code_commune` (INSEE code) instead of `nom_commune` for filtering, working around `nom_commune` errors in the national database (e.g., Pierrefitte-sur-Seine schools listed under "Saint-Denis")
+- **New:** Added `code_commune` column to local database and synced CSV export
+- **Improved:** Backward compatible — falls back to `nom_commune` filtering when `code_commune` is unavailable
 
-Ce projet est sous licence **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+### 1.8.8 - 2026-03-27
+- **Fixed:** Empty school search results were cached for 1 hour, causing false "no results" for existing schools
+- **New:** "API Fallback" option: when Local Only mode returns no results, silently queries the remote API as a last resort (disabled by default, visible only when Local Only is active)
+- **New:** Fuzzy search on local database: tolerates typos in city and school names using Levenshtein distance (e.g., "mobtreuil" → "Montreuil"). Activates automatically when exact search returns no results (minimum 3 characters)
+- **Changed:** Internal refactoring: remote API calls extracted into private methods `get_villes_from_api()` and `get_ecoles_from_api()`
 
-Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+### 1.8.7 - 2026-03-09
+- **Fixed:** WordPress 6.7+ warning "Translation loading triggered too early" — removed `__()` call in `cron_schedules` filter
+- **Fixed:** PHP warning "Undefined property: stdClass::$slug" on update-core.php — added required `id`, `slug`, `plugin`, and `new_version` fields to GitHub updater update object
+- **Changed:** Centralized `TESTED_WP`, `REQUIRES_PHP`, and `PLUGIN_SLUG` constants in `GF_French_Schools_GitHub_Updater`
 
-## Auteur
+### 1.8.6 - 2026-03-03
+- **New:** Department number as sub-input (`{Label:ID.18}`) and merge tag (`{Label:ID:numero_departement}`)
+- **New:** Merge tags `{Label:ID:statut}` and `{Label:ID:departement}` for status and department name
+- **Improved:** Documentation updated with all available merge tags and sub-inputs
+
+### 1.8.5 - 2026-03-02
+- **Fixed:** Circonscription name cleaning: added missing pattern "Circonscription d'inspection du 1er degré" (without article de/du/d')
+
+### 1.8.4 - 2026-02-25
+- **Security:** Fixed rate-limit bypass via proxy header spoofing (`X-Forwarded-For`, `CF-Connecting-IP`, etc.) — forwarding headers are now only trusted when `REMOTE_ADDR` is in the `gf_french_schools_trusted_proxies` allowlist
+- **Security:** AJAX search endpoint now verifies the submitted form contains an `ecoles_fr` field
+
+### 1.8.3 - 2026-02-23
+- **Fixed:** WordPress 6.7 warning "`_load_textdomain_just_in_time` called incorrectly" — removed `__()` call in `get_default_inputs()` that triggered early translation loading
+- **Changed:** Textdomain loading moved to `init` hook (instead of `plugins_loaded`) per WordPress 6.7+ recommendations
+
+### 1.8.2 - 2026-02-20
+- **Fixed:** "Email Circonscription" field was displayed on frontend but not saved in entries for forms created before the sub-input was added
+- **Improved:** Field constructor now always synchronizes sub-inputs with the canonical definition
+
+### 1.8.1 - 2026-02-18
+- **Fixed:** City search with articles: "les pa" now finds "Les Pavillons Sous Bois", "les l" finds "Les Lilas", etc.
+- **Improved:** Both remote API and local DB now use word-by-word matching for city names
+- **New:** GP Copy Cat compatibility: hidden sub-inputs now fire jQuery `change` events on school selection
+
+### 1.8.0 - 2026-02-16
+- **New:** Full conditional logic support: every sub-input (ID, name, type, category, postal code, city, etc.) is available as a conditional logic parameter
+- **Improved:** Category cleaning: "ECOLE DE NIVEAU ELEMENTAIRE" now displays "Élémentaire" instead of "De niveau elementaire"
+- **Improved:** Automatic primary school detection: when the school name contains "primaire", category displays "Primaire" instead of "Élémentaire"
+- **Improved:** Browser autocomplete blocked on all form fields
+
+### 1.7.3 - 2026-02-15
+- **Changed:** Merge tags renamed for consistency: `id` → `identifiant`, `nature` → `categorie`, `commune` → `ville`
+- **Improved:** Old names remain functional for backward compatibility
+
+### 1.7.2 - 2026-02-11
+- **New:** Merge tag `autres_nom` for manually entered school names
+- **Improved:** Merge tag now visible in Gravity Forms merge tag dropdown
+
+### 1.7.1 - 2026-02-11
+- **Fixed:** School search for Paris arrondissements (inconsistent spacing in database)
+- **Improved:** Parisian school name display (removed E.M.PU, E.E.PU, E.P.PR, etc. prefixes and addresses)
+- **Changed:** API search uses LIKE instead of search() for better partial matching
+- **Fixed:** Cache now separates local and remote results
+
+### 1.7.0 - 2026-02-11
+- **New:** Full Gravity Forms Orbital theme support
+- **Fixed:** Autocomplete dropdown hidden behind following fields (z-index)
+- **Fixed:** Blur handler dismissed results too quickly
+- **Fixed:** Department placeholder when status is preselected
+- **Changed:** Field icon changed to match settings page (dashicons-building)
+- **Improved:** Cancel button hidden in form editor
+
+### 1.6.1 - 2026-02-10
+- **Improved:** Major improvement to school name cleaning
+
+### 1.6.0 - 2026-02-10
+- **Improved:** Result display in Entry View
+- **Fixed:** "Priority Education" field now shows "Non" instead of blank when not set
+
+### 1.5.4 - 2026-02-09
+- **Fixed:** Complete rewrite of translation loading system for compatibility
+- **Improved:** Absolute path loading, multi-hook safety net, forced reload on locale change, base locale fallback
+
+### 1.5.3 - 2026-02-08
+- **Improved:** Toggle instead of checkbox for "Local Only" option (Gravity Forms style consistency)
+- **Fixed:** "Sync Now" button styling to match Gravity Forms settings buttons
+
+### 1.5.2 - 2026-02-07
+- **New:** Dashicon "building" icon for the French Schools settings tab
+
+### 1.5.1 - 2026-02-07
+- **Changed:** Settings page integrated into Gravity Forms Settings tab (GFAddOn) instead of a separate submenu
+- **Improved:** Uses GFAddOn framework for rendering and saving settings
+
+### 1.5.0 - 2026-02-07
+- **New:** Local database as safety net when the API is unavailable
+- **New:** Automatic monthly download of the full directory (~69 000 schools) via WP-Cron
+- **New:** Secure CSV import with staging table (existing data only replaced after validation)
+- **New:** Automatic fallback to local DB on API error
+- **New:** Settings page under **Forms → French Schools**
+- **New:** Local Only mode to disable the remote API entirely
+- **New:** Manual sync button with real-time status display
+
+### 1.4.0 - 2026-01-27
+- **New:** "Circonscription" and "Mail circo" fields for each school
+- **Improved:** Circonscription name cleaned of standard prefix
+- **Improved:** Circonscription email auto-generated from code + academic domain
+- **New:** Merge tags `nom_circonscription` and `code_circonscription`
+
+### 1.3.0 - 2026-01-23
+- **New:** "Other" field for manual school name entry when search returns no results
+- **Improved:** Manual entries correctly saved, displayed, and exported with "Manual Entry" label
+- **Improved:** French translation files updated
+
+### 1.2.0 - 2026-01-18
+- **New:** Guilamu Bug Reporter integration
+- **New:** "🐛 Report a Bug" link in the plugins list
+
+### 1.1.3 - 2026-01-06
+- **Improved:** Plugin description translated to French
+- **New:** GitHub Actions workflow for automatic release creation
+- **Improved:** Automatic ZIP generation with correct folder naming
+
+### 1.1.1 - 2025-12-27
+- **New:** Option to hide the summary block with accessible fallback directly in the field (Type Category Name)
+- **New:** i18n string for "No" fallback in JS
+- **Improved:** Consistent cleaning of stored and displayed values (name/category)
+
+### 1.1.0 - 2025-12-27
+- **Security:** AJAX form validation, status/department whitelists, filterable rate limiting
+- **Improved:** Robust frontend requests: in-flight cancellation, deduplication, configurable timeouts, retries with backoff
+- **Improved:** Minimum Gravity Forms version check with clear error messages
+- **Improved:** More resilient GitHub updater (fallback copy/delete, debug logging)
+- **Changed:** Admin CSS extracted to dedicated file (no more inline styles)
+
+### 1.0.4 - 2025-12-26
+- **Improved:** CSS for preselected fields no longer loaded on every page
+- **New:** Rate limiting on AJAX endpoint
+- **Improved:** GitHub updater refactored with API request caching
+- **Removed:** Dead code (unused merge tag filter)
+- **Improved:** Better contrast between enabled and disabled fields
+- **Improved:** Translation files updated
+
+### 1.0.3 - 2025-12-26
+- Initial release
+
+## Contributing
+
+Contributions are welcome! Feel free to open an issue or a pull request on [GitHub](https://github.com/guilamu/gf-french-schools).
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
+
+## Author
 
 **Guilamu** - [GitHub](https://github.com/guilamu)
 
-## Remerciements
+## Acknowledgments
 
-- [Gravity Forms](https://www.gravityforms.com/) pour leur excellent framework de formulaires
-- [data.education.gouv.fr](https://data.education.gouv.fr/) pour l'API de l'annuaire des établissements scolaires
+- [Gravity Forms](https://www.gravityforms.com/) for their excellent forms framework
+- [data.education.gouv.fr](https://data.education.gouv.fr/) for the school directory API
 
-## Change Log
+---
 
-### Version 1.9.2 - 2026-05-21
-- Optimisation des performances en mode « Local Only » : les résultats de recherche de villes sont désormais mis en cache (transient) pour éviter de re-interroger les 68 000 enregistrements à chaque frappe
-- Optimisation de la vérification `has_data()` : remplacement de `COUNT(*)` par `SELECT 1 LIMIT 1` avec cache statique par requête
-- Optimisation de l'endpoint AJAX : la validation du formulaire (chargement + scan des champs) est désormais mise en cache pendant 5 minutes au lieu d'être exécutée à chaque frappe
-- Limitation des résultats de la recherche floue (fuzzy search) : `LIMIT 500` pour les villes et `LIMIT 200` pour les écoles, évitant les pics de mémoire/CPU sur les départements volumineux
-
-### Version 1.9.1 - 2026-03-28
-- Ajout du lien « View details » sur la page Extensions, ouvrant une popup modale avec les onglets Description, Installation et Changelog (parsés depuis le README.md local via Parsedown)
-- Amélioration de la recherche floue (fuzzy search) : les fautes de frappe dans les mots partiellement saisis sont désormais détectées (ex : « aubertill » → « Aubervilliers ») ; l'API distante repasse sur la base locale quand elle ne retourne aucun résultat
-
-### Version 1.9.0 - 2026-03-28
-- Reconnaissance automatique des abréviations courantes dans les noms d'écoles : la recherche est désormais bidirectionnelle (ex : "St Exupéry" trouve "Saint-Exupéry" et inversement)
-- Abréviations supportées : St/Saint, Ste/Sainte, Gén/Gal/Général, Cdt/Commandant, Lt/Lieutenant, Col/Colonel, Mal/Maréchal, Dr/Docteur, Pr/Professeur, Mgr/Monseigneur, Mme/Madame, Mlle/Mademoiselle, Pdt/Président, Cpt/Capitaine, Sgt/Sergent, Adj/Adjudant
-- Fonctionne sur les 3 modes de recherche : API distante, base locale (LIKE) et recherche floue (Levenshtein)
-
-### Version 1.8.9 - 2026-03-27
-- Correction d'un problème d'écoles introuvables dans certaines communes : la recherche d'écoles utilise désormais le `code_commune` (code INSEE) au lieu du `nom_commune` pour filtrer les résultats, contournant les erreurs de `nom_commune` dans la base nationale (ex : écoles de Pierrefitte-sur-Seine listées sous « Saint-Denis »)
-- Ajout de la colonne `code_commune` dans la base de données locale et l'export CSV synchronisé
-- Rétro-compatibilité : si `code_commune` n'est pas disponible, le filtrage par `nom_commune` reste actif
-
-### Version 1.8.8 - 2026-03-27
-- Correction du bug de cache : les résultats vides de recherche d'écoles étaient mis en cache pendant 1 heure, provoquant des faux « aucun résultat » pour des écoles existantes
-- Nouvelle option « Repli API » : lorsque le mode local seul est activé et qu'une recherche ne retourne aucun résultat, le plugin peut interroger silencieusement l'API distante en dernier recours (option désactivée par défaut, visible uniquement quand « Local Only » est actif)
-- Recherche floue (fuzzy search) sur la base locale : tolère les fautes de frappe dans les noms de villes et d'écoles grâce à un algorithme de distance de Levenshtein (ex : « mobtreuil » → « Montreuil »). Activé automatiquement quand la recherche exacte ne retourne aucun résultat (minimum 3 caractères)
-- Refactoring interne : extraction des appels API distants dans des méthodes privées `get_villes_from_api()` et `get_ecoles_from_api()`
-
-### Version 1.8.7 - 2026-03-09
-- Correction de l'avertissement WordPress 6.7+ « Translation loading triggered too early » : suppression de l'appel `__()` dans le filtre `cron_schedules` qui déclenchait le chargement des traductions avant `init`
-- Correction de l'avertissement PHP « Undefined property: stdClass::$slug » sur la page update-core.php : ajout des champs obligatoires `id`, `slug`, `plugin` et `new_version` à l'objet de mise à jour retourné par le GitHub updater
-- Centralisation des constantes `TESTED_WP`, `REQUIRES_PHP` et `PLUGIN_SLUG` dans la classe `GF_French_Schools_GitHub_Updater`
-
-### Version 1.8.6 - 2026-03-03
-- Ajout du numéro de département comme sous-champ (`{Libellé:ID.18}`) et merge tag (`{Libellé:ID:numero_departement}`), permettant de récupérer le code officiel du département (ex : « 93 » pour Seine-Saint-Denis, « 2A » pour Corse-du-Sud, « 974 » pour La Réunion)
-- Ajout des merge tags `{Libellé:ID:statut}` et `{Libellé:ID:departement}` pour accéder au statut et au nom du département via modificateur
-- Documentation complétée : tous les merge tags et sous-champs disponibles sont désormais listés dans le README
-
-### Version 1.8.5 - 2026-03-02
-- Correction du nettoyage des noms de circonscriptions : ajout du patron manquant « Circonscription d'inspection du 1er degré » (sans article de/du/d') qui laissait un résidu « d'inspection du 1er degré » dans le nom affiché
-
-### Version 1.8.4 - 2026-02-25
-- Sécurité : correction du contournement du rate-limiting par usurpation des en-têtes proxy (`X-Forwarded-For`, `CF-Connecting-IP`, etc.) — ces en-têtes ne sont désormais pris en compte que si `REMOTE_ADDR` figure dans la liste blanche `gf_french_schools_trusted_proxies` (filtre WordPress)
-- Sécurité : l'endpoint AJAX de recherche vérifie maintenant que le formulaire soumis contient bien un champ `ecoles_fr`, empêchant l'utilisation scriptée de l'endpoint avec n'importe quel `form_id` valide
-
-### Version 1.8.3 - 2026-02-23
-- Correction de l'avertissement WordPress 6.7 « `_load_textdomain_just_in_time` called incorrectly » : suppression de l'appel `__()` dans `get_default_inputs()` qui déclenchait le chargement des traductions lors de la construction du champ (avant `init`), via `gform_loaded` → `plugins_loaded`
-- Le chargement du textdomain est désormais effectué uniquement sur le hook `init` (et non plus `plugins_loaded`) conformément aux recommandations WordPress 6.7+
-
-### Version 1.8.2 - 2026-02-20
-- Correction de l'enregistrement du champ « Email Circonscription » : la valeur était affichée côté frontend mais n'était pas sauvegardée dans l'entrée pour les formulaires créés avant l'ajout de ce sous-champ
-- Le constructeur du champ synchronise désormais systématiquement les sous-inputs avec la définition canonique, garantissant la prise en charge des sous-champs ajoutés dans les nouvelles versions
-
-### Version 1.8.1 - 2026-02-18
-- Correction de la recherche de villes avec article : "les pa" trouve désormais "Les Pavillons Sous Bois", "les l" trouve "Les Lilas", etc.
-- La recherche distante (API) et la base locale effectuent désormais une correspondance mot par mot : chaque mot saisi doit apparaître dans le nom de la ville, au lieu d'un test de sous-chaîne continue qui échouait dès qu'un espace séparait deux mots.
-- Compatibilité gwcopycat (GP Copy Cat) : les sous-champs cachés déclenchent désormais un événement jQuery `change` lors de la sélection d'un établissement, permettant leur copie vers d'autres champs.
-
-### Version 1.8.0 - 2026-02-16
-- Support complet de la logique conditionnelle : chaque sous-champ (identifiant, nom, type, catégorie, code postal, ville, etc.) est désormais disponible comme paramètre de logique conditionnelle pour les autres champs du formulaire
-- Amélioration du nettoyage de la catégorie : "ECOLE DE NIVEAU ELEMENTAIRE" affiche désormais "Élémentaire" au lieu de "De niveau elementaire"
-- Détection automatique des écoles primaires : lorsque le nom de l'établissement contient "primaire", la catégorie affiche "Primaire" au lieu de "Élémentaire"
-- Blocage de l'auto-complétion navigateur sur tous les champs du formulaire
-
-### Version 1.7.3 - 2026-02-15
-- Renommage des merge tags pour plus de cohérence avec l'interface :
-  - `id` -> `identifiant`
-  - `nature` -> `categorie`
-  - `commune` -> `ville`
-- Les anciens noms restent fonctionnels pour la rétro-compatibilité.
-
-### Version 1.7.2 - 2026-02-11
-- Ajout du merge tag `autres_nom` pour accéder au nom d'école saisi manuellement ("School Name (Manual)" / "Nom de l'école (saisie manuelle)")
-- Le merge tag est maintenant visible dans le dropdown des merge tags de Gravity Forms
-
-### Version 1.7.1 - 2026-02-11
-- Correction de la recherche d'écoles pour les arrondissements de Paris (espacement incohérent dans la base de données)
-- Amélioration de l'affichage des noms d'écoles parisiennes (suppression des préfixes E.M.PU, E.E.PU, E.P.PR, etc. et des adresses)
-- Modification de la recherche API pour utiliser LIKE au lieu de search() (meilleure correspondance partielle)
-- Correction du cache pour séparer les résultats locaux et distants
-
-### Version 1.7.0 - 2026-02-11
-- Support complet du thème Gravity Forms Orbital
-- Correction de l'affichage du dropdown autocomplete masqué par les champs suivants (z-index)
-- Correction du gestionnaire blur qui masquait les résultats trop rapidement
-- Correction du placeholder du département quand le statut est présélectionné
-- Changement de l'icône du champ pour correspondre à la page de réglages (dashicons-building)
-- Masquage du bouton Annuler dans l'éditeur de formulaire
-
-### Version 1.6.1 - 2026-02-10
-- Amélioration majeure du nettoyage des noms d'établissements
-
-### Version 1.6.0 - 2026-02-10
-- Amélioration de l'affichage des résultats dans la vue d'entrée (Entry View)
-- Le champ "Éducation prioritaire" affiche maintenant "Non" au lieu d'un vide lorsqu'il n'est pas renseigné
-
-### Version 1.5.4 - 2026-02-09
-- Réécriture complète du système de chargement des traductions pour résoudre les problèmes de compatibilité :
-  - Utilisation de chemins absolus avec `load_textdomain()` au lieu de `load_plugin_textdomain()`
-  - Chargement sur plusieurs hooks (`plugins_loaded`, `init`, `gform_pre_render`) comme filets de sécurité
-  - Support du rechargement forcé si la locale change entre les hooks
-  - Fallback sur la locale de base (ex: 'fr' si 'fr_FR.mo' n'existe pas)
-
-### Version 1.5.3 - 2026-02-08
-- Utilisation d'un toggle au lieu d'une checkbox pour l'option "Local Only" (cohérence avec le style Gravity Forms)
-- Style du bouton "Sync Now" corrigé pour correspondre aux autres boutons de réglages Gravity Forms
-
-### Version 1.5.2 - 2026-02-07
-- Ajout de l'icône Dashicon "building" pour l'onglet French Schools dans les réglages Gravity Forms
-
-### Version 1.5.1 - 2026-02-07
-- Intégration de la page de réglages dans l'onglet Gravity Forms Settings (GFAddOn) au lieu d'un sous-menu séparé
-- Utilisation du framework GFAddOn pour le rendu et la sauvegarde des paramètres (bouton Save natif)
-
-### Version 1.5.0 - 2026-02-07
-- Ajout d'une base de données locale comme filet de sécurité en cas d'indisponibilité de l'API
-- Téléchargement mensuel automatique de l'annuaire complet (~69 000 établissements) via WP-Cron
-- Import CSV sécurisé avec table de staging (les données existantes ne sont remplacées qu'après validation)
-- Basculement automatique vers la base locale en cas d'erreur API
-- Nouvelle page de réglages sous Formulaires → French Schools
-- Mode « Local Only » : possibilité de désactiver totalement l'API distante
-- Bouton de synchronisation manuelle avec affichage du statut en temps réel
-
-### Version 1.4.0 - 2026-01-27
-- Ajout des champs "Circonscription" et "Mail circo" pour chaque établissement
-- Le nom de la circonscription est nettoyé (suppression du préfixe "Circonscription d'inspection du 1er degré de/du/d'")
-- Le mail de la circonscription est généré automatiquement (code + domaine académique de l'école)
-- Nouveaux merge tags disponibles : `nom_circonscription` et `code_circonscription`
-
-### Version 1.3.0 - 2026-01-23
-- Ajout d'un champ "Autre" permettant la saisie manuelle du nom de l'école si la recherche ne retourne aucun résultat
-- Le champ manuel apparaît uniquement après une recherche infructueuse
-- Les entrées manuelles sont correctement enregistrées, affichées et exportées avec la mention "Saisie manuelle"
-- Mise à jour des fichiers de traduction (français)
-
-### Version 1.2.0 - 2026-01-18
-- Intégration du support Guilamu Bug Reporter
-- Ajout du lien "🐛 Report a Bug" dans la liste des extensions
-
-### Version 1.1.3 - 2026-01-06
-- Traduction de la description du plugin en français
-- Ajout du workflow GitHub Actions pour la création automatique des releases
-- Génération automatique du fichier ZIP avec le bon nommage de dossier
-
-### Version 1.1.1 - 2025-12-27
-- Option pour cacher le bloc de récapitulatif et fallback accessible directement dans le champ (Type Catégorie Nom)
-- Chaîne i18n pour le fallback "No" côté JS
-- Nettoyage cohérent des valeurs (nom/catégorie) stockées et affichées
-
-### Version 1.1.0 - 2025-12-27
-- Durcissement de la sécurité : validation du formulaire côté AJAX, whitelists statut/département, limite de requêtes filtrable
-- Requêtes frontend plus robustes : annulation des appels en cours, déduplication, timeouts configurables et retries avec backoff
-- Vérification de version minimale Gravity Forms et messages d'erreur plus clairs
-- Updater GitHub plus résilient (fallback copy/delete, logs en debug)
-- CSS admin extrait dans un fichier dédié (plus d'inline styles)
-
-### Version 1.0.4 - 2025-12-26
-- Amélioration des performances : le CSS pour les champs présélectionnés n'est plus chargé sur toutes les pages
-- Ajout d'une limite de requêtes (rate limiting) sur l'endpoint AJAX
-- Refactorisation du module de mise à jour GitHub avec mise en cache des requêtes API
-- Suppression du code mort (filtre de merge tag inutilisé)
-- Amélioration du contraste visuel entre les champs activés et désactivés
-- Mise à jour des fichiers de traduction
-
-### Version 1.0.3 - 2025-12-26
-- Version initiale
-
+<p align="center">
+  Made with love for the WordPress community
+</p>
