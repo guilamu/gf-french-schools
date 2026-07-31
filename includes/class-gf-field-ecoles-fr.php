@@ -839,13 +839,18 @@ class GF_Field_Ecoles_FR extends GF_Field
      * GF 3.0 added get_value_save_input() to replace the now-deprecated
      * get_value_save_entry() and GFFormsModel::prepare_value().
      *
-     * The parameter list is declared variadic on purpose. GF 3.0 shipped on
-     * 2026-07-28 and the signature of this method is not documented yet; PHP
-     * fatals with "Declaration must be compatible" if a child override
-     * declares a different number of parameters than the parent, whereas a
-     * variadic override is accepted against a parent of any arity. Only the
-     * first argument is read, matching every other GF_Field::get_value_*()
-     * method, where the value is always passed first.
+     * The parent signature, as shipped in Gravity Forms 3.0.0, is:
+     *
+     *     get_value_save_input( $value, $form, $input_name, $entry_id, $entry, $repeater_index = '' )
+     *
+     * The override is declared variadic rather than repeating those six
+     * parameters. PHP fatals with "Declaration must be compatible" whenever a
+     * child override declares fewer parameters than its parent, and GF 3.0
+     * grew this method from five parameters to six by adding $repeater_index -
+     * exactly the change that breaks add-ons written against the old arity. A
+     * variadic override is accepted against a parent of any arity, so another
+     * parameter in a future release cannot take the site down. Only the value
+     * is read, and it is always passed first.
      *
      * @param mixed ...$args Value first, then the GF-supplied context arguments.
      * @return string|array
@@ -860,6 +865,11 @@ class GF_Field_Ecoles_FR extends GF_Field
      *
      * Deprecated by GF 3.0 in favour of get_value_save_input(), but still the
      * method GF calls on 2.5 - 2.9, which this plugin supports.
+     *
+     * It is not reached on GF 3.0: the base get_value_save_input() only falls
+     * back to this method when a child class has left get_value_save_input()
+     * alone, and the override above takes precedence. So the value is never
+     * sanitized twice.
      *
      * @param string $value      The sub-input value.
      * @param array  $form       The form object.

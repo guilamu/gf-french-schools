@@ -234,6 +234,10 @@ Assurez-vous d'utiliser la version 1.9.2 ou ultérieure, qui inclut la mise en c
 
 ## Changelog
 
+### 1.9.4 - 2026-07-31
+- **Documentation :** Aucun changement fonctionnel depuis la 1.9.3. La signature de `get_value_save_input()` a été vérifiée directement dans le code source de Gravity Forms 3.0.0 et est désormais consignée dans le code, avec la raison pour laquelle la surcharge est déclarée variadique : GF 3.0 fait passer la méthode de cinq à six paramètres (ajout de `$repeater_index`), et PHP émet une erreur fatale « Declaration must be compatible » dès qu'une surcharge déclare moins de paramètres que la classe parente
+- **Documentation :** Ajout d'une note précisant que `get_value_save_entry()` n'est jamais atteinte sous Gravity Forms 3.0 — la surcharge de `get_value_save_input()` a la priorité sur le repli par réflexion de Gravity Forms — la valeur n'est donc jamais assainie deux fois
+
 ### 1.9.3 - 2026-07-31
 - **Compatibilité :** Support de Gravity Forms 3.0 — l'enregistrement des valeurs passe par la nouvelle méthode `get_value_save_input()`, qui remplace `get_value_save_entry()` et `GFFormsModel::prepare_value()` dépréciés en 3.0
 - **Compatibilité :** L'ancienne méthode est conservée pour Gravity Forms 2.5 à 2.9 ; les deux chemins appliquent la même sanitisation
