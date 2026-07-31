@@ -807,24 +807,70 @@ class GF_Field_Ecoles_FR extends GF_Field
     }
 
     /**
-     * Get field value for entry save.
+     * Sanitize a value on its way into the entry.
      *
-     * With sub-inputs defined, GF calls this once per sub-input.
-     * Each sub-input value is a simple string.
+     * Shared by get_value_save_input() (Gravity Forms 3.0+) and the legacy
+     * get_value_save_entry() (Gravity Forms < 3.0) so both storage paths apply
+     * exactly the same sanitization.
+     *
+     * With sub-inputs defined, GF hands us one sub-input value at a time and
+     * each one is a plain string. Arrays are still walked defensively so an
+     * unexpected shape degrades to sanitized data instead of being discarded.
+     *
+     * @param mixed $value The submitted value.
+     * @return string|array
+     */
+    private function sanitize_save_value( $value )
+    {
+        if ( is_array( $value ) ) {
+            return array_map( array( $this, 'sanitize_save_value' ), $value );
+        }
+
+        if ( is_scalar( $value ) ) {
+            return wp_strip_all_tags( (string) $value );
+        }
+
+        return '';
+    }
+
+    /**
+     * Get field value for entry save (Gravity Forms 3.0+).
+     *
+     * GF 3.0 added get_value_save_input() to replace the now-deprecated
+     * get_value_save_entry() and GFFormsModel::prepare_value().
+     *
+     * The parameter list is declared variadic on purpose. GF 3.0 shipped on
+     * 2026-07-28 and the signature of this method is not documented yet; PHP
+     * fatals with "Declaration must be compatible" if a child override
+     * declares a different number of parameters than the parent, whereas a
+     * variadic override is accepted against a parent of any arity. Only the
+     * first argument is read, matching every other GF_Field::get_value_*()
+     * method, where the value is always passed first.
+     *
+     * @param mixed ...$args Value first, then the GF-supplied context arguments.
+     * @return string|array
+     */
+    public function get_value_save_input( ...$args )
+    {
+        return $this->sanitize_save_value( isset( $args[0] ) ? $args[0] : '' );
+    }
+
+    /**
+     * Get field value for entry save (Gravity Forms < 3.0).
+     *
+     * Deprecated by GF 3.0 in favour of get_value_save_input(), but still the
+     * method GF calls on 2.5 - 2.9, which this plugin supports.
      *
      * @param string $value      The sub-input value.
      * @param array  $form       The form object.
      * @param string $input_name The input name (e.g. "input_5.1").
      * @param int    $lead_id    The entry ID.
      * @param array  $lead       The entry object.
-     * @return string
+     * @return string|array
      */
     public function get_value_save_entry( $value, $form, $input_name, $lead_id, $lead )
     {
-        if ( is_string( $value ) ) {
-            return wp_strip_all_tags( $value );
-        }
-        return '';
+        return $this->sanitize_save_value( $value );
     }
 
     /**

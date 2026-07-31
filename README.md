@@ -234,6 +234,10 @@ Assurez-vous d'utiliser la version 1.9.2 ou ultérieure, qui inclut la mise en c
 
 ## Changelog
 
+### 1.9.3 - 2026-07-31
+- **Compatibilité :** Support de Gravity Forms 3.0 — l'enregistrement des valeurs passe par la nouvelle méthode `get_value_save_input()`, qui remplace `get_value_save_entry()` et `GFFormsModel::prepare_value()` dépréciés en 3.0
+- **Compatibilité :** L'ancienne méthode est conservée pour Gravity Forms 2.5 à 2.9 ; les deux chemins appliquent la même sanitisation
+
 ### 1.9.2 - 2026-05-21
 - **Amélioration :** Le mode Local Only met désormais en cache les résultats de recherche de villes dans des transients — les requêtes identiques sont servies instantanément au lieu de re-interroger les 68 000 enregistrements
 - **Amélioration :** La vérification `has_data()` utilise `SELECT 1 LIMIT 1` avec cache statique au lieu de `COUNT(*)` à chaque requête
