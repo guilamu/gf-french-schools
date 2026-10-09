@@ -451,3 +451,17 @@ msgstr ""
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder."
 msgstr ""
+
+#: gf-french-schools.php
+msgid "Layout"
+msgstr ""
+
+#: gf-french-schools.php
+msgid "Display as numbered steps"
+msgstr ""
+
+#. translators: %s: label of the previous step, e.g. "City".
+#: includes/class-gf-field-ecoles-fr.php
+#, php-format
+msgid "Choose first: %s"
+msgstr ""

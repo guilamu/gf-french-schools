@@ -29,6 +29,9 @@
 
         // Load result visibility
         $('#ecoles_fr_hide_result').prop('checked', field.hideResult === true);
+
+        // Load layout
+        $('#ecoles_fr_steps_layout').prop('checked', field.stepsLayout === true);
     });
 
     // Persist setting changes without inline handlers.

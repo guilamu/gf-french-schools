@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.9.4
+ * Version: 1.10.0
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.9.4');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.10.0');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
@@ -376,6 +376,17 @@ function gf_french_schools_field_settings($position, $form_id)
                 <input type="checkbox" id="ecoles_fr_hide_result" class="ecoles-fr-setting" data-setting="hideResult" />
                 <label for="ecoles_fr_hide_result" style="display: inline;">
                     <?php esc_html_e('Hide the selected school summary block', 'gf-french-schools'); ?>
+                </label>
+            </div>
+
+            <label class="section_label" style="margin-top: 15px;">
+                <?php esc_html_e('Layout', 'gf-french-schools'); ?>
+            </label>
+
+            <div style="margin-bottom: 10px;">
+                <input type="checkbox" id="ecoles_fr_steps_layout" class="ecoles-fr-setting" data-setting="stepsLayout" />
+                <label for="ecoles_fr_steps_layout" style="display: inline;">
+                    <?php esc_html_e('Display as numbered steps', 'gf-french-schools'); ?>
                 </label>
             </div>
         </li>

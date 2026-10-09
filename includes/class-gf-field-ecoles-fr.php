@@ -617,10 +617,35 @@ class GF_Field_Ecoles_FR extends GF_Field
         $tabindex = $this->get_tabindex();
         $aria_label = esc_attr($this->label);
 
+        // Numbered steps: each visible step names the previous one in its
+        // "Choose first" hint, shown by the CSS while the step is disabled.
+        $steps_layout = !empty($this->stepsLayout);
+        $step_hints = array();
+        if ($steps_layout) {
+            $previous = '';
+            $steps = array(
+                'statut'      => array(__('Status', 'gf-french-schools'), $hide_statut),
+                'departement' => array(__('Department', 'gf-french-schools'), $hide_departement),
+                'ville'       => array(__('City', 'gf-french-schools'), false),
+                'ecole'       => array(__('School', 'gf-french-schools'), false),
+            );
+            foreach ($steps as $key => $step) {
+                if ($step[1]) {
+                    continue;
+                }
+                /* translators: %s: label of the previous step, e.g. "City". */
+                $step_hints[$key] = $previous ? sprintf(__('Choose first: %s', 'gf-french-schools'), $previous) : '';
+                $previous = $step[0];
+            }
+        }
+        $hint_attr = function ($key) use ($step_hints) {
+            return !empty($step_hints[$key]) ? ' data-hint="' . esc_attr($step_hints[$key]) . '"' : '';
+        };
+
         // Build the field HTML
         ob_start();
 ?>
-        <div class="gf-ecoles-fr-wrapper ginput_complex ginput_container" id="<?php echo esc_attr($input_id); ?>_container"
+        <div class="gf-ecoles-fr-wrapper<?php echo $steps_layout ? ' gf-ecoles-fr-steps' : ''; ?> ginput_complex ginput_container" id="<?php echo esc_attr($input_id); ?>_container"
             data-field-id="<?php echo esc_attr($field_id); ?>"
             data-form-id="<?php echo esc_attr($form_id); ?>"
             data-preselected-statut="<?php echo esc_attr($preselected_statut); ?>"
@@ -643,7 +668,7 @@ class GF_Field_Ecoles_FR extends GF_Field
             <?php endforeach; ?>
 
             <!-- Statut -->
-            <span class="gf-ecoles-fr-field gf-ecoles-fr-statut-field<?php echo $hide_statut ? ' gf-ecoles-fr-hidden' : ''; ?>">
+            <span class="gf-ecoles-fr-field gf-ecoles-fr-statut-field<?php echo $hide_statut ? ' gf-ecoles-fr-hidden' : ''; ?>"<?php echo $hint_attr('statut'); ?>>
                 <label for="<?php echo esc_attr($input_id); ?>_statut">
                     <?php esc_html_e('Status', 'gf-french-schools'); ?>
                 </label>
@@ -662,7 +687,7 @@ class GF_Field_Ecoles_FR extends GF_Field
 
             <!-- Département -->
             <span
-                class="gf-ecoles-fr-field gf-ecoles-fr-departement-field<?php echo $hide_departement ? ' gf-ecoles-fr-hidden' : ''; ?>">
+                class="gf-ecoles-fr-field gf-ecoles-fr-departement-field<?php echo $hide_departement ? ' gf-ecoles-fr-hidden' : ''; ?>"<?php echo $hint_attr('departement'); ?>>
                 <label for="<?php echo esc_attr($input_id); ?>_departement">
                     <?php esc_html_e('Department', 'gf-french-schools'); ?>
                 </label>
@@ -679,7 +704,7 @@ class GF_Field_Ecoles_FR extends GF_Field
             </span>
 
             <!-- Ville -->
-            <span class="gf-ecoles-fr-field gf-ecoles-fr-ville-field">
+            <span class="gf-ecoles-fr-field gf-ecoles-fr-ville-field"<?php echo $hint_attr('ville'); ?>>
                 <label for="<?php echo esc_attr($input_id); ?>_ville">
                     <?php esc_html_e('City', 'gf-french-schools'); ?>
                 </label>
@@ -695,7 +720,7 @@ class GF_Field_Ecoles_FR extends GF_Field
             </span>
 
             <!-- École -->
-            <span class="gf-ecoles-fr-field gf-ecoles-fr-ecole-field">
+            <span class="gf-ecoles-fr-field gf-ecoles-fr-ecole-field"<?php echo $hint_attr('ecole'); ?>>
                 <label for="<?php echo esc_attr($input_id); ?>_ecole">
                     <?php esc_html_e('School', 'gf-french-schools'); ?>
                 </label>

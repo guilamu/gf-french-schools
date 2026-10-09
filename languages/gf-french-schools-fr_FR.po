@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Gravity Forms - French Schools 1.9.2\n"
+"Project-Id-Version: Gravity Forms - French Schools 1.10.0\n"
 "Report-Msgid-Bugs-To: https://github.com/guilamu/gf-french-schools/issues\n"
 "POT-Creation-Date: 2026-02-11T12:00:00+01:00\n"
-"PO-Revision-Date: 2026-05-21 21:58+0200\n"
+"PO-Revision-Date: 2026-10-09 10:30+0200\n"
 "Last-Translator: Guilamu <guilamu@gmail.com>\n"
 "Language-Team: French <guilamu@gmail.com>\n"
 "Language: fr_FR\n"
@@ -450,3 +450,17 @@ msgstr "Si la base de données locale ne retourne aucun résultat pour une reche
 #: includes/class-github-updater.php
 msgid "Unable to rename the update folder."
 msgstr "Impossible de renommer le dossier de mise à jour."
+
+#: gf-french-schools.php
+msgid "Layout"
+msgstr "Mise en page"
+
+#: gf-french-schools.php
+msgid "Display as numbered steps"
+msgstr "Afficher en étapes numérotées"
+
+#. translators: %s: label of the previous step, e.g. "City".
+#: includes/class-gf-field-ecoles-fr.php
+#, php-format
+msgid "Choose first: %s"
+msgstr "Choisissez d'abord : %s"

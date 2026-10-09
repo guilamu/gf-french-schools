@@ -723,3 +723,142 @@
         align-self: flex-start;
     }
 }
+
+/* ==========================================================================
+   Numbered steps (field setting « Display as numbered steps »)
+   Same look as the « chained steps » of Divi Gravity Forms Enhanced: its
+   colour variables are used when the form sits in such a module, the
+   Gravity Forms theme colours otherwise.
+   ========================================================================== */
+
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps {
+    --gf-ecoles-fr-ink: var(--dgfe-ink-c, var(--dgfe-ink, #1f1d26));
+    --gf-ecoles-fr-accent: var(--dgfe-accent-c, var(--dgfe-accent, var(--gf-color-primary, #204ce5)));
+    --gf-ecoles-fr-line: var(--dgfe-line-c, var(--dgfe-line, #e2e0e7));
+    --gf-ecoles-fr-border: var(--dgfe-field-border, #d6d6d6);
+    --gf-ecoles-fr-muted: #8a8a93;
+    counter-reset: gf-ecoles-fr-step;
+}
+
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps.ginput_complex,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps {
+    row-gap: 0 !important;
+}
+
+/* Each visible step: badge in a 28px column, label then control beside it. */
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps.ginput_complex > span.gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden),
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps > span.gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden) {
+    counter-increment: gf-ecoles-fr-step;
+    display: grid !important;
+    grid-template-columns: 28px minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 8px;
+    align-items: center;
+    padding: 0 !important;
+}
+
+/* Space and vertical line down to the next visible step. */
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps.ginput_complex > span.gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden):has(~ span.gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden)),
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps > span.gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden):has(~ span.gf-ecoles-fr-field:not(.gf-ecoles-fr-hidden)) {
+    padding-bottom: 28px !important;
+    background: linear-gradient(var(--gf-ecoles-fr-line), var(--gf-ecoles-fr-line)) no-repeat 13px 34px / 2px calc(100% - 40px);
+}
+
+/* Badge: to fill (ink), filled (accent), waiting (grey). */
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps > span.gf-ecoles-fr-field::before {
+    content: counter(gf-ecoles-fr-step);
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    background: var(--gf-ecoles-fr-ink);
+}
+
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps > span.gf-ecoles-fr-field:has(select option:checked:not([value=""]))::before,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps > span.gf-ecoles-fr-field:has(input[type="text"]:not(:disabled):not(:placeholder-shown))::before {
+    background: var(--gf-ecoles-fr-accent);
+}
+
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps > span.gf-ecoles-fr-field:has(select:disabled, input[type="text"]:disabled)::before {
+    color: var(--gf-ecoles-fr-muted);
+    background: var(--gf-ecoles-fr-line);
+}
+
+/* Label above the control, like a field label (the plugin hides it otherwise). */
+.gravity-theme.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field > label,
+.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field > label,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field > label {
+    display: block !important;
+    visibility: visible !important;
+    grid-column: 2;
+    grid-row: 1;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: var(--dgfe-label-size, 13px);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--gf-ecoles-fr-ink);
+    text-align: left;
+}
+
+.gfield_contains_required .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field:not(.gf-ecoles-fr-autres-field) > label::after {
+    content: " *";
+    color: var(--gf-ecoles-fr-accent);
+}
+
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field > select,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field > .gf-ecoles-fr-autocomplete-wrapper,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field > .gf-ecoles-fr-autres-wrapper {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field select:not(:disabled),
+.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field input[type="text"]:not(:disabled),
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field select:not(:disabled),
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field input[type="text"]:not(:disabled) {
+    background-color: var(--dgfe-field-bg, #fff) !important;
+    border-color: var(--gf-ecoles-fr-border) !important;
+    color: var(--gf-ecoles-fr-ink) !important;
+}
+
+/* Waiting step: grey label and control, « Choose first » hint below. */
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field:has(select:disabled, input[type="text"]:disabled) > label {
+    color: var(--gf-ecoles-fr-muted);
+}
+
+.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field select:disabled,
+.gform_wrapper .gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field input[type="text"]:disabled,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field select:disabled,
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field input[type="text"]:disabled {
+    color: #9a9aa2 !important;
+    background-color: #f4f4f6 !important;
+    border-color: var(--gf-ecoles-fr-line) !important;
+    opacity: 1;
+}
+
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps .gf-ecoles-fr-field[data-hint]:has(select:disabled, input[type="text"]:disabled)::after {
+    content: attr(data-hint);
+    grid-column: 2;
+    grid-row: 3;
+    font-size: var(--dgfe-sublabel-size, 11px);
+    color: var(--gf-ecoles-fr-muted);
+}
+
+/* Manual entry open: the school search is disabled on purpose, no hint. */
+.gf-ecoles-fr-wrapper.gf-ecoles-fr-steps:has(.gf-ecoles-fr-autres-field:not(.gf-ecoles-fr-hidden)) .gf-ecoles-fr-ecole-field::after {
+    content: none;
+}

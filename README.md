@@ -63,6 +63,9 @@ Dans l'éditeur de formulaire, le champ « Écoles françaises » propose les op
 - **Masquer les écoles primaires :** Exclut les écoles maternelles et élémentaires des résultats
 - **Masquer les collèges et lycées :** Exclut les établissements secondaires des résultats
 
+#### Mise en page
+- **Afficher en étapes numérotées :** Présente Statut, Département, Ville et École comme des étapes numérotées reliées par un trait (même rendu que les listes liées en étapes de Divi Gravity Forms Enhanced) : libellé au-dessus de chaque liste, pastille colorée une fois l’étape remplie, étape en attente grisée avec l’indication « Choisissez d’abord : … ». Les étapes présélectionnées (donc masquées) ne sont pas numérotées. Les couleurs reprennent celles du module Divi Gravity Forms Enhanced quand le formulaire y est placé, celles du thème Gravity Forms sinon.
+
 ### Page de réglages
 
 Accessible via **Formulaires → Réglages → French Schools** :
@@ -233,6 +236,10 @@ Assurez-vous d'utiliser la version 1.9.2 ou ultérieure, qui inclut la mise en c
 ```
 
 ## Changelog
+
+### 1.10.0 - 2026-10-09
+- **Nouveau :** Réglage de champ « Afficher en étapes numérotées » (section Mise en page) : Statut, Département, Ville et École deviennent des étapes numérotées reliées par un trait, avec libellé au-dessus, pastille colorée une fois remplie et indication « Choisissez d’abord : … » sur l’étape en attente. Rendu identique aux listes liées en étapes de Divi Gravity Forms Enhanced, dont les variables de couleur sont reprises quand elles existent
+- **Traduction :** Trois chaînes françaises ajoutées (« Mise en page », « Afficher en étapes numérotées », « Choisissez d’abord : %s »)
 
 ### 1.9.4 - 2026-07-31
 - **Documentation :** Aucun changement fonctionnel depuis la 1.9.3. La signature de `get_value_save_input()` a été vérifiée directement dans le code source de Gravity Forms 3.0.0 et est désormais consignée dans le code, avec la raison pour laquelle la surcharge est déclarée variadique : GF 3.0 fait passer la méthode de cinq à six paramètres (ajout de `$repeater_index`), et PHP émet une erreur fatale « Declaration must be compatible » dès qu'une surcharge déclare moins de paramètres que la classe parente
