@@ -219,6 +219,14 @@ class GF_French_Schools_AddOn extends GFAddOn
                         'class'      => 'medium',
                         'label'      => esc_html__('data.education.gouv.fr API key', 'gf-french-schools'),
                         'tooltip'    => esc_html__('Sent in the Authorization header of every request to the school directory, including the monthly local database sync.', 'gf-french-schools'),
+                        'validation_callback' => function ($field, $value) {
+                            $value = trim((string) $value);
+                            // Keys are plain alphanumeric tokens (56 hex chars today). Catch
+                            // common paste mistakes such as a URL or text with spaces.
+                            if ($value !== '' && !preg_match('/^[A-Za-z0-9_-]{16,128}$/', $value)) {
+                                $field->set_error(esc_html__('This does not look like an API key (letters and digits only, no URL or spaces). Copy the key from Account preferences → API keys on data.education.gouv.fr.', 'gf-french-schools'));
+                            }
+                        },
                     ),
                 ),
             ),

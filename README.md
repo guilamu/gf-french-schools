@@ -266,6 +266,10 @@ Assurez-vous d'utiliser la version 1.9.2 ou ultérieure, qui inclut la mise en c
 
 ## Changelog
 
+### 1.11.1 - 2026-11-16
+- **Amélioration :** Le champ « Clé API » refuse à l'enregistrement une valeur qui ne ressemble pas à une clé (URL, texte avec espaces), erreur de collage fréquente
+- **Traduction :** Une chaîne française ajoutée
+
 ### 1.11.0 - 2026-11-16
 - **Nouveau :** Réglage « Clé API » dans **Formulaires → Réglages → French Schools**. data.education.gouv.fr n'accepte plus les requêtes anonymes (redirection vers la connexion, `401 Unauthorized` sur l'API) : la clé est envoyée dans l'en-tête `Authorization: Apikey …` des recherches et de la synchronisation de la base locale
 - **Nouveau :** Constante `GF_FRENCH_SCHOOLS_API_KEY` (wp-config.php) et filtre `gf_french_schools_api_key` pour fournir la clé sans la stocker en base

@@ -492,3 +492,7 @@ msgstr "Clé API data.education.gouv.fr"
 #: includes/class-gf-french-schools-addon.php
 msgid "Sent in the Authorization header of every request to the school directory, including the monthly local database sync."
 msgstr "Envoyée dans l'en-tête Authorization de chaque requête vers l'annuaire, y compris la synchronisation mensuelle de la base locale."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "This does not look like an API key (letters and digits only, no URL or spaces). Copy the key from Account preferences → API keys on data.education.gouv.fr."
+msgstr "Ceci ne ressemble pas à une clé API (lettres et chiffres uniquement, sans URL ni espace). Copiez la clé depuis Préférences du compte → Clés d'API sur data.education.gouv.fr."
