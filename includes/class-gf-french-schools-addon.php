@@ -203,8 +203,12 @@ class GF_French_Schools_AddOn extends GFAddOn
     public function plugin_settings_fields()
     {
         $api_key_description = esc_html__('Required since November 2026: data.education.gouv.fr no longer answers anonymous requests. Create a free account on the portal, then generate a key under Account preferences → API keys.', 'gf-french-schools');
-        if (defined('GF_FRENCH_SCHOOLS_API_KEY') && GF_FRENCH_SCHOOLS_API_KEY) {
+        $api_key_description .= ' ' . esc_html__('This key is shared with French Schools Map: saving it here also updates it there, and vice versa.', 'gf-french-schools');
+        $api_key_source = gf_french_schools_api_key_source();
+        if ($api_key_source === 'constant') {
             $api_key_description .= ' <strong>' . esc_html__('The GF_FRENCH_SCHOOLS_API_KEY constant is defined in wp-config.php and overrides this field.', 'gf-french-schools') . '</strong>';
+        } elseif ($api_key_source === 'shared_constant') {
+            $api_key_description .= ' <strong>' . esc_html__('The FR_EDUCATION_API_KEY constant is defined in wp-config.php and overrides this field.', 'gf-french-schools') . '</strong>';
         }
 
         return array(
@@ -223,7 +227,7 @@ class GF_French_Schools_AddOn extends GFAddOn
                             $value = trim((string) $value);
                             // Keys are plain alphanumeric tokens (56 hex chars today). Catch
                             // common paste mistakes such as a URL or text with spaces.
-                            if ($value !== '' && !preg_match('/^[A-Za-z0-9_-]{16,128}$/', $value)) {
+                            if ($value !== '' && !gf_french_schools_is_valid_api_key($value)) {
                                 $field->set_error(esc_html__('This does not look like an API key (letters and digits only, no URL or spaces). Copy the key from Account preferences → API keys on data.education.gouv.fr.', 'gf-french-schools'));
                             }
                         },
@@ -381,6 +385,10 @@ class GF_French_Schools_AddOn extends GFAddOn
             parent::update_plugin_settings($settings);
         }
 
+        // The API key lives in the option shared with the other plugins, so a
+        // key saved from French Schools Map shows up here too.
+        $settings['api_key'] = gf_french_schools_get_saved_api_key();
+
         return $settings;
     }
 
@@ -406,16 +414,19 @@ class GF_French_Schools_AddOn extends GFAddOn
             $settings['local_fallback_api'] = '';
         }
 
-        $api_key = isset($settings['api_key']) ? trim(sanitize_text_field($settings['api_key'])) : '';
-        $settings['api_key'] = $api_key;
+        // The API key is not kept in the add-on settings: it goes to the option
+        // shared with the other plugins (see gf_french_schools_save_api_key()).
+        $has_api_key = array_key_exists('api_key', $settings);
+        $api_key     = $has_api_key ? trim(sanitize_text_field($settings['api_key'])) : '';
+        unset($settings['api_key']);
 
         parent::update_plugin_settings($settings);
         update_option('gf_ecoles_fr_local_only', $local_only);
         update_option('gf_ecoles_fr_local_fallback_api', $local_fallback_api);
 
-        // Stored separately (not autoloaded) so the API and the cron sync can
-        // read it without loading the add-on framework.
-        update_option(GF_FRENCH_SCHOOLS_API_KEY_OPTION, $api_key, false);
+        if ($has_api_key) {
+            gf_french_schools_save_api_key($api_key);
+        }
     }
 
     /**

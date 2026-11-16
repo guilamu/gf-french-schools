@@ -60,18 +60,20 @@ Le compte et la clé sont gratuits.
 1. **Créer un compte** sur la plateforme Opendatasoft (Huwise), qui héberge le portail : [data.opendatasoft.com/signup](https://data.opendatasoft.com/signup/?flg=fr-fr). Renseignez votre nom, votre adresse e-mail et un mot de passe.
 2. **Confirmer l'adresse e-mail** via le lien reçu par mail.
 3. **Se connecter** sur [data.education.gouv.fr](https://data.education.gouv.fr/) avec ce compte (bouton de connexion en haut à droite). Vérifiez que vous voyez bien l'[annuaire de l'éducation](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/) une fois connecté.
-4. **Générer la clé** : cliquez sur vos initiales en haut à droite → **Préférences du compte** → section « Paramètres du portail » → onglet **Clés d'API** (lien direct : [data.education.gouv.fr/account/api-keys/](https://data.education.gouv.fr/account/api-keys/)), puis **Générer une nouvelle clé**. Donnez-lui un nom explicite (ex. le nom de votre site) et ne cochez que la permission de lecture des données : le plugin ne fait que lire l'annuaire.
-5. **Copier la clé** et la coller dans **Formulaires → Réglages → French Schools → Clé API**, puis enregistrer.
+4. **Générer la clé** : cliquez sur vos initiales en haut à droite → **Préférences du compte** → section « Paramètres du portail » → onglet **Clés d'API** (lien direct : [data.education.gouv.fr/account/api-keys/](https://data.education.gouv.fr/account/api-keys/)), puis **Générer une nouvelle clé**. Donnez-lui un nom explicite (ex. le nom de votre site). La permission « Parcourir tous les jeux de données » suffit : le plugin ne fait que lire l'annuaire.
+5. **Copier la clé** avec l'icône « Copier dans le presse-papier » et la coller dans **Formulaires → Réglages → French Schools → Clé API**, puis enregistrer. Une valeur qui ne ressemble pas à une clé (URL, texte avec espaces) est refusée à l'enregistrement.
 
 La clé hérite des droits de votre compte et peut être révoquée à tout moment depuis le même onglet. Utilisez une clé par site pour pouvoir en révoquer une sans couper les autres.
 
-**Alternative (wp-config.php)** : pour ne pas stocker la clé en base de données, définissez une constante. Elle prend le pas sur le champ de réglage :
+**Clé partagée** : la clé est enregistrée dans l'option WordPress `fr_education_api_key`, commune avec [French Schools Map](https://github.com/guilamu/french-schools-map). Une clé saisie dans l'un des deux plugins est automatiquement utilisée par l'autre.
+
+**Alternative (wp-config.php)** : pour ne pas stocker la clé en base de données, définissez la constante commune aux deux plugins. Elle prend le pas sur le champ de réglage :
 
 ```php
-define( 'GF_FRENCH_SCHOOLS_API_KEY', 'votre-cle-api' );
+define( 'FR_EDUCATION_API_KEY', 'votre-cle-api' );
 ```
 
-La clé peut aussi être fournie par le filtre `gf_french_schools_api_key`.
+La constante `GF_FRENCH_SCHOOLS_API_KEY` reste reconnue et prioritaire, mais ne vaut que pour ce plugin. La clé peut aussi être fournie par les filtres `fr_education_api_key` (tous les plugins) et `gf_french_schools_api_key` (ce plugin seulement).
 
 ## Configuration
 
@@ -265,6 +267,11 @@ Assurez-vous d'utiliser la version 1.9.2 ou ultérieure, qui inclut la mise en c
 ```
 
 ## Changelog
+
+### 1.11.2 - 2026-11-16
+- **Nouveau :** Clé API partagée avec French Schools Map via l'option `fr_education_api_key`, la constante `FR_EDUCATION_API_KEY` (wp-config.php) et le filtre `fr_education_api_key` : une clé saisie dans un plugin sert à l'autre. La clé enregistrée par les versions 1.11.0 et 1.11.1 est reprise automatiquement
+- **Amélioration :** Une valeur déjà enregistrée qui ne ressemble pas à une clé (URL, texte avec espaces) est ignorée au lieu d'être envoyée à l'API
+- **Traduction :** Deux chaînes françaises ajoutées
 
 ### 1.11.1 - 2026-11-16
 - **Amélioration :** Le champ « Clé API » refuse à l'enregistrement une valeur qui ne ressemble pas à une clé (URL, texte avec espaces), erreur de collage fréquente

@@ -496,3 +496,11 @@ msgstr "Envoyée dans l'en-tête Authorization de chaque requête vers l'annuair
 #: includes/class-gf-french-schools-addon.php
 msgid "This does not look like an API key (letters and digits only, no URL or spaces). Copy the key from Account preferences → API keys on data.education.gouv.fr."
 msgstr "Ceci ne ressemble pas à une clé API (lettres et chiffres uniquement, sans URL ni espace). Copiez la clé depuis Préférences du compte → Clés d'API sur data.education.gouv.fr."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "This key is shared with French Schools Map: saving it here also updates it there, and vice versa."
+msgstr "Cette clé est partagée avec French Schools Map : l'enregistrer ici la met aussi à jour là-bas, et inversement."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "The FR_EDUCATION_API_KEY constant is defined in wp-config.php and overrides this field."
+msgstr "La constante FR_EDUCATION_API_KEY est définie dans wp-config.php et remplace ce champ."

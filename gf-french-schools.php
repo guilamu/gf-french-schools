@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.11.1
+ * Version: 1.11.2
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,39 +20,107 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.11.1');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.11.2');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
 
 /**
- * Option key storing the data.education.gouv.fr API key.
+ * Option storing the data.education.gouv.fr API key.
+ *
+ * Shared with the other plugins that read the same portal (French Schools Map):
+ * a key saved in any of them is used by all. Do not rename.
+ */
+define('GF_FRENCH_SCHOOLS_SHARED_API_KEY_OPTION', 'fr_education_api_key');
+
+/**
+ * Option used by 1.11.0 before the key became shared. Read as a fallback.
  */
 define('GF_FRENCH_SCHOOLS_API_KEY_OPTION', 'gf_ecoles_fr_api_key');
 
 /**
+ * Whether a string looks like an Opendatasoft API key.
+ *
+ * Catches paste mistakes (URL, text with spaces) before they reach the API.
+ *
+ * @param string $key Candidate key.
+ * @return bool
+ */
+function gf_french_schools_is_valid_api_key($key)
+{
+    return (bool) preg_match('/^[A-Za-z0-9_-]{16,128}$/', (string) $key);
+}
+
+/**
+ * Where the active API key comes from, for display in the settings.
+ *
+ * @return string 'constant', 'shared_constant', or 'option'.
+ */
+function gf_french_schools_api_key_source()
+{
+    if (defined('GF_FRENCH_SCHOOLS_API_KEY') && GF_FRENCH_SCHOOLS_API_KEY) {
+        return 'constant';
+    }
+    if (defined('FR_EDUCATION_API_KEY') && FR_EDUCATION_API_KEY) {
+        return 'shared_constant';
+    }
+    return 'option';
+}
+
+/**
+ * Read the key saved in the database (shared option, then legacy option).
+ *
+ * @return string
+ */
+function gf_french_schools_get_saved_api_key()
+{
+    $key = trim((string) get_option(GF_FRENCH_SCHOOLS_SHARED_API_KEY_OPTION, ''));
+    if ($key === '') {
+        $key = trim((string) get_option(GF_FRENCH_SCHOOLS_API_KEY_OPTION, ''));
+    }
+    return $key;
+}
+
+/**
  * Get the API key used to authenticate against data.education.gouv.fr.
  *
- * Priority: GF_FRENCH_SCHOOLS_API_KEY constant (wp-config.php), then the
- * value saved in Forms → Settings → French Schools. Filterable.
+ * Priority: GF_FRENCH_SCHOOLS_API_KEY constant, then the shared
+ * FR_EDUCATION_API_KEY constant (wp-config.php), then the shared option
+ * saved from any plugin's settings. Values that do not look like a key
+ * are ignored. Filterable with `fr_education_api_key` (all plugins) and
+ * `gf_french_schools_api_key` (this plugin only).
  *
  * @return string API key, or empty string when none is configured.
  */
 function gf_french_schools_get_api_key()
 {
-    $key = '';
-    if (defined('GF_FRENCH_SCHOOLS_API_KEY') && GF_FRENCH_SCHOOLS_API_KEY) {
-        $key = (string) GF_FRENCH_SCHOOLS_API_KEY;
-    } else {
-        $key = (string) get_option(GF_FRENCH_SCHOOLS_API_KEY_OPTION, '');
+    switch (gf_french_schools_api_key_source()) {
+        case 'constant':
+            $key = (string) GF_FRENCH_SCHOOLS_API_KEY;
+            break;
+        case 'shared_constant':
+            $key = (string) FR_EDUCATION_API_KEY;
+            break;
+        default:
+            $key = gf_french_schools_get_saved_api_key();
     }
 
-    /**
-     * Filter the data.education.gouv.fr API key.
-     *
-     * @param string $key API key.
-     */
-    return trim((string) apply_filters('gf_french_schools_api_key', $key));
+    $key = trim((string) apply_filters('fr_education_api_key', trim($key)));
+    $key = trim((string) apply_filters('gf_french_schools_api_key', $key));
+
+    return gf_french_schools_is_valid_api_key($key) ? $key : '';
+}
+
+/**
+ * Save the shared API key (empty string clears it).
+ *
+ * @param string $key API key.
+ * @return void
+ */
+function gf_french_schools_save_api_key($key)
+{
+    update_option(GF_FRENCH_SCHOOLS_SHARED_API_KEY_OPTION, trim((string) $key), false);
+    delete_option(GF_FRENCH_SCHOOLS_API_KEY_OPTION);
 }
 
 /**
