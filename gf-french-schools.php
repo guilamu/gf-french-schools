@@ -4,7 +4,7 @@
  * Plugin Name: Gravity Forms - French Schools
  * Plugin URI: https://github.com/guilamu/gf-french-schools
  * Description: Ajoute un champ "Écoles françaises" à Gravity Forms permettant de rechercher et sélectionner un établissement scolaire français via l'API du Ministère de l'Éducation Nationale.
- * Version: 1.10.0
+ * Version: 1.11.0
  * Author: Guilamu
  * Author URI: https://github.com/guilamu
  * Text Domain: gf-french-schools
@@ -20,10 +20,55 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('GF_FRENCH_SCHOOLS_VERSION', '1.10.0');
+define('GF_FRENCH_SCHOOLS_VERSION', '1.11.0');
 define('GF_FRENCH_SCHOOLS_PLUGIN_FILE', __FILE__);
 define('GF_FRENCH_SCHOOLS_PATH', plugin_dir_path(__FILE__));
 define('GF_FRENCH_SCHOOLS_URL', plugin_dir_url(__FILE__));
+
+/**
+ * Option key storing the data.education.gouv.fr API key.
+ */
+define('GF_FRENCH_SCHOOLS_API_KEY_OPTION', 'gf_ecoles_fr_api_key');
+
+/**
+ * Get the API key used to authenticate against data.education.gouv.fr.
+ *
+ * Priority: GF_FRENCH_SCHOOLS_API_KEY constant (wp-config.php), then the
+ * value saved in Forms → Settings → French Schools. Filterable.
+ *
+ * @return string API key, or empty string when none is configured.
+ */
+function gf_french_schools_get_api_key()
+{
+    $key = '';
+    if (defined('GF_FRENCH_SCHOOLS_API_KEY') && GF_FRENCH_SCHOOLS_API_KEY) {
+        $key = (string) GF_FRENCH_SCHOOLS_API_KEY;
+    } else {
+        $key = (string) get_option(GF_FRENCH_SCHOOLS_API_KEY_OPTION, '');
+    }
+
+    /**
+     * Filter the data.education.gouv.fr API key.
+     *
+     * @param string $key API key.
+     */
+    return trim((string) apply_filters('gf_french_schools_api_key', $key));
+}
+
+/**
+ * Build the HTTP headers for requests to data.education.gouv.fr.
+ *
+ * @param array $headers Extra headers to merge.
+ * @return array Headers including the Authorization header when a key is set.
+ */
+function gf_french_schools_api_headers($headers = array())
+{
+    $key = gf_french_schools_get_api_key();
+    if ($key !== '') {
+        $headers['Authorization'] = 'Apikey ' . $key;
+    }
+    return $headers;
+}
 
 /**
  * Load translations using absolute path to handle edge cases where plugin_basename()

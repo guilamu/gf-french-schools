@@ -221,7 +221,7 @@ class GF_Ecoles_Local_DB
         wp_raise_memory_limit('admin');
 
         // 1. Download CSV to a temporary file.
-        $tmp_file = download_url(self::EXPORT_URL, 300);
+        $tmp_file = self::download_export();
         if (is_wp_error($tmp_file)) {
             self::sync_failed($tmp_file->get_error_message());
             return $tmp_file;
@@ -247,6 +247,64 @@ class GF_Ecoles_Local_DB
         self::log('Sync completed successfully. Records imported: ' . $result);
 
         return true;
+    }
+
+    /**
+     * Download the CSV export to a temporary file, sending the API key.
+     *
+     * download_url() cannot send custom headers, so the request is streamed
+     * to a temp file manually.
+     *
+     * @return string|WP_Error Path to the temporary file, or error.
+     */
+    private static function download_export()
+    {
+        if (!function_exists('wp_tempnam')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+
+        $tmp_file = wp_tempnam('gf-ecoles-fr-export.csv');
+        if (!$tmp_file) {
+            return new WP_Error('http_no_file', __('Could not create a temporary file.', 'gf-french-schools'));
+        }
+
+        $headers = function_exists('gf_french_schools_api_headers') ? gf_french_schools_api_headers() : array();
+
+        $response = wp_safe_remote_get(
+            self::EXPORT_URL,
+            array(
+                'timeout'  => 300,
+                'stream'   => true,
+                'filename' => $tmp_file,
+                'headers'  => $headers,
+            )
+        );
+
+        if (is_wp_error($response)) {
+            @unlink($tmp_file); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+            return $response;
+        }
+
+        $status_code = (int) wp_remote_retrieve_response_code($response);
+        if ($status_code !== 200) {
+            @unlink($tmp_file); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+            if ($status_code === 401 || $status_code === 403) {
+                return new WP_Error(
+                    'api_auth_error',
+                    __('The school directory requires a valid API key. Configure it in Forms → Settings → French Schools.', 'gf-french-schools')
+                );
+            }
+            return new WP_Error(
+                'http_' . $status_code,
+                sprintf(
+                    /* translators: %d: HTTP status code */
+                    __('API request failed with status code %d', 'gf-french-schools'),
+                    $status_code
+                )
+            );
+        }
+
+        return $tmp_file;
     }
 
     /**

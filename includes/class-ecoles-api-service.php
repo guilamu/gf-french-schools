@@ -469,8 +469,10 @@ class GF_Ecoles_API_Service
             $url,
             array(
                 'timeout' => 15,
-                'headers' => array(
-                    'Accept' => 'application/json',
+                'headers' => gf_french_schools_api_headers(
+                    array(
+                        'Accept' => 'application/json',
+                    )
                 ),
             )
         );
@@ -481,6 +483,16 @@ class GF_Ecoles_API_Service
         }
 
         $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code === 401 || $status_code === 403) {
+            $this->log_error(
+                'API authentication error: ' . $status_code . (gf_french_schools_get_api_key() === '' ? ' (no API key configured)' : ' (API key rejected)'),
+                $url
+            );
+            return new WP_Error(
+                'api_auth_error',
+                __('The school directory requires a valid API key. Configure it in Forms → Settings → French Schools.', 'gf-french-schools')
+            );
+        }
         if ($status_code !== 200) {
             $this->log_error('API HTTP error: ' . $status_code, $url);
             return new WP_Error(

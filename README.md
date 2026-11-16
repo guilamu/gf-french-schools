@@ -46,8 +46,32 @@ Extension Gravity Forms permettant aux utilisateurs de rechercher et sélectionn
 1. Téléchargez le plugin depuis [GitHub Releases](https://github.com/guilamu/gf-french-schools/releases)
 2. Uploadez le dossier `gf-french-schools` dans `/wp-content/plugins/`
 3. Activez le plugin dans le menu **Extensions** de WordPress
-4. Accédez à **Formulaires → Réglages → French Schools** et configurez le mode de fonctionnement (API, Local Only, ou hybride)
-5. Le nouveau type de champ « Écoles françaises » est disponible dans l'éditeur de formulaires Gravity Forms
+4. Créez un compte et une clé API sur data.education.gouv.fr (voir [Obtenir une clé API](#obtenir-une-clé-api) ci-dessous) — **obligatoire depuis novembre 2026**
+5. Accédez à **Formulaires → Réglages → French Schools**, collez la clé dans le champ **Clé API**, puis configurez le mode de fonctionnement (API, Local Only, ou hybride)
+6. Lancez une première synchronisation avec le bouton « Synchroniser maintenant » pour remplir la base locale
+7. Le nouveau type de champ « Écoles françaises » est disponible dans l'éditeur de formulaires Gravity Forms
+
+## Obtenir une clé API
+
+Depuis novembre 2026, le portail [data.education.gouv.fr](https://data.education.gouv.fr/) n'est plus accessible anonymement : le site redirige vers une page de connexion et l'API répond `401 Unauthorized` aux requêtes sans clé. Sans clé, ni la recherche en ligne ni la synchronisation de la base locale ne fonctionnent.
+
+Le compte et la clé sont gratuits.
+
+1. **Créer un compte** sur la plateforme Opendatasoft (Huwise), qui héberge le portail : [data.opendatasoft.com/signup](https://data.opendatasoft.com/signup/?flg=fr-fr). Renseignez votre nom, votre adresse e-mail et un mot de passe.
+2. **Confirmer l'adresse e-mail** via le lien reçu par mail.
+3. **Se connecter** sur [data.education.gouv.fr](https://data.education.gouv.fr/) avec ce compte (bouton de connexion en haut à droite). Vérifiez que vous voyez bien l'[annuaire de l'éducation](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/) une fois connecté.
+4. **Générer la clé** : cliquez sur vos initiales en haut à droite → **Préférences du compte** → section « Paramètres du portail » → onglet **Clés d'API** (lien direct : [data.education.gouv.fr/account/api-keys/](https://data.education.gouv.fr/account/api-keys/)), puis **Générer une nouvelle clé**. Donnez-lui un nom explicite (ex. le nom de votre site) et ne cochez que la permission de lecture des données : le plugin ne fait que lire l'annuaire.
+5. **Copier la clé** et la coller dans **Formulaires → Réglages → French Schools → Clé API**, puis enregistrer.
+
+La clé hérite des droits de votre compte et peut être révoquée à tout moment depuis le même onglet. Utilisez une clé par site pour pouvoir en révoquer une sans couper les autres.
+
+**Alternative (wp-config.php)** : pour ne pas stocker la clé en base de données, définissez une constante. Elle prend le pas sur le champ de réglage :
+
+```php
+define( 'GF_FRENCH_SCHOOLS_API_KEY', 'votre-cle-api' );
+```
+
+La clé peut aussi être fournie par le filtre `gf_french_schools_api_key`.
 
 ## Configuration
 
@@ -69,6 +93,11 @@ Dans l'éditeur de formulaire, le champ « Écoles françaises » propose les op
 ### Page de réglages
 
 Accessible via **Formulaires → Réglages → French Schools** :
+
+#### Clé API
+- Clé data.education.gouv.fr envoyée dans l'en-tête `Authorization: Apikey …` de chaque requête (recherche en ligne et synchronisation de la base locale)
+- Obligatoire depuis novembre 2026 — voir [Obtenir une clé API](#obtenir-une-clé-api)
+- Si la clé est absente ou refusée, la recherche bascule sur la base locale (si elle existe) et l'erreur est journalisée ; la synchronisation affiche « L'annuaire scolaire exige une clé API valide »
 
 #### Mode Local uniquement
 - Activer/désactiver le mode « Local Only » pour utiliser exclusivement la base de données locale sans appeler l'API distante
@@ -160,7 +189,7 @@ Chaque donnée est également accessible via son numéro de sous-champ `{Libell�
 
 ### Quelle API est utilisée ?
 
-Le plugin interroge l'[API OpenDataSoft du Ministère de l'Éducation Nationale](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/) (`v2.1`). Aucune authentification ou clé API n'est requise — les données sont gratuites et accessibles publiquement.
+Le plugin interroge l'[API OpenDataSoft du Ministère de l'Éducation Nationale](https://data.education.gouv.fr/explore/dataset/fr-en-annuaire-education/) (`v2.1`). Les données sont gratuites, mais depuis novembre 2026 l'API exige une clé liée à un compte (gratuit) : voir [Obtenir une clé API](#obtenir-une-clé-api).
 
 - **Endpoint :** `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records`
 - **Documentation :** [OpenDataSoft API v2.1](https://help.opendatasoft.com/apis/ods-explore-v2/)
@@ -236,6 +265,14 @@ Assurez-vous d'utiliser la version 1.9.2 ou ultérieure, qui inclut la mise en c
 ```
 
 ## Changelog
+
+### 1.11.0 - 2026-11-16
+- **Nouveau :** Réglage « Clé API » dans **Formulaires → Réglages → French Schools**. data.education.gouv.fr n'accepte plus les requêtes anonymes (redirection vers la connexion, `401 Unauthorized` sur l'API) : la clé est envoyée dans l'en-tête `Authorization: Apikey …` des recherches et de la synchronisation de la base locale
+- **Nouveau :** Constante `GF_FRENCH_SCHOOLS_API_KEY` (wp-config.php) et filtre `gf_french_schools_api_key` pour fournir la clé sans la stocker en base
+- **Amélioration :** Message d'erreur explicite quand l'API répond 401/403 (clé absente ou refusée), dans les journaux et dans le statut de synchronisation
+- **Modification :** Le téléchargement de l'export CSV n'utilise plus `download_url()`, qui ne permet pas d'envoyer d'en-tête d'authentification
+- **Documentation :** Procédure de création de compte et de génération de la clé API
+- **Traduction :** Sept chaînes françaises ajoutées
 
 ### 1.10.0 - 2026-10-09
 - **Nouveau :** Réglage de champ « Afficher en étapes numérotées » (section Mise en page) : Statut, Département, Ville et École deviennent des étapes numérotées reliées par un trait, avec libellé au-dessus, pastille colorée une fois remplie et indication « Choisissez d’abord : … » sur l’étape en attente. Rendu identique aux listes liées en étapes de Divi Gravity Forms Enhanced, dont les variables de couleur sont reprises quand elles existent

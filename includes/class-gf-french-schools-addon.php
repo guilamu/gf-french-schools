@@ -202,7 +202,26 @@ class GF_French_Schools_AddOn extends GFAddOn
      */
     public function plugin_settings_fields()
     {
+        $api_key_description = esc_html__('Required since November 2026: data.education.gouv.fr no longer answers anonymous requests. Create a free account on the portal, then generate a key under Account preferences → API keys.', 'gf-french-schools');
+        if (defined('GF_FRENCH_SCHOOLS_API_KEY') && GF_FRENCH_SCHOOLS_API_KEY) {
+            $api_key_description .= ' <strong>' . esc_html__('The GF_FRENCH_SCHOOLS_API_KEY constant is defined in wp-config.php and overrides this field.', 'gf-french-schools') . '</strong>';
+        }
+
         return array(
+            array(
+                'title'       => esc_html__('API Key', 'gf-french-schools'),
+                'description' => $api_key_description,
+                'fields'      => array(
+                    array(
+                        'name'       => 'api_key',
+                        'type'       => 'text',
+                        'input_type' => 'password',
+                        'class'      => 'medium',
+                        'label'      => esc_html__('data.education.gouv.fr API key', 'gf-french-schools'),
+                        'tooltip'    => esc_html__('Sent in the Authorization header of every request to the school directory, including the monthly local database sync.', 'gf-french-schools'),
+                    ),
+                ),
+            ),
             array(
                 'title'       => esc_html__('Mode', 'gf-french-schools'),
                 'description' => esc_html__('Configure how the plugin searches for schools.', 'gf-french-schools'),
@@ -379,9 +398,16 @@ class GF_French_Schools_AddOn extends GFAddOn
             $settings['local_fallback_api'] = '';
         }
 
+        $api_key = isset($settings['api_key']) ? trim(sanitize_text_field($settings['api_key'])) : '';
+        $settings['api_key'] = $api_key;
+
         parent::update_plugin_settings($settings);
         update_option('gf_ecoles_fr_local_only', $local_only);
         update_option('gf_ecoles_fr_local_fallback_api', $local_fallback_api);
+
+        // Stored separately (not autoloaded) so the API and the cron sync can
+        // read it without loading the add-on framework.
+        update_option(GF_FRENCH_SCHOOLS_API_KEY_OPTION, $api_key, false);
     }
 
     /**

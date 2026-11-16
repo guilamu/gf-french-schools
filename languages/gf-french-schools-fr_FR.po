@@ -464,3 +464,31 @@ msgstr "Afficher en étapes numérotées"
 #, php-format
 msgid "Choose first: %s"
 msgstr "Choisissez d'abord : %s"
+
+#: includes/class-ecoles-api-service.php, includes/class-ecoles-local-db.php
+msgid "The school directory requires a valid API key. Configure it in Forms → Settings → French Schools."
+msgstr "L'annuaire scolaire exige une clé API valide. Configurez-la dans Formulaires → Réglages → French Schools."
+
+#: includes/class-ecoles-local-db.php
+msgid "Could not create a temporary file."
+msgstr "Impossible de créer un fichier temporaire."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "API Key"
+msgstr "Clé API"
+
+#: includes/class-gf-french-schools-addon.php
+msgid "Required since November 2026: data.education.gouv.fr no longer answers anonymous requests. Create a free account on the portal, then generate a key under Account preferences → API keys."
+msgstr "Obligatoire depuis novembre 2026 : data.education.gouv.fr ne répond plus aux requêtes anonymes. Créez un compte gratuit sur le portail, puis générez une clé dans Préférences du compte → Clés d'API."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "The GF_FRENCH_SCHOOLS_API_KEY constant is defined in wp-config.php and overrides this field."
+msgstr "La constante GF_FRENCH_SCHOOLS_API_KEY est définie dans wp-config.php et remplace ce champ."
+
+#: includes/class-gf-french-schools-addon.php
+msgid "data.education.gouv.fr API key"
+msgstr "Clé API data.education.gouv.fr"
+
+#: includes/class-gf-french-schools-addon.php
+msgid "Sent in the Authorization header of every request to the school directory, including the monthly local database sync."
+msgstr "Envoyée dans l'en-tête Authorization de chaque requête vers l'annuaire, y compris la synchronisation mensuelle de la base locale."

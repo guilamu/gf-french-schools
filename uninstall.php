@@ -15,6 +15,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/class-ecoles-local-db.php';
 // Drop the custom database table and remove associated options.
 GF_Ecoles_Local_DB::drop_table();
 
+// Remove the stored API key.
+delete_option('gf_ecoles_fr_api_key');
+
 // Remove any remaining scheduled cron events.
 $timestamp = wp_next_scheduled('gf_ecoles_fr_sync');
 if ($timestamp) {
